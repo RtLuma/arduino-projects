@@ -11,7 +11,7 @@
 volatile uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 volatile uint8_t rgb[3] = {255, 32, 0};
 
-const byte hues[BANDS] = { 0, 20, 45, 105, 140, 185, 215 };
+const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };
 
 typedef void (*SimplePatternList[])();
 
@@ -24,49 +24,36 @@ SimplePatternList gPatterns = {
 
     FFT.read();
 
-    byte magnitudes[BANDS][2][3];
-    byte t = 0;
-    //    byte t = millis() >> 8;
+    byte magnitudes[2][BANDS][3];
+    //    byte t = 0;
+    byte t = millis() >> 8;
     for (byte band = 0; band < BANDS; band++) {
 
-      byte hue = hues[band];
+      byte hue = (band << 4) + t;
 
-      uint32_t ratios[3] = { rainbow(hue + 170), rainbow(hue + 85), rainbow(hue) };
+      uint32_t color[3] = { rainbow(hue + 170), rainbow(hue + 85), rainbow(hue) };
 
       for (byte channel = 0; channel < 2; channel++) {
-        uint32_t* level = channel ? FFT.R : FFT.L;
-        uint32_t* thresh = channel ? FFT.Rmax : FFT.Lmax;
-
-        uint32_t numer = uint32_t(level[band] >> 6);
-        uint32_t denom = uint32_t(thresh[band] >> 6);
-
-        for (byte i = 0; i < 3; i++) {
-          ratios[0] *= numer;
-          ratios[0] /= denom;
-          ratios[1] *= numer;
-          ratios[1] /= denom;
-          ratios[2] *= numer;
-          ratios[2] /= denom;
-        }
-
-        magnitudes[band][channel][0] = ratios[0];
-        magnitudes[band][channel][1] = ratios[1];
-        magnitudes[band][channel][2] = ratios[2];
+        auto level = FFT.lvls[channel][band] + 1;
+                
+        magnitudes[channel][band][0] = (color[0] * level) >> 10;
+        magnitudes[channel][band][1] = (color[1] * level) >> 10;
+        magnitudes[channel][band][2] = (color[2] * level) >> 10;
       }
     }
 
     for (byte band = 0; band < BANDS; band++) {
       for (byte p = 0; p < 43; p++ ) {
-        sendPixel(magnitudes[band][0][0], magnitudes[band][0][1], magnitudes[band][0][2]);
+        sendPixel(magnitudes[0][band][0], magnitudes[0][band][1], magnitudes[0][band][2]);
       }
     }
     for (char band = BANDS - 1; band > -1; band--) {
       for (byte p = 0; p < 43; p++ ) {
-        sendPixel(magnitudes[band][1][0], magnitudes[band][1][1], magnitudes[band][1][2]);
+        sendPixel(magnitudes[1][band][0], magnitudes[1][band][1], magnitudes[1][band][2]);
       }
     }
     show();
-    //    delay(10);
+//        delay(5);
   }
 };
 
