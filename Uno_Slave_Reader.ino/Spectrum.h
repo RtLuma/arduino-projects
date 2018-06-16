@@ -2,7 +2,8 @@
 #define STROBE 4
 #define BANDS 7
 #define MAX_CUTOFF 200
-#define MIN_CUTOFF 65
+#define MIN_CUTOFF 90
+
 
 struct spectrumShield {
 
@@ -20,19 +21,18 @@ struct spectrumShield {
     for (byte band = 0; band < BANDS; band++)  {
       maxs[0][band] = MAX_CUTOFF + 1;
       maxs[1][band] = MAX_CUTOFF + 1;
-    }
+    }byte ratios[2][BANDS];
   }
 
   void read(void) {
     for (byte band = 0; band < BANDS; band++)  {
       for (byte channel = 0; channel < 2; channel++) {
 
-        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band] -= 2;
-        if (lvls[channel][band] > 8) lvls[channel][band] -= lvls[channel][band] / 7;  // Fade by subtracting a proportion
+        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band]--;
+        if (lvls[channel][band] > 8) lvls[channel][band] -= lvls[channel][band] >> 3;  // Fade by subtracting a proportion
         else lvls[channel][band] = 0;
 
         uint16_t level = (analogRead(channel) + analogRead(channel)) >> 1;
-        //        level = level > MIN_CUTOFF ? level - MIN_CUTOFF : 0;
         level = level > MIN_CUTOFF ? map(level, MIN_CUTOFF, 1023, 0, 1023) : 0;
 
         uint32_t ratio = 1023;
@@ -46,9 +46,8 @@ struct spectrumShield {
         else maxs[channel][band] = level;
 
         if (ratio > lvls[channel][band]) {
-//          lvls[channel][band] = ratio;
-//          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
-          lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
+          lvls[channel][band] = ratio;
+          //          lvls[channel][band] >>= 1;
         }
 
       }

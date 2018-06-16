@@ -260,9 +260,9 @@ void detonate( unsigned char r , unsigned char g , unsigned char b , unsigned in
 
 }
 
-byte rainbow(byte hue) {
-  if (hue > 170) return 255 - (hue + (hue << 1));
-  if (hue > 85) return hue + (hue << 1);
+byte rainbow(byte i) {
+  if (i > 170) return 255 - i * 3;
+  if (i > 85)  return i * 3;
   return 0;
 }
 //p.r = rainbow(_t);
