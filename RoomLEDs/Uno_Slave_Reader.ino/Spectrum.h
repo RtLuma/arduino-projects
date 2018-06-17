@@ -47,8 +47,8 @@ struct spectrumShield {
 
         if (ratio > lvls[channel][band]) {
 //          lvls[channel][band] = ratio;
-//          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
-          lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
+          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
+//          lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
         }
 
       }
