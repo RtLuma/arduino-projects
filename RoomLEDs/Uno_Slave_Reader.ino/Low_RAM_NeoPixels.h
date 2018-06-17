@@ -86,7 +86,7 @@ inline void sendBit( bool bitVal ) {
 
 
 inline void sendByte( unsigned char byte ) {
-  cli();
+//  cli();
   for ( unsigned char bit = 0 ; bit < 8 ; bit++ ) {
 
     sendBit( bitRead( byte , 7 ) );                // Neopixel wants bit in highest-to-lowest order
@@ -94,7 +94,7 @@ inline void sendByte( unsigned char byte ) {
     byte <<= 1;                                    // and then shift left so bit 6 moves into 7, 5 moves into 6, etc
 
   }
-  sei();
+//  sei();
 }
 
 void ledsetup() {
@@ -102,11 +102,11 @@ void ledsetup() {
 }
 
 inline void sendPixel( unsigned char r, unsigned char g , unsigned char b )  {
-
+cli();
   sendByte(g);          // Neopixel wants colors in green then red then blue order
   sendByte(r);
   sendByte(b);
-
+sei();
 }
 
 

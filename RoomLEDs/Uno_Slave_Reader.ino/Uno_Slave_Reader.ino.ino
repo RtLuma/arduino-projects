@@ -18,11 +18,6 @@ const byte hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
 
 typedef void (*SimplePatternList[])();
 
-void sendVisualizer(uint8_t channel, uint8_t band, int8_t nextband) {
-
-}
-
-
 SimplePatternList gPatterns = {
   []() { theaterChase(RGB[0], RGB[1], RGB[2], 1); },
   []() { showColor(RGB[0], RGB[1], RGB[2]); delay(1);},
@@ -42,7 +37,7 @@ SimplePatternList gPatterns = {
         uint32_t level = FFT.lvls[channel][band] + 1;
 
         colors[channel][band][0] = (rainbow(hue + 170)  * level) >> 10;
-        colors[channel][band][1] = (rainbow(hue + 85)   * level) >> 11;
+        colors[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
         colors[channel][band][2] = (rainbow(hue)        * level) >> 10;
       }
 
@@ -108,7 +103,7 @@ SimplePatternList gPatterns = {
       }
     }
     
-    show();
+//    show();
   }
 };
 
@@ -159,32 +154,7 @@ void setup() {
   showColor(0, 0, 0);
 }
 
-void loop() {
-  //  showColor(255, 64, 0);
-  gPatterns[gCurrentPatternNumber]();
-
-  // Some example procedures showing how to display to the pixels:
-
-  //  showColor(125, 125, 125);
-  //  delay(5000);
-  //
-  //  colorWipe(255, 32, 0, 5); // Red
-  //  colorWipe(0, 255, 0, 5); // Green
-  //  colorWipe(0, 0, 255, 5); // Blue
-  //  //    colorWipe(200, 200, 200, 500);
-  //
-  //  // Send a theater pixel chase in...
-  //  theaterChase(127, 127, 127, 20); // White
-  //  //    show();
-  //  //    theaterChase(127,   0,   0, 5); // Red
-  //  theaterChase(  0,   64, 127, 20); // Blue
-  //
-  //  rainbowCycle(1000 , 20 , 5, 20);
-  //  //  for (int i = 0; i < PIXELS; i++)  rainbowCycle(1000 , 20 , i );
-  //  //    detonate( 200 , 200 , 200 , 1000);
-  //  //delay(100);
-
-}
+void loop() { gPatterns[gCurrentPatternNumber](); }
 
 
 
