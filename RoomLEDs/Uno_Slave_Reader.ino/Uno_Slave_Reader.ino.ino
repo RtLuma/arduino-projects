@@ -12,11 +12,14 @@
 volatile uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 volatile uint8_t RGB[3] = {255, 32, 0};
 uint8_t colors[2][BANDS + 1][3] = {0};
+int32_t spiral = 0;
 
-//const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 }; // Pretty
+//const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };   // Pretty
 const byte hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
 
 typedef void (*SimplePatternList[])();
+
+uint32_t counter = 0;
 
 SimplePatternList gPatterns = {
   []() { theaterChase(RGB[0], RGB[1], RGB[2], 1); },
@@ -27,7 +30,7 @@ SimplePatternList gPatterns = {
 
     FFT.read();
 
-    byte t = millis() >> 7;
+    byte t = millis() >> 8;
 
     for (uint8_t channel = 0; channel < 2; channel++) {
       for (uint8_t band = 0; band < BANDS; band++) {
@@ -37,7 +40,7 @@ SimplePatternList gPatterns = {
         uint32_t level = FFT.lvls[channel][band] + 1;
 
         colors[channel][band][0] = (rainbow(hue + 170)  * level) >> 10;
-        colors[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
+        colors[channel][band][1] = (rainbow(hue + 85)   * level) >> 11;
         colors[channel][band][2] = (rainbow(hue)        * level) >> 10;
       }
 
@@ -53,6 +56,7 @@ SimplePatternList gPatterns = {
     uint8_t dist, band;
     uint8_t pixelAr, pixelAg, pixelAb, pixelBr, pixelBg, pixelBb;
     uint8_t *pixelA, *pixelB;
+
 
     for (band = 0; band < BANDS; band++) {
 
@@ -102,8 +106,33 @@ SimplePatternList gPatterns = {
         );
       }
     }
-    
-//    show();
+    sendPixel(colors[1][0][0], colors[1][0][1], colors[1][0][2]);
+
+    uint32_t sum_vals = 0, sum_maxs = 0;
+
+    for (uint8_t band = 0; band < BANDS; band++) {
+      sum_vals += (FFT.lvls[0][band] + FFT.lvls[1][band]) >> 1;
+      sum_maxs += (FFT.maxs[0][band] + FFT.maxs[1][band]) >> 1;
+    }
+
+    spiral += (sum_vals * 300) / sum_maxs;
+    spiral >>= 1;
+    //    spiral = (sum_vals * spiral) / sum_maxs;
+
+    spiral = min(spiral, 300);
+
+    byte magn = (spiral * 255) / 300;
+        magn = (spiral * magn) / 300;
+    magn >>= 1;
+
+
+    int16_t p = 0;
+    //for (p; p < spiral; p++) sendPixel2(magn, magn, magn);
+    //for (p; p < 300; p++) sendPixel2(0, 0, 0);
+
+    for (p; p < 300 - spiral; p++) sendPixel2(0, 0, 0);
+    for (p; p < 300; p++) sendPixel2(magn, magn, magn);
+
   }
 };
 
@@ -154,7 +183,9 @@ void setup() {
   showColor(0, 0, 0);
 }
 
-void loop() { gPatterns[gCurrentPatternNumber](); }
+void loop() {
+  gPatterns[gCurrentPatternNumber]();
+}
 
 
 
