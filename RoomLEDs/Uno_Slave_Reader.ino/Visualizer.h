@@ -1,4 +1,4 @@
-#define SECTION 21
+#define SECTION 22
 
 extern const uint8_t hues[BANDS];
 
@@ -12,8 +12,8 @@ uint8_t pupil[3] = { 0 };
   pixelBr = pixelB[0];\
   pixelBg = pixelB[1];\
   pixelBb = pixelB[2];\
-  dist = SECTION + (band%2);\
-  for (uint8_t p = 0; p < SECTION + (band%2); p++) {\
+  dist = SECTION;\
+  for (uint8_t p = 0; p < SECTION; p++) {\
     dist--;\
     sendPixel(\
               ((pixelAr * dist) + (pixelBr * p)) / SECTION,\
@@ -26,12 +26,13 @@ uint8_t pupil[3] = { 0 };
 void Chroma(void) {
   FFT.read();
 
-  byte t = millis() >> 9;
+  //  byte t = millis() >> 9;
 
   for (uint8_t channel = 0; channel < 2; channel++) {
     for (uint8_t band = 0; band < BANDS; band++) {
 
-      uint8_t hue = hues[band] - t;
+      //      uint8_t hue = hues[band] - t;
+      uint8_t hue = hues[band];
 
       uint32_t level = FFT.lvls[channel][band] + 1;
 
@@ -52,7 +53,7 @@ void Chroma(void) {
   uint8_t *pixelA, *pixelB;
 
 
-  for (band=3; band < BANDS - 1; band++) {
+  for (band = 3; band < BANDS - 1; band++) {
     pixelA = sclera[0][band]; pixelB = sclera[0][band + 1];
     sendSclera
   }
@@ -65,10 +66,10 @@ void Chroma(void) {
     sendSclera
   }
 
-  pixelA = sclera[1][0];pixelB = sclera[0][0];
+  pixelA = sclera[1][0]; pixelB = sclera[0][0];
   sendSclera
 
-  for (band=0; band < 3; band++) {
+  for (band = 0; band < 3; band++) {
     pixelA = sclera[0][band]; pixelB = sclera[0][band + 1];
     sendSclera
   }
@@ -92,18 +93,18 @@ void Chroma(void) {
     newPupil[2] += (sclera[2][band][2] + sclera[1][band][2]) >> 1;
   }
 
-  newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2; 
-  
+  newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2;
+
   iris[0] = (newIris[0] + newIris[0] + newIris[0] + iris[0]) >> 2;
   iris[1] = (newIris[1] + newIris[1] + newIris[1] + iris[1]) >> 2;
   iris[2] = (newIris[2] + newIris[2] + newIris[2] + iris[2]) >> 2;
 
-  newPupil[0] >>= 2; newPupil[1] >>= 2; newPupil[2] >>= 2; 
-  
+  newPupil[0] >>= 2; newPupil[1] >>= 2; newPupil[2] >>= 2;
+
   pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + pupil[0]) >> 2;
   pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + pupil[1]) >> 2;
   pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + pupil[2]) >> 2;
-  
+
   for (p; p < 200; p++) sendPixel2(iris[0], iris[1], iris[2]);
   for (p; p < 300; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);
 }
