@@ -103,7 +103,9 @@ void show() {
 }
 
 void showColor( unsigned char r , unsigned char g , unsigned char b ) {
-  for ( uint16_t p = 0; p < PIXELS; p++ ) sendPixel( r , g , b );
+  for ( uint16_t p = 0; p < PIXELS; p++ ) {
+    sendPixel( r , g , b ); sendPixel2( r , g , b );
+  }
   show();
 }
 
@@ -124,7 +126,7 @@ void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  cha
 
 #define THEATER_SPACING (PIXELS/20)
 
-void theaterChase( unsigned char r , unsigned char g, unsigned char b, unsigned char wait ) {
+void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
 
   for (int j = 0; j < 3 ; j++) {
 
@@ -134,18 +136,17 @@ void theaterChase( unsigned char r , unsigned char g, unsigned char b, unsigned 
 
       for (int i = 0; i < PIXELS ; i++) {
 
-        if (step == q) sendPixel( r , g , b );
-        else sendPixel( 0 , 0 , 0 );
+        if (step == q) {sendPixel( r , g , b ); sendPixel2( r , g , b );}
+        else {sendPixel( 0 , 0 , 0 );sendPixel2( 0 , 0 , 0 );}
 
         step++;
         if (step == THEATER_SPACING) step = 0;
 
       }
-
+      delayMicroseconds(80);
       show();
-      delay(wait);
 
-    }
+    } 
 
   }
 
