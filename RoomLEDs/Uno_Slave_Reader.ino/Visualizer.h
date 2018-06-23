@@ -1,4 +1,4 @@
-#define SECTION 25
+#define SECTION 23
 
 extern const uint8_t hues[BANDS];
 

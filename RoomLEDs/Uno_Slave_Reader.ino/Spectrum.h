@@ -27,12 +27,12 @@ struct spectrumShield {
     for (byte band = 0; band < BANDS; band++)  {
       for (byte channel = 0; channel < 2; channel++) {
 
-        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band]-=2;
+        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band] -= 2;
         if (lvls[channel][band] > 8) lvls[channel][band] -= lvls[channel][band] / 5;  // Fade by subtracting a proportion
         else lvls[channel][band] = 0;
 
         uint16_t level = (analogRead(channel) + analogRead(channel)) >> 1;
-//         level = 1023;
+        //        level = 1023;
         //        level = level > MIN_CUTOFF ? level - MIN_CUTOFF : 0;
         level = level > MIN_CUTOFF ? map(level, MIN_CUTOFF, 1023, 0, 1023) : 0;
 
@@ -47,8 +47,8 @@ struct spectrumShield {
         else maxs[channel][band] = level;
 
         if (ratio > lvls[channel][band]) {
-//          lvls[channel][band] = ratio;
-//          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
+          //          lvls[channel][band] = ratio;
+          //          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
           lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
         }
 
