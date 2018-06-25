@@ -9,9 +9,9 @@
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
-const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };   // Pretty
+//const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };   // Pretty
 //const byte hues[BANDS] = { 2, 21, 35, 185, 200, 220, 240 };   // Sunset
-//const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
+const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
 
 volatile uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
 volatile uint8_t RGB[3] = {255, 32, 0};
@@ -42,8 +42,6 @@ void receiveEvent(int howMany) {
   if (howMany < 3) {
     nextPattern();
     ((void (*)())NULL)();
-    //    resetFunc();
-    //    ((void(*)(void))&loop)();
     return;
   }
 

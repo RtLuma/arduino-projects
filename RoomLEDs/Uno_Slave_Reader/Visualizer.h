@@ -1,8 +1,9 @@
-#define SECTION 22
+#define SECTION 21
+#define SECTIONODD 22
 
 extern const uint8_t hues[BANDS];
 
-uint8_t sclera[2][BANDS + 1][3] = {0};
+uint8_t sclera[2][BANDS][3] = {0};
 uint8_t iris[3] = { 0 };
 uint8_t pupil[3] = { 0 };
 
@@ -22,17 +23,33 @@ uint8_t pupil[3] = { 0 };
              );\
   }
 
+#define sendScleraOdd pixelAr = pixelA[0];\
+  pixelAg = pixelA[1];\
+  pixelAb = pixelA[2];\
+  pixelBr = pixelB[0];\
+  pixelBg = pixelB[1];\
+  pixelBb = pixelB[2];\
+  dist = SECTIONODD;\
+  for (uint8_t p = 0; p < SECTIONODD; p++) {\
+    dist--;\
+    sendPixel(\
+              ((pixelAr * dist) + (pixelBr * p)) / SECTIONODD,\
+              ((pixelAg * dist) + (pixelBg * p)) / SECTIONODD,\
+              ((pixelAb * dist) + (pixelBb * p)) / SECTIONODD\
+             );\
+  }
+
 
 void Chroma(void) {
   FFT.read();
 
-  //  byte t = millis() >> 9;
+  byte t = millis() >> 9;
 
   for (uint8_t channel = 0; channel < 2; channel++) {
     for (uint8_t band = 0; band < BANDS; band++) {
 
-      //      uint8_t hue = hues[band] - t;
-      uint8_t hue = hues[band];
+      uint8_t hue = hues[band] - t;
+      //      uint8_t hue = hues[band];
 
       uint32_t level = FFT.lvls[channel][band] + 1;
 
@@ -52,30 +69,26 @@ void Chroma(void) {
   uint8_t pixelAr, pixelAg, pixelAb, pixelBr, pixelBg, pixelBb;
   uint8_t *pixelA, *pixelB;
 
-
-  for (band = 3; band < BANDS - 1; band++) {
-    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1];
-    sendSclera
+  for (band = 3; band < 6; band++) {
+    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1]; sendSclera
   }
 
-  pixelA = sclera[0][BANDS - 1]; pixelB = sclera[1][BANDS - 1];
-  sendSclera
+  pixelA = sclera[0][6]; pixelB = sclera[1][6]; sendSclera
 
-  for (band = BANDS - 1; band > 0; band--) {
-    pixelA = sclera[1][band]; pixelB = sclera[1][band - 1];
-    sendSclera
+  for (band; band > 3; band--) {
+    pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendSclera
   }
-
-  pixelA = sclera[1][0]; pixelB = sclera[0][0];
-  sendSclera
-
-  for (band = 0; band < 3; band++) {
-    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1];
-    sendSclera
+  
+  for (band; band > 0; band--) {
+    pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendScleraOdd
   }
-  //sendPixel(sclera[1][0][0], sclera[1][0][1], sclera[1][0][2]);
+ 
+  pixelA = sclera[1][0]; pixelB = sclera[0][0]; sendSclera
 
-
+  for (band; band < 3; band++) {
+    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1]; sendScleraOdd
+  }
+  
 
   uint16_t newIris[3] = { 0 };
   uint16_t newPupil[3] = { 0 };
@@ -99,13 +112,13 @@ void Chroma(void) {
   iris[1] = (newIris[1] + newIris[1] + newIris[1] + iris[1]) >> 2;
   iris[2] = (newIris[2] + newIris[2] + newIris[2] + iris[2]) >> 2;
 
-  newPupil[0] >>= 2; newPupil[1] >>= 2; newPupil[2] >>= 2;
+  newPupil[0] >>= 1; newPupil[1] >>= 1; newPupil[2] >>= 1;
 
   pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + pupil[0]) >> 2;
   pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + pupil[1]) >> 2;
   pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + pupil[2]) >> 2;
 
-  for (p; p < 200; p++) sendPixel2(iris[0], iris[1], iris[2]);
-  for (p; p < 300; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);
+  for (p; p < 194; p++) sendPixel2(iris[0], iris[1], iris[2]);
+  for (p; p < 298; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);
 }
 

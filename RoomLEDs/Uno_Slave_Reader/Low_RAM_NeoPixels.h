@@ -107,6 +107,7 @@ void showColor( unsigned char r , unsigned char g , unsigned char b ) {
     sendPixel( r , g , b ); sendPixel2( r , g , b );
   }
   show();
+  show();
 }
 
 void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  char wait ) {
@@ -119,12 +120,10 @@ void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  cha
     //    while (p++ <= PIXELS) sendPixel(0, 0, 0);
 
     show();
-    //    delayMicroseconds(125);
-    //    delay(wait);
   }
 }
 
-#define THEATER_SPACING (PIXELS/20)
+#define THEATER_SPACING (PIXELS/25)
 
 void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
 
@@ -143,7 +142,7 @@ void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
         if (step == THEATER_SPACING) step = 0;
 
       }
-      delayMicroseconds(80);
+      delayMicroseconds(85);
       show();
 
     } 
@@ -180,14 +179,17 @@ void rainbowCycle(uint16_t frameAdvance, uint16_t pixelAdvance ) {
 
         case 0:
           sendPixel( ~step , step ,  0 );
+          sendPixel2( ~step , step ,  0 );
           break;
 
         case 1:
           sendPixel( 0 , ~step , step );
+          sendPixel2( 0 , ~step , step );
           break;
 
         case 2:
           sendPixel(  step , 0 , ~step );
+          sendPixel2(  step , 0 , ~step );
           break;
 
       }
@@ -200,27 +202,6 @@ void rainbowCycle(uint16_t frameAdvance, uint16_t pixelAdvance ) {
     delayMicroseconds(250);
     //    delay(wait);
   }
-}
-
-void detonate( unsigned char r , unsigned char g , unsigned char b , unsigned int startdelayms) {
-  while (startdelayms) {
-
-    showColor( r , g , b );      // Flash the color
-    showColor( 0 , 0 , 0 );
-
-    delay( startdelayms );
-
-    startdelayms =  ( startdelayms * 4 ) / 5 ;           // delay between flashes is halved each time until zero
-    //    delayMicroseconds(250);
-  }
-
-  for ( int fade = 256; fade > 0; fade-- ) {
-    showColor( (r * fade) / 256 , (g * fade) / 256 , (b * fade) / 256 );
-    //    delay(1);
-  }
-
-  showColor( 0 , 0 , 0 );
-
 }
 
 byte rainbow(byte hue) {

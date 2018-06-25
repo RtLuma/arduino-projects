@@ -1,7 +1,7 @@
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ArduinoOTA.h>
+//#include <ArduinoOTA.h>
 
 #define SLAVE_ADDR 8
 
@@ -17,26 +17,25 @@ byte retries = 0;
 ESP8266WebServer server(80);
 
 bool sendBytes(char data[], byte length) {
-//  byte retry = 0;
-//  do {
-    Wire.beginTransmission(SLAVE_ADDR);
-    for (byte i = 0; i < length; i++)  Wire.write(data[i]);
-//    retry++;
-//    if (retry > 5) {
-//      Wire.endTransmission();
-//      checkI2CLock();
-//      return false;
-//    }
-//  }
-//  while (Wire.endTransmission() > 1); // Guarantee data was sent
+  //  byte retry = 0;
+  //  do {
+  Wire.beginTransmission(SLAVE_ADDR);
+  for (byte i = 0; i < length; i++)  Wire.write(data[i]);
+  //    retry++;
+  //    if (retry > 5) {
+  //      Wire.endTransmission();
+  //      checkI2CLock();
+  //      return false;
+  //    }
+  //  }
+  //  while (Wire.endTransmission() > 1); // Guarantee data was sent
   return !Wire.endTransmission();
 }
 
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
-
-  ArduinoOTA.begin();
+  //  ArduinoOTA.begin();
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -109,6 +108,11 @@ void setup() {
 }
 
 void loop() {
-  ArduinoOTA.handle();
+  //  ArduinoOTA.handle();
   server.handleClient();
+  //  if (millis() >> 16) {
+  //    Serial.println("jews");
+  //    ESP.reset();
+  //    ((void (*)())NULL)()
+  //  }
 }
