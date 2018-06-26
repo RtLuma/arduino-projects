@@ -57,11 +57,6 @@ void Chroma(void) {
       sclera[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
       sclera[channel][band][2] = (rainbow(hue)        * level) >> 10;
     }
-
-    //Prevent segfault
-    sclera[channel][BANDS][0] = sclera[channel][BANDS - 1][0];
-    sclera[channel][BANDS][1] = sclera[channel][BANDS - 1][1];
-    sclera[channel][BANDS][2] = sclera[channel][BANDS - 1][2];
   }
 
   /////////////////////////////// start computing and broadcasting each pixel on the fly
