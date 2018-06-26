@@ -1,1 +1,45 @@
-r: 64, g: 32, b: 255
+<html>
+    <head>
+        <style type="text/css">
+            fieldset {
+                display: inline;
+            }
+            legend { 
+                text-align: center;
+            }
+        </style>
+        <script>
+        let cansend = true;
+        let colors = {
+            "red":0, "green":0, "blue":0
+        }
+        function color(bar) {
+            if (!cansend) return;
+            cansend = false;
+            colors[bar.name] = bar.value;
+            console.log(bar.value)
+            var strang = `http://10.0.0.69/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
+            console.log(strang);
+            fetch(strang, {mode: 'no-cors'}).then(d => d.text()).then(d => {
+                document.querySelector("pre").innerText = d;
+                cansend = true;
+            });
+        };             
+        </script>
+    </head>
+    <body>
+        <pre></pre>
+        <fieldset>
+            <legend>Red</legend>
+            <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)">
+        </fieldset>
+        <fieldset>
+            <legend>Green</legend>
+            <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)">
+        </fieldset>
+        <fieldset>
+            <legend>Blue</legend>
+            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)">
+        </fieldset>
+    </body>
+</html>
