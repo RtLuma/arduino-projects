@@ -9,6 +9,7 @@
             }
         </style>
         <script>
+        const API_URL = "http://10.0.0.69";
         let cansend = true;
         let colors = {
             "red":0, "green":0, "blue":0
@@ -18,13 +19,20 @@
             cansend = false;
             colors[bar.name] = bar.value;
             console.log(bar.value)
-            var strang = `http://10.0.0.69/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
+            var strang = `${API_URL}/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
             console.log(strang);
             fetch(strang, {mode: 'no-cors'}).then(d => d.text()).then(d => {
                 document.querySelector("pre").innerText = d;
                 cansend = true;
             });
-        };             
+        };            
+        function next() {
+            if (!cansend) return;
+            cansend = false;
+            fetch(`${API_URL}/next`, {mode: 'no-cors'})
+            .then(d => d.text())
+            .then(d => { cansend = true; })
+        }; 
         </script>
     </head>
     <body>
@@ -39,7 +47,9 @@
         </fieldset>
         <fieldset>
             <legend>Blue</legend>
-            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)">
+            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)">  
         </fieldset>
+        <br>
+        <!-- <input type="button" value="Next" name="Next" onclick="next()">             -->
     </body>
 </html>

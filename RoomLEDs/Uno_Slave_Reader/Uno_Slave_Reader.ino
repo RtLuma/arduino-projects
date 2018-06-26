@@ -26,7 +26,7 @@ SimplePatternList gPatterns = {
   []() { theaterChase(RGB[0], RGB[1], RGB[2]); },
   []() { showColor(RGB[0], RGB[1], RGB[2]); delay(1);},
   //  []() { colorWipe(RGB[0], RGB[1], RGB[2], 1); },
-  []() { rainbowCycle(5 , 3); },
+//  []() { rainbowCycle(5 , 3); },
   Chroma
 };
 

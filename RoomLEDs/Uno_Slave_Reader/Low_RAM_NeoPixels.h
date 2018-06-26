@@ -127,7 +127,7 @@ void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  cha
 
 void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
 
-  for (int j = 0; j < 3 ; j++) {
+//  for (int j = 0; j < 3 ; j++) {
 
     for (int q = 0; q < THEATER_SPACING ; q++) {
 
@@ -147,7 +147,7 @@ void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
 
     } 
 
-  }
+//  }
 
 }
 
