@@ -5,6 +5,7 @@
 #include "Credentials.h"
 
 #define SLAVE_ADDR 8
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 //To-do try fast i2c shit with this, look into tinywire?
 
@@ -30,13 +31,23 @@ void setup() {
     server.send(200, "text/plain", "Login OK");
   });
 
-  server.on("/next", []() {
-    char payload[] = {'0'};
-    if (sendBytes(payload, 1)) server.send(200, "text/plain", "next");
-    else server.send(404, "text/plain", "I2C error");
-  });
+  server.on("/m", []() {
+    if (!server.hasArg("m")) {
+      server.send(400, "text/plain", "Must specify mode label");
+      return;
+    }
 
-  server.on("/color", []() {
+    char payload[server.args()];
+    payload[0] = 'm';
+
+    for (uint8_t i = 1; i < server.args(); i++) payload[i] = server.arg(i).toInt();
+
+    if (sendBytes(payload, ARRAY_SIZE(payload)))
+      server.send(200, "text/plain", "Mode changed?");
+    else server.send(404, "text/plain", "I2C error");
+});
+
+  server.on("/c", []() {
 
     /*
       String arg(String name);        // get request argument value by name
@@ -51,24 +62,16 @@ void setup() {
     }
 
     char payload[] = {
+      'c',//olor
       server.arg("r").toInt(),
       server.arg("g").toInt(),
       server.arg("b").toInt()
     };
 
-    if (sendBytes(payload, 3))
+    if (sendBytes(payload, ARRAY_SIZE(payload)))
       server.send(200, "text/plain",
                   "r: " + server.arg("r") + ", g: " + server.arg("g") + ", b: " + server.arg("b"));
     else server.send(404, "text/plain", "I2C error");
-
-    //    Wire.beginTransmission(8); // transmit to device #8
-    //    Wire.write(server.arg("r").toInt());
-    //    Wire.write(server.arg("g").toInt());
-    //    Wire.write(server.arg("b").toInt());
-    //    Wire.endTransmission();    // stop transmitting
-
-    //    server.send(200, "text/plain", );
-
   });
 
   server.onNotFound([]() {

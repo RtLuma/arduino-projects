@@ -106,21 +106,8 @@ void showColor( unsigned char r , unsigned char g , unsigned char b ) {
   for ( uint16_t p = 0; p < PIXELS; p++ ) {
     sendPixel( r , g , b ); sendPixel2( r , g , b );
   }
+//  show();
   show();
-  show();
-}
-
-void colorWipe(unsigned char r , unsigned char g, unsigned char b, unsigned  char wait ) {
-  for (uint16_t i = 0; i < PIXELS; i++ ) sendPixel(0, 0, 0);
-  for (uint16_t i = 0; i < PIXELS; i += 6 ) {
-
-    unsigned int p = 0;
-
-    while (p++ <= i) sendPixel(r, g, b);
-    //    while (p++ <= PIXELS) sendPixel(0, 0, 0);
-
-    show();
-  }
 }
 
 #define THEATER_SPACING (PIXELS/25)

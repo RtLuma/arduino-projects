@@ -23,14 +23,14 @@ modePointer mode;
 modePointer modes[] = {
   []() { theaterChase(RGB[0], RGB[1], RGB[2]); },
   []() { showColor(RGB[0], RGB[1], RGB[2]); delay(1);},
-  //  []() { colorWipe(RGB[0], RGB[1], RGB[2], 1); },
-  //  []() { rainbowCycle(5 , 3); },
+//  []() { rainbowCycle(5 , 3); },
   Chroma
 };
 char modeLabels[] = {
-  ,'t'//heaterChase
-  ,'f'//ill color
-  ,'m'//usic visualizer
+  , 't' //heaterChase
+  , 'f' //ill color
+  //  ,'r'//ainbow
+  , 'm' //usic visualizer
 };
 
 const PROGMEM byte HASH_SIZE = ARRAY_SIZE(modes);
@@ -43,32 +43,46 @@ void modeChange(char m) {
 }
 
 
-void receiveEvent(int howMany) {
+void receiveEvent(byte howMany) {
   cli();
 
-  //NO
-  //BAD
-  //BAD MICHAEL
-  //NO
 
   //New I2C protocol:
-  // [ 0, '\r', char<mode>, ... ]
+  //   [  0,  char<mode>, ... ]
+  //   [init, mode,       args ]
   //NOT < 3
-  
-  if (howMany < 3) {
-    modeChange();
-    ((void (*)())NULL)();
-    return;
-  }
+
+//  if (howMany < 3) {
+//    modeChange();
+//    ((void (*)())NULL)();
+//    return;
+//  }
+
+
+//  for (i = 0; i < 3; i++) EEPROM.write(EEPROM_RGB_ADDR + i, RGB[i]);
 
   byte i = 0;
+  byte payload[howMany];
 
   while (Wire.available()) { // loop through all but the last
-    RGB[i] = Wire.read(); // receive byte as a character
+    payload[i] = Wire.read(); // receive byte as a character
     i++;
   }
 
-  for (i = 0; i < 3; i++) EEPROM.write(EEPROM_RGB_ADDR + i, RGB[i]);
+  char operation = payload[0];
+
+  switch(operation) {
+    case 'c': // change global color
+      RGB[0]=payload[1];RGB[1]=payload[2];RGB[2]=payload[3];
+      break;
+    
+    default:
+      modeChange(operation);
+      ((void (*)())NULL)();
+      return;
+  }
+
+
 
   Wire.flush();
 
@@ -81,16 +95,16 @@ void setup() {
 
   ledsetup();
   showColor(0, 0, 0);
-  
+
   FFT.begin();
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
 
   for (byte i = 0; i < 3; i++) RGB[i] = EEPROM.read(EEPROM_RGB_ADDR + i);
-  for (byte m=0; m < HASH_SIZE; m++) modeMap[m](modeLabels[m], modes[m]);
+  for (byte m = 0; m < HASH_SIZE; m++) modeMap[m](modeLabels[m], modes[m]);
   showColor(0, 0, 0);
-  
+
   mode = modeMap.getValueOf(EEPROM.read(EEPROM_MODE_ADDR));
 }
 
