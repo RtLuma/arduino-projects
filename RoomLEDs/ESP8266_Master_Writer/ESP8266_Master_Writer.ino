@@ -2,30 +2,17 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 //#include <ArduinoOTA.h>
+#include "Credentials.h"
 
 #define SLAVE_ADDR 8
 
 //To-do try fast i2c shit with this, look into tinywire?
 
-
-
-byte retries = 0;
-
 ESP8266WebServer server(80);
 
 bool sendBytes(char data[], byte length) {
-  //  byte retry = 0;
-  //  do {
   Wire.beginTransmission(SLAVE_ADDR);
   for (byte i = 0; i < length; i++)  Wire.write(data[i]);
-  //    retry++;
-  //    if (retry > 5) {
-  //      Wire.endTransmission();
-  //      checkI2CLock();
-  //      return false;
-  //    }
-  //  }
-  //  while (Wire.endTransmission() > 1); // Guarantee data was sent
   return !Wire.endTransmission();
 }
 

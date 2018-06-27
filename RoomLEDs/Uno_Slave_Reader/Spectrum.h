@@ -6,8 +6,8 @@
 
 struct spectrumShield {
 
-  uint16_t lvls[2][BANDS] = {{0}};
-  uint16_t maxs[2][BANDS] = {{MAX_CUTOFF}};
+  uint16_t lvls[2][BANDS] = {0};
+  uint16_t maxs[2][BANDS] = {MAX_CUTOFF+1};
 
   void begin(void) {
     pinMode(RESET, OUTPUT);
@@ -17,10 +17,10 @@ struct spectrumShield {
     digitalWrite(STROBE, HIGH);   delay(1);
     digitalWrite(STROBE, LOW);    delay(1);
     digitalWrite(RESET, LOW);     delay(5);
-    for (byte band = 0; band < BANDS; band++)  {
-      maxs[0][band] = MAX_CUTOFF + 1;
-      maxs[1][band] = MAX_CUTOFF + 1;
-    }
+//    for (byte band = 0; band < BANDS; band++)  {
+//      maxs[0][band] = MAX_CUTOFF + 1;
+//      maxs[1][band] = MAX_CUTOFF + 1;
+//    }
   }
 
   void read(void) {
@@ -58,14 +58,8 @@ struct spectrumShield {
 
       digitalWrite(STROBE, HIGH);
       digitalWrite(STROBE, LOW);
-
-
-      //      Serial.print((1023 * (lvls[0][band] + 1)) >> 10);
-      //      Serial.print("/");
-      //      Serial.print(maxs[0][band]);
-      //      Serial.print("\t");
     }
-    //    Serial.println();
+    //Average top and bottom bands for visual consistency
     lvls[0][0] = lvls[1][0] = (lvls[0][0] + lvls[1][0]) >> 1;
     lvls[0][BANDS - 1] = lvls[1][BANDS - 1] = (lvls[0][BANDS - 1] + lvls[1][BANDS - 1]) >> 1;
   }

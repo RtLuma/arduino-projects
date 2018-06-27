@@ -18,7 +18,6 @@
             if (!cansend) return;
             cansend = false;
             colors[bar.name] = bar.value;
-            console.log(bar.value)
             var strang = `${API_URL}/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
             console.log(strang);
             fetch(strang, {mode: 'no-cors'}).then(d => d.text()).then(d => {
@@ -39,17 +38,17 @@
         <pre></pre>
         <fieldset>
             <legend>Red</legend>
-            <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)">
+            <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)" onchange="color(this)">
         </fieldset>
         <fieldset>
             <legend>Green</legend>
-            <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)">
+            <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)" onchange="color(this)">
         </fieldset>
         <fieldset>
             <legend>Blue</legend>
-            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)">  
+            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)" onchange="color(this)">  
         </fieldset>
         <br>
-        <!-- <input type="button" value="Next" name="Next" onclick="next()">             -->
+        <input type="button" value="Next" name="Next" onclick="next()">            
     </body>
 </html>

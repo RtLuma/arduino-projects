@@ -2,6 +2,7 @@
 #define SECTIONODD 22
 
 extern const uint8_t hues[BANDS];
+extern volatile uint8_t RGB[3];
 
 uint8_t sclera[2][BANDS][3] = {0};
 uint8_t iris[3] = { 0 };
@@ -52,10 +53,15 @@ void Chroma(void) {
       //      uint8_t hue = hues[band];
 
       uint32_t level = FFT.lvls[channel][band] + 1;
+      //
+            sclera[channel][band][0] = (rainbow(hue + 170)  * level) >> 10;
+            sclera[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
+            sclera[channel][band][2] = (rainbow(hue)        * level) >> 10;
 
-      sclera[channel][band][0] = (rainbow(hue + 170)  * level) >> 10;
-      sclera[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
-      sclera[channel][band][2] = (rainbow(hue)        * level) >> 10;
+
+//      sclera[channel][band][0] = (RGB[0]  * level) >> 10;
+//      sclera[channel][band][1] = (RGB[1]   * level) >> 10;
+//      sclera[channel][band][2] = (RGB[2]        * level) >> 10;
     }
   }
 
@@ -73,17 +79,17 @@ void Chroma(void) {
   for (band; band > 3; band--) {
     pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendSclera
   }
-  
+
   for (band; band > 0; band--) {
     pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendScleraOdd
   }
- 
+
   pixelA = sclera[1][0]; pixelB = sclera[0][0]; sendSclera
 
   for (band; band < 3; band++) {
     pixelA = sclera[0][band]; pixelB = sclera[0][band + 1]; sendScleraOdd
   }
-  
+
 
   uint16_t newIris[3] = { 0 };
   uint16_t newPupil[3] = { 0 };
@@ -92,13 +98,14 @@ void Chroma(void) {
 
   for (band; band < 3; band++) {
     newIris[0] += (sclera[0][band][0] + sclera[1][band][0]) >> 1;
-    newIris[1] += (sclera[1][band][1] + sclera[1][band][1]) >> 1;
-    newIris[2] += (sclera[2][band][2] + sclera[1][band][2]) >> 1;
+    newIris[1] += (sclera[0][band][1] + sclera[1][band][1]) >> 1;
+    newIris[2] += (sclera[0][band][2] + sclera[1][band][2]) >> 1;
   }
+  band++;
   for (band; band < 7; band++) {
     newPupil[0] += (sclera[0][band][0] + sclera[1][band][0]) >> 1;
-    newPupil[1] += (sclera[1][band][1] + sclera[1][band][1]) >> 1;
-    newPupil[2] += (sclera[2][band][2] + sclera[1][band][2]) >> 1;
+    newPupil[1] += (sclera[0][band][1] + sclera[1][band][1]) >> 1;
+    newPupil[2] += (sclera[0][band][2] + sclera[1][band][2]) >> 1;
   }
 
   newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2;
