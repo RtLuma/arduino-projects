@@ -1,54 +1,84 @@
 <html>
-    <head>
-        <style type="text/css">
-            fieldset {
-                display: inline;
-            }
-            legend { 
-                text-align: center;
-            }
-        </style>
-        <script>
+
+<head>
+    <style type="text/css">
+        fieldset {
+            display: inline;
+        }
+        
+        legend {
+            text-align: center;
+        }
+    </style>
+    <script>
+        /*
+                return fetch(url, {
+            body: JSON.stringify(data), // must match 'Content-Type' header
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, same-origin, *omit
+            headers: {
+              'user-agent': 'Mozilla/4.0 MDN Example',
+              'content-type': 'application/json'
+            },
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+            redirect: 'follow', // manual, *follow, error
+            referrer: 'no-referrer', // *client, no-referrer
+          })
+                */
+
         const API_URL = "http://10.0.0.69";
         let cansend = true;
         let colors = {
-            "red":0, "green":0, "blue":0
+            "red": 0,
+            "green": 0,
+            "blue": 0
         }
+
         function color(bar) {
             if (!cansend) return;
             cansend = false;
             colors[bar.name] = bar.value;
             var strang = `${API_URL}/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
             console.log(strang);
-            fetch(strang, {mode: 'no-cors'}).then(d => d.text()).then(d => {
+            fetch(strang, {
+                mode: 'no-cors'
+            }).then(d => d.text()).then(d => {
                 document.querySelector("pre").innerText = d;
                 cansend = true;
             });
-        };            
+        };
+
         function next() {
             if (!cansend) return;
             cansend = false;
-            fetch(`${API_URL}/next`, {mode: 'no-cors'})
-            .then(d => d.text())
-            .then(d => { cansend = true; })
-        }; 
-        </script>
-    </head>
-    <body>
-        <pre></pre>
-        <fieldset>
-            <legend>Red</legend>
-            <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)" onchange="color(this)">
-        </fieldset>
-        <fieldset>
-            <legend>Green</legend>
-            <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)" onchange="color(this)">
-        </fieldset>
-        <fieldset>
-            <legend>Blue</legend>
-            <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)" onchange="color(this)">  
-        </fieldset>
-        <br>
-        <input type="button" value="Next" name="Next" onclick="next()">            
-    </body>
+            fetch(`${API_URL}/next`, {
+                    mode: 'no-cors'
+                })
+                .then(d => d.text())
+                .then(d => {
+                    cansend = true;
+                })
+        };
+    </script>
+</head>
+
+<body>
+    <pre></pre>
+    <fieldset>
+        <legend>Red</legend>
+        <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)" onchange="color(this)">
+    </fieldset>
+    <fieldset>
+        <legend>Green</legend>
+        <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)" onchange="color(this)">
+    </fieldset>
+    <fieldset>
+        <legend>Blue</legend>
+        <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)" onchange="color(this)">
+    </fieldset>
+    <br>
+    <input type="button" value="Next" name="Next" onclick="next()">
+</body>
+
 </html>

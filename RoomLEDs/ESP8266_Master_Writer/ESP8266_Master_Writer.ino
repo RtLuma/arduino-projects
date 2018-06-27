@@ -31,23 +31,22 @@ void setup() {
     server.send(200, "text/plain", "Login OK");
   });
 
-  server.on("/m", []() {
-    if (!server.hasArg("m")) {
+  server.on("/m", []() { 
+    if (!server.args()) {             // .../m?f HOPEFULLY!
       server.send(400, "text/plain", "Must specify mode label");
       return;
     }
 
-    char payload[server.args()];
+    char payload[2];
     payload[0] = 'm';
+    payload[1] = server.argName[0];
 
-    for (uint8_t i = 1; i < server.args(); i++) payload[i] = server.arg(i).toInt();
-
-    if (sendBytes(payload, ARRAY_SIZE(payload)))
+    if (sendBytes(payload, 2))
       server.send(200, "text/plain", "Mode changed?");
     else server.send(404, "text/plain", "I2C error");
 });
 
-  server.on("/c", []() {
+  server.on("/c", []() {  // Change global color
 
     /*
       String arg(String name);        // get request argument value by name
