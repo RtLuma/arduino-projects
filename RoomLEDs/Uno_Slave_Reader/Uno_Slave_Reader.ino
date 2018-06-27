@@ -10,7 +10,7 @@
 #define EEPROM_RGB_G_ADDR       2
 #define EEPROM_RGB_B_ADDR       3
 #define EEPROM_CYCLE_SPEED_ADDR 4
-#define EEPROM_CYCLE_NUM_ADDR   5
+#define EEPROM_CYCLE_REPS_ADDR  5
 #define EEPROM_SPACING_ADDR     6
 
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
