@@ -7,10 +7,7 @@
 
 //To-do try fast i2c shit with this, look into tinywire?
 
-const char* PROGMEM ssid = "Tell My Wi-Fi Love Her";
-const char* PROGMEM password = "MikeGriffinMike";
-const char* PROGMEM www_username = "admin";
-const char* PROGMEM www_password = "euphoria";
+
 
 byte retries = 0;
 
