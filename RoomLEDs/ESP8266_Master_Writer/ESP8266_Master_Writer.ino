@@ -23,11 +23,15 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
+  //TODO: This should be the only route u nignog ////////////////////////////////
+
   server.on("/", []() {
     if (!server.authenticate(www_username, www_password))
       return server.requestAuthentication();
     server.send(200, "text/plain", "Login OK");
   });
+  
+  ////////////////////////////////////////////////////////////////////
 
   server.on("/*", []() {
     if (!server.authenticate(www_username, www_password))
