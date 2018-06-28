@@ -31,7 +31,7 @@ void setup() {
     server.send(200, "text/plain", "Login OK");
   });
 
-  server.on("/m", []() { 
+  server.on("/m", []() {
     if (!server.args()) {             // .../m?f HOPEFULLY!
       server.send(400, "text/plain", "Must specify mode label");
       return;
@@ -39,12 +39,15 @@ void setup() {
 
     char payload[2];
     payload[0] = 'm';
-    payload[1] = server.argName[0];
+    payload[1] = server.argName(0)[0];
 
-    if (sendBytes(payload, 2))
-      server.send(200, "text/plain", "Mode changed?");
+    if (sendBytes(payload, 2)) {
+      String msg = "Mode changed? Got label ";
+      msg += payload[1];
+      server.send(200, "text/plain", msg);
+    }
     else server.send(404, "text/plain", "I2C error");
-});
+  });
 
   server.on("/c", []() {  // Change global color
 
@@ -75,7 +78,7 @@ void setup() {
 
   server.onNotFound([]() {
 
-    String message = "File Not Found\n\n";
+    String message = "404\n\n";
     message += "URI: ";
     message += server.uri();
     message += "\nMethod: ";
@@ -96,9 +99,4 @@ void setup() {
 void loop() {
   //  ArduinoOTA.handle();
   server.handleClient();
-  //  if (millis() >> 16) {
-  //    Serial.println("jews");
-  //    ESP.reset();
-  //    ((void (*)())NULL)()
-  //  }
 }

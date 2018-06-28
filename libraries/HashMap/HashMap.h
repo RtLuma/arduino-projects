@@ -75,12 +75,13 @@ public:
 		return hashMap[x];
 	}
 	
-	byte getIndexOf( hash key ){
+	int8_t getIndexOf( hash key ){
 		for (byte i=0; i<size; i++){
 			if (hashMap[i].getHash()==key){
 				return i;
 			}
 		}
+		return -1;
 	}
 	map getValueOf( hash key ){
 		for (byte i=0; i<size; i++){

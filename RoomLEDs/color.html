@@ -39,8 +39,7 @@
             if (!cansend) return;
             cansend = false;
             colors[bar.name] = bar.value;
-            var strang = `${API_URL}/color?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
-            console.log(strang);
+            var strang = `${API_URL}/c?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
             fetch(strang, {
                 mode: 'no-cors'
             }).then(d => d.text()).then(d => {
