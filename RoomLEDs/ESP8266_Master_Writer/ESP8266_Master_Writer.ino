@@ -1,13 +1,11 @@
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-//#include <ArduinoOTA.h>
+#include <ArduinoOTA.h>
 #include "Credentials.h"
 
 #define SLAVE_ADDR 8
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
-//To-do try fast i2c shit with this, look into tinywire?
 
 ESP8266WebServer server(80);
 
@@ -20,18 +18,27 @@ bool sendBytes(char data[], byte length) {
 
 void setup() {
   Wire.begin(); // join i2c bus (address optional for master)
-  //  ArduinoOTA.begin();
+  ArduinoOTA.begin();
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
   server.on("/", []() {
-    //    if (!server.authenticate(www_username, www_password))
-    //      return server.requestAuthentication();
+    if (!server.authenticate(www_username, www_password))
+      return server.requestAuthentication();
+    server.send(200, "text/plain", "Login OK");
+  });
+
+  server.on("/*", []() {
+    if (!server.authenticate(www_username, www_password))
+      return server.requestAuthentication();
     server.send(200, "text/plain", "Login OK");
   });
 
   server.on("/m", []() {
+    if (!server.authenticate(www_username, www_password))
+      return server.requestAuthentication();
+
     if (!server.args()) {             // .../m?f HOPEFULLY!
       server.send(400, "text/plain", "Must specify mode label");
       return;
@@ -50,6 +57,8 @@ void setup() {
   });
 
   server.on("/c", []() {  // Change global color
+    if (!server.authenticate(www_username, www_password))
+      return server.requestAuthentication();
 
     /*
       String arg(String name);        // get request argument value by name
@@ -97,6 +106,6 @@ void setup() {
 }
 
 void loop() {
-  //  ArduinoOTA.handle();
   server.handleClient();
+  ArduinoOTA.handle();
 }
