@@ -113,15 +113,15 @@ void Chroma(void) {
 
   newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2;
 
-  iris[0] = (newIris[0] + newIris[0] + newIris[0] + newIris[0]) >> 2;
-  iris[1] = (newIris[1] + newIris[1] + newIris[1] + newIris[1]) >> 2;
-  iris[2] = (newIris[2] + newIris[2] + newIris[2] + newIris[2]) >> 2;
+  iris[0] = (newIris[0] + newIris[0] + newIris[0] + iris[0]) >> 2;
+  iris[1] = (newIris[1] + newIris[1] + newIris[1] + iris[1]) >> 2;
+  iris[2] = (newIris[2] + newIris[2] + newIris[2] + iris[2]) >> 2;
 
   newPupil[0] >>= 1; newPupil[1] >>= 1; newPupil[2] >>= 1;
 
-  pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + newPupil[0]) >> 2;
-  pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + newPupil[1]) >> 2;
-  pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + newPupil[2]) >> 2;
+  pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + pupil[0]) >> 2;
+  pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + pupil[1]) >> 2;
+  pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + pupil[2]) >> 2;
 
   for (p; p < 194; p++) sendPixel2(iris[0], iris[1], iris[2]);
   for (p; p < 298; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);

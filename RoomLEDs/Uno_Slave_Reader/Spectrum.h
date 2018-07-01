@@ -10,14 +10,18 @@ struct spectrumShield {
   uint16_t maxs[2][BANDS] = {{MAX_CUTOFF + 1}, {MAX_CUTOFF + 1}};
 
   void begin(void) {
-    pinMode(RESET, OUTPUT);
+    pinMode(RESET,  OUTPUT);
     pinMode(STROBE, OUTPUT);
-    digitalWrite(STROBE, LOW);    delay(1);
-    digitalWrite(RESET, HIGH);    delay(1);
-    digitalWrite(STROBE, HIGH);   delay(1);
-    digitalWrite(STROBE, LOW);    delay(1);
-    digitalWrite(RESET, LOW);     delay(5);
-    delay(100);
+    digitalWrite(STROBE, LOW);  delay(1);
+    digitalWrite(RESET,  HIGH); delay(1);
+    digitalWrite(STROBE, HIGH); delay(1);
+    digitalWrite(STROBE, LOW);  delay(1);
+    digitalWrite(RESET,  LOW);  delay(5);
+
+    for (byte band = 0; band < BANDS; band++)  {
+      maxs[0][band] = MAX_CUTOFF + 1;
+      maxs[1][band] = MAX_CUTOFF + 1;
+    }
   }
 
   void read(void) {

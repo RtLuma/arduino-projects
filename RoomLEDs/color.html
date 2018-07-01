@@ -11,21 +11,20 @@
         }
     </style>
     <script>
-        /*
-                return fetch(url, {
-            body: JSON.stringify(data), // must match 'Content-Type' header
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            credentials: 'same-origin', // include, same-origin, *omit
-            headers: {
-              'user-agent': 'Mozilla/4.0 MDN Example',
-              'content-type': 'application/json'
-            },
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, cors, *same-origin
-            redirect: 'follow', // manual, *follow, error
-            referrer: 'no-referrer', // *client, no-referrer
-          })
-                */
+/*
+   return fetch(url, {
+   body: JSON.stringify(data), // must match 'Content-Type' header
+   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+   credentials: 'same-origin', // include, same-origin, *omit
+   headers: {
+   'user-agent': 'Mozilla/4.0 MDN Example',
+   'content-type': 'application/json'
+   },
+   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+   mode: 'cors', // no-cors, cors, *same-origin
+   redirect: 'follow', // manual, *follow, error
+   referrer: 'no-referrer', // *client, no-referrer })
+   */
 
         const API_URL = "http://10.0.0.69";
         let cansend = true;
@@ -39,7 +38,8 @@
             if (!cansend) return;
             cansend = false;
             colors[bar.name] = bar.value;
-            var strang = `${API_URL}/c?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
+            var strang = `${API_URL}?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
+            console.log(strang)
             fetch(strang, {
                 mode: 'no-cors',
                 credentials: "include"

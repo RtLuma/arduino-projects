@@ -9,11 +9,11 @@
 
 ESP8266WebServer server(80);
 
-bool sendBytes(char data[], byte length) {
-  Wire.beginTransmission(SLAVE_ADDR);
-  for (byte i = 0; i < length; i++)  Wire.write(data[i]);
-  return !Wire.endTransmission();
-}
+//bool sendBytes(char data[], byte length) {
+//Wire.beginTransmission(SLAVE_ADDR);
+//for (byte i = 0; i < length; i++)  Wire.write(data[i]);
+//return !Wire.endTransmission();
+//}
 
 
 void setup() {
@@ -32,26 +32,29 @@ void setup() {
     bool succesfulQuery = true;
 
     if (server.args()) {
-      byte length = server.args() << 1;
-
+      const byte length = server.args()<<1;
       char payload[length];
 
-      for (uint8_t i = 0; i < length; i += 2) {
-        payload[i] = server.argName(i)[0];
-
-        //m i.e. mode is the only thing that shoudl be seen as a char
-        if (payload[i] == 'M') payload[i + 1] = server.arg(i)[0];
-        else payload[i + 1] = server.arg(i).toInt();
+      for (uint8_t i = 0; i < server.args(); i++) {
+        uint8_t i2 = i << 1;
+        payload[i2 + 1] =
+          (payload[i2] = server.argName(i)[0]) == 'm' ?
+          server.arg(i)[0] : server.arg(i).toInt();
       }
+      
+      Wire.beginTransmission(SLAVE_ADDR);
+      for (byte i = 0; i < length; i++)  Wire.write(payload[i]);
+      succesfulQuery = !Wire.endTransmission();
 
-      succesfulQuery = sendBytes(payload, length);
-
-      for (uint8_t i = 0; i < server.args(); i++) message += server.arg(i) + " ";
+      for (uint8_t i = 0; i < length; i+=2) {
+        char jews[] = {payload[i], '\0'};
+        message += String(jews) + ": " + String((uint8_t)payload[i+1]) + "; ";
+      }
     }
-//    else message = "No args";
+    else message = "No args";
 
-//    if (succesfulQuery) server.send(200, "text/plain", "");
-        if (succesfulQuery) server.send(200, "text/plain", message);
+    //if (succesfulQuery) server.send(200, "text/plain", "");
+    if (succesfulQuery) server.send(200, "text/plain", message + "\n");
     else server.send(500, "text/plain", "I2C error?");
   });
 

@@ -10,6 +10,7 @@ enum EEPROM_ADDRESS {
   ,e_freq
   ,e_per
   ,e_width
+  
   ,e_STORED_ARGM_NUM
 };
 
@@ -27,7 +28,7 @@ const PROGMEM char modeLabels[] = {
   //Traffic?
 };
 const modePointer modes[] = {
-  []() { showColor(R, G, B); delay(10000);},
+  []() { showColor(R, G, B); delay(100);},
   []() { theaterChase(R, G, B); },  
   []() { rainbowCycle(5 , 3); },
   Chroma
@@ -39,15 +40,15 @@ int8_t label2modeIndex(char label) {
   return -1;
 }
 
-//
-//#define EEPROM_MODE_ADDR        0
-//#define EEPROM_RGB_R_ADDR       1
-//#define EEPROM_RGB_G_ADDR       2
-//#define EEPROM_RGB_B_ADDR       3
-//#define EEPROM_CYCLE_SPEED_ADDR 4
-//#define EEPROM_CYCLE_REPS_ADDR  5
-//#define EEPROM_SPACING_ADDR     6
-//#define EEPROM_STORED_ARG_NUM   7 // Increase if more customization options are added
+
+#define EEPROM_MODE_ADDR        0
+#define EEPROM_RGB_R_ADDR       1
+#define EEPROM_RGB_G_ADDR       2
+#define EEPROM_RGB_B_ADDR       3
+#define EEPROM_CYCLE_SPEED_ADDR 4
+#define EEPROM_CYCLE_REPS_ADDR  5
+#define EEPROM_SPACING_ADDR     6
+#define EEPROM_STORED_ARG_NUM   7 // Increase if more customization options are added
 
 //uint8_t arg2addr(char argument) {
 //  switch(argument) {

@@ -1,4 +1,5 @@
-volatile uint8_t R = 255, G = 32, B = 0, F = 0, P = 0, W = 0;
+//volatile uint8_t R = 255, G = 32, B = 0, F = 0, P = 0, W = 0;
+volatile uint8_t* R, G, B, F, P, W;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #include <Wire.h>
@@ -11,38 +12,51 @@ volatile uint8_t R = 255, G = 32, B = 0, F = 0, P = 0, W = 0;
 void receiveEvent(byte length) {
   cli();
   uint8_t i = 0;
-  uint8_t arg_num = length >> 1;
-  char    labels[arg_num];
-  uint8_t values[arg_num];
-
+  byte payload[length];
+    
+    //  while (Wire.available()) payload[++i] = Wire.read();
   while (Wire.available()) {
-    labels[i] = Wire.read(); // receive byte as a character
-    values[i] = Wire.read();
+    payload[i] = Wire.read();
     i++;
   }
   Wire.flush();
+
   bool needSoftReset = false;
 
-  for (i = 0; i < arg_num; i++) {
-    switch (labels[i]) {
-      case 'M': {
-          int8_t modeIndex = label2modeIndex(values[i]);
+  for (i = 0; i < length; i += 2) {
+    char label = payload[i];
+    uint8_t value = payload[i + 1];
+    Serial.print(label);
+    Serial.print("=");
+    label == 'm' ? Serial.print((char)value) : Serial.print(value);
+    Serial.print("; ");
+    
+    
+    switch (label) {
+      case 'm': {
+          int8_t modeIndex = label2modeIndex(value);
           if (modeIndex > -1) {
             EEPROM.write(e_mode, modeIndex);
             needSoftReset = true;
             mode = modes[modeIndex];
           }
+          break;
         }
-      case 'R': R = values[i]; EEPROM.write(e_red,   R); 
-      case 'G': G = values[i]; EEPROM.write(e_green, G); 
-      case 'B': B = values[i]; EEPROM.write(e_blue,  B); 
-      case 'F': F = values[i]; EEPROM.write(e_freq,  F); 
-      case 'P': P = values[i]; EEPROM.write(e_per,   P); 
-      case 'W': W = values[i]; EEPROM.write(e_width, W); 
+      case 'r': R = value; EEPROM.write(e_red,   R); break;
+      case 'g': G = value; EEPROM.write(e_green, G); break;
+      case 'b': B = value; EEPROM.write(e_blue,  B); break;
+      case 'f': F = value; EEPROM.write(e_freq,  F); break;
+      case 'p': P = value; EEPROM.write(e_per,   P); break;
+      case 'w': W = value; EEPROM.write(e_width, W); break;
+      default: break;
     }
   }
+
+  Serial.println();
+  Serial.flush();
+
   if (needSoftReset) ((void (*)())NULL)();
-  else if (!EEPROM.read(e_mode)) mode();
+  //  else if (!EEPROM.read(e_mode)) mode();
   sei();
 }
 
@@ -50,13 +64,16 @@ void receiveEvent(byte length) {
 void setup() {
   Serial.begin(9600);
 
+  uint8_t EEPROM_RAW[e_STORED_ARGM_NUM];
+  for (uint8_t i = 0; i < e_STORED_ARGM_NUM; i++) EEPROM_RAW[i] = EEPROM.read(i);
+
   // Load user settings
-  R = EEPROM.read(e_red);
-  G = EEPROM.read(e_green);
-  B = EEPROM.read(e_blue);
-  F = EEPROM.read(e_freq);
-  P = EEPROM.read(e_per);
-  W = EEPROM.read(e_width);
+  R = EEPROM_RAW[e_red];
+  G = EEPROM_RAW[e_green];
+  B = EEPROM_RAW[e_blue];
+  F = EEPROM_RAW[e_freq];
+  P = EEPROM_RAW[e_per];
+  W = EEPROM_RAW[e_width];
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
@@ -66,7 +83,7 @@ void setup() {
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
   ledsetup();
-//  showColor(0, 0, 0); //blank the display
+  //  showColor(0, 0, 0); //blank the display
 }
 
 void loop() {
