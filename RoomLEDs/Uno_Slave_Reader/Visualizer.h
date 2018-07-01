@@ -1,7 +1,10 @@
 #define SECTION 21
 #define SECTIONODD 22
 
-extern const uint8_t hues[BANDS];
+//const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };   // Pretty
+//const byte hues[BANDS] = { 2, 21, 35, 185, 200, 22a0, 240 };   // Sunset
+const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
+
 extern volatile uint8_t RGB[3];
 
 uint8_t sclera[2][BANDS][3] = {0};
@@ -110,15 +113,15 @@ void Chroma(void) {
 
   newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2;
 
-  iris[0] = (newIris[0] + newIris[0] + newIris[0] + iris[0]) >> 2;
-  iris[1] = (newIris[1] + newIris[1] + newIris[1] + iris[1]) >> 2;
-  iris[2] = (newIris[2] + newIris[2] + newIris[2] + iris[2]) >> 2;
+  iris[0] = (newIris[0] + newIris[0] + newIris[0] + newIris[0]) >> 2;
+  iris[1] = (newIris[1] + newIris[1] + newIris[1] + newIris[1]) >> 2;
+  iris[2] = (newIris[2] + newIris[2] + newIris[2] + newIris[2]) >> 2;
 
   newPupil[0] >>= 1; newPupil[1] >>= 1; newPupil[2] >>= 1;
 
-  pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + pupil[0]) >> 2;
-  pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + pupil[1]) >> 2;
-  pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + pupil[2]) >> 2;
+  pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + newPupil[0]) >> 2;
+  pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + newPupil[1]) >> 2;
+  pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + newPupil[2]) >> 2;
 
   for (p; p < 194; p++) sendPixel2(iris[0], iris[1], iris[2]);
   for (p; p < 298; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);

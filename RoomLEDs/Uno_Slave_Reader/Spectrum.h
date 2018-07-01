@@ -17,10 +17,7 @@ struct spectrumShield {
     digitalWrite(STROBE, HIGH);   delay(1);
     digitalWrite(STROBE, LOW);    delay(1);
     digitalWrite(RESET, LOW);     delay(5);
-    //    for (byte band = 0; band < BANDS; band++)  {
-    //      maxs[0][band] = MAX_CUTOFF + 1;
-    //      maxs[1][band] = MAX_CUTOFF + 1;
-    //    }
+    delay(100);
   }
 
   void read(void) {

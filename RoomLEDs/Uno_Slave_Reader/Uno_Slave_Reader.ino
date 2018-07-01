@@ -1,78 +1,48 @@
+volatile uint8_t R = 255, G = 32, B = 0, F = 0, P = 0, W = 0;
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
 #include <Wire.h>
 #include <EEPROM.h>
-#include <HashMap.h>
 #include "Low_RAM_NeoPixels.h"
 #include "Spectrum.h"
 #include "Visualizer.h"
-
-#define EEPROM_MODE_ADDR        0
-#define EEPROM_RGB_R_ADDR       1
-#define EEPROM_RGB_G_ADDR       2
-#define EEPROM_RGB_B_ADDR       3
-#define EEPROM_CYCLE_SPEED_ADDR 4
-#define EEPROM_CYCLE_REPS_ADDR  5
-#define EEPROM_SPACING_ADDR     6
-
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-
-using modePointer = void(*)(void);
-
-//const byte hues[BANDS] = { 2, 21, 45, 115, 150, 200, 225 };   // Pretty
-//const byte hues[BANDS] = { 2, 21, 35, 185, 200, 22a0, 240 };   // Sunset
-const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
-
-char modeLabel = 'm';
-volatile uint8_t RGB[3] = {255, 32, 0};
-
-modePointer mode;
-modePointer modes[] = {
-  []() { theaterChase(RGB[0], RGB[1], RGB[2]); },
-  []() { showColor(RGB[0], RGB[1], RGB[2]); delay(1);},
-  []() { rainbowCycle(5 , 3); },
-  Chroma
-};
-char modeLabels[] = {
-  't' //heaterChase
-  , 'f' //ill color
-  , 'r' //ainbow
-  , 'm' //usic visualizer
-};
-
-const PROGMEM byte HASH_SIZE = ARRAY_SIZE(modes);
-HashType<char, modePointer> hashRawArray[HASH_SIZE] = {};
-HashMap<char, modePointer> modeMap = HashMap<char, modePointer>(hashRawArray, ARRAY_SIZE(hashRawArray));
+#include "LabelMaps.h"
 
 void receiveEvent(byte length) {
   cli();
-  byte i = 0;
-  byte payload[length];
+  uint8_t i = 0;
+  uint8_t arg_num = length >> 1;
+  char    labels[arg_num];
+  uint8_t values[arg_num];
 
-  while (Wire.available()) { // loop through all but the last
-    payload[i] = Wire.read(); // receive byte as a character
+  while (Wire.available()) {
+    labels[i] = Wire.read(); // receive byte as a character
+    values[i] = Wire.read();
     i++;
   }
-
-  char operation = payload[0];
-
-  switch (operation) {
-    case 'c': // change global color
-      RGB[0] = payload[1]; RGB[1] = payload[2]; RGB[2] = payload[3];
-      EEPROM.write(EEPROM_RGB_R_ADDR, RGB[0]);
-      EEPROM.write(EEPROM_RGB_G_ADDR, RGB[1]);
-      EEPROM.write(EEPROM_RGB_B_ADDR, RGB[2]);
-      break;
-
-    case 'm': // change active mode to specified label
-      if (modeMap.getIndexOf(payload[1]) > -1)
-        EEPROM.write(EEPROM_MODE_ADDR, payload[1]);
-      else break;
-
-    default:
-      ((void (*)())NULL)();
-      return;
-  }
-
   Wire.flush();
+  bool needSoftReset = false;
+
+  for (i = 0; i < arg_num; i++) {
+    switch (labels[i]) {
+      case 'M': {
+          int8_t modeIndex = label2modeIndex(values[i]);
+          if (modeIndex > -1) {
+            EEPROM.write(e_mode, modeIndex);
+            needSoftReset = true;
+            mode = modes[modeIndex];
+          }
+        }
+      case 'R': R = values[i]; EEPROM.write(e_red,   R); 
+      case 'G': G = values[i]; EEPROM.write(e_green, G); 
+      case 'B': B = values[i]; EEPROM.write(e_blue,  B); 
+      case 'F': F = values[i]; EEPROM.write(e_freq,  F); 
+      case 'P': P = values[i]; EEPROM.write(e_per,   P); 
+      case 'W': W = values[i]; EEPROM.write(e_width, W); 
+    }
+  }
+  if (needSoftReset) ((void (*)())NULL)();
+  else if (!EEPROM.read(e_mode)) mode();
   sei();
 }
 
@@ -80,24 +50,23 @@ void receiveEvent(byte length) {
 void setup() {
   Serial.begin(9600);
 
-  ledsetup();
-  showColor(0, 0, 0);   //blank the display
-
-  FFT.begin();  // Init Audio-Spectrum shield
+  // Load user settings
+  R = EEPROM.read(e_red);
+  G = EEPROM.read(e_green);
+  B = EEPROM.read(e_blue);
+  F = EEPROM.read(e_freq);
+  P = EEPROM.read(e_per);
+  W = EEPROM.read(e_width);
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
 
-  // Load last specified global color
-  RGB[0] = EEPROM.read(EEPROM_RGB_R_ADDR);
-  RGB[1] = EEPROM.read(EEPROM_RGB_G_ADDR);
-  RGB[2] = EEPROM.read(EEPROM_RGB_B_ADDR);
+  FFT.begin();  // Init Audio-Spectrum shield
+  //      mode = modes[0];
+  mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
-  // Instantiate label -> function map to load display mode from label
-  for (byte m = 0; m < HASH_SIZE; m++) modeMap[m](modeLabels[m], modes[m]);
-
-  mode = modeMap.getValueOf(EEPROM.read(EEPROM_MODE_ADDR)); // Load display mode
-//    mode = modes[0];
+  ledsetup();
+//  showColor(0, 0, 0); //blank the display
 }
 
 void loop() {
