@@ -27,26 +27,23 @@
    */
 
         const API_URL = "http://10.0.0.69";
-        let cansend = true;
-        let colors = {
-            "red": 0,
-            "green": 0,
-            "blue": 0
+        // let cansend = true;
+        
+        function sendpacket(args) {
+            // if (cansend) return;
+            let url = `${API_URL}?`;
+            for (let a of Object.keys(args)) url += `${a}=${args[a]}&`;
+            url=url.slice(0, -1);
+            console.log(url)
+            fetch(url, {
+                mode: 'no-cors',
+                credentials: "include"
+            })
+            // .then(d => {cansend = true;});
         }
 
         function color(bar) {
-            if (!cansend) return;
-            cansend = false;
-            colors[bar.name] = bar.value;
-            var strang = `${API_URL}?r=${colors.red}&g=${colors.green}&b=${colors.blue}`;
-            console.log(strang)
-            fetch(strang, {
-                mode: 'no-cors',
-                credentials: "include"
-            }).then(d => d.text()).then(d => {
-                document.querySelector("pre").innerText = d;
-                cansend = true;
-            });
+            sendpacket(JSON.parse(`{"${bar.name}":${bar.value}}`))
         };
 
         function next() {
@@ -67,15 +64,15 @@
     <pre></pre>
     <fieldset>
         <legend>Red</legend>
-        <input type="range" value="0" min="0" max="255" name="red" oninput="color(this)" onchange="color(this)">
+        <input type="range" value="0" min="0" max="255" name="r" oninput="color(this)" onchange="color(this)">
     </fieldset>
     <fieldset>
         <legend>Green</legend>
-        <input type="range" value="0" min="0" max="255" name="green" oninput="color(this)" onchange="color(this)">
+        <input type="range" value="0" min="0" max="255" name="g" oninput="color(this)" onchange="color(this)">
     </fieldset>
     <fieldset>
         <legend>Blue</legend>
-        <input type="range" value="0" min="0" max="255" name="blue" oninput="color(this)" onchange="color(this)">
+        <input type="range" value="0" min="0" max="255" name="b" oninput="color(this)" onchange="color(this)">
     </fieldset>
     <br>
     <input type="button" value="Next" name="Next" onclick="next()">
