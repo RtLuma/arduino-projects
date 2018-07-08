@@ -1,5 +1,6 @@
-//volatile uint8_t R = 255, G = 32, B = 0, F = 0, P = 0, W = 0;
 volatile uint8_t* R, G, B, F, P, W;
+volatile uint8_t SEGMENTS;
+uint16_t OFFSET = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 #include <Wire.h>
@@ -9,12 +10,14 @@ volatile uint8_t* R, G, B, F, P, W;
 #include "Visualizer.h"
 #include "LabelMaps.h"
 
+
+
 void receiveEvent(byte length) {
   cli();
   uint8_t i = 0;
   byte payload[length];
-    
-    //  while (Wire.available()) payload[++i] = Wire.read();
+
+  //  while (Wire.available()) payload[++i] = Wire.read();
   while (Wire.available()) {
     payload[i] = Wire.read();
     i++;
@@ -26,28 +29,28 @@ void receiveEvent(byte length) {
   for (i = 0; i < length; i += 2) {
     char label = payload[i];
     uint8_t value = payload[i + 1];
-    Serial.print(label);
-    Serial.print("=");
-    label == 'm' ? Serial.print((char)value) : Serial.print(value);
-    Serial.print("; ");
-    
-    
+
+    //Serial.print(label);
+    //Serial.print("=");
+    //label == 'm' ? Serial.print((char)value) : Serial.print(value);
+    //Serial.print("; ");
+
     switch (label) {
-      case 'm': {
-          int8_t modeIndex = label2modeIndex(value);
-          if (modeIndex > -1) {
-            EEPROM.write(e_mode, modeIndex);
-            needSoftReset = true;
-            mode = modes[modeIndex];
-          }
-          break;
+      case 'm':{
+        int8_t modeIndex = label2modeIndex(value);
+        if (modeIndex > -1) {
+          EEPROM.write(e_mode, modeIndex);
+          needSoftReset = true;
+          mode = modes[modeIndex];
         }
+        break;
+      }
       case 'r': R = value; EEPROM.write(e_red,   R); break;
       case 'g': G = value; EEPROM.write(e_green, G); break;
       case 'b': B = value; EEPROM.write(e_blue,  B); break;
       case 'f': F = value; EEPROM.write(e_freq,  F); break;
       case 'p': P = value; EEPROM.write(e_per,   P); break;
-      case 'w': W = value; EEPROM.write(e_width, W); break;
+      case 'w': W = value; EEPROM.write(e_width, W); SEGMENTS = PIXELS / W; break;
       default: break;
     }
   }
@@ -74,6 +77,8 @@ void setup() {
   F = EEPROM_RAW[e_freq];
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
+
+  SEGMENTS = PIXELS / W;
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event

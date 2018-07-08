@@ -2,7 +2,7 @@
 #define PIXEL_PORT  PORTB  // Port of the pin the pixels are connected to
 #define PIXEL_DDR   DDRB   // Port of the pin the pixels are connected to
 #define PIXEL_BIT   0      // Bit of the pin the pixels are connected to
-#define PIXEL_BIT2   1      // Bit of the pin the pixels are connected to
+#define PIXEL_BIT2   1     // Bit of the pin the second pixels are connected to
 #define T1H  900    // Width of a 1 bit in ns
 #define T1L  600    // Width of a 1 bit in ns
 #define T0H  350    // Width of a 0 bit in ns
@@ -105,40 +105,50 @@ void show() {
 void showColor( unsigned char r , unsigned char g , unsigned char b ) {
   for ( uint16_t p = 0; p < PIXELS; p++ ) {
     sendPixel( r , g , b ); sendPixel2( r , g , b );
+  }  show();
+}
+
+
+void theaterChase() {
+  OFFSET += F;
+  uint8_t l = (PIXELS + (OFFSET>>4)) % W;
+  
+  for (uint8_t s = 0; s < SEGMENTS; s++) {
+    uint8_t i = 0;
+    for (i; i < l; i++) sendPixel(0, 0, 0);
+    sendPixel(R, G, B);
+    for (++i; i < W; i++) sendPixel(0, 0, 0);
   }
-//  show();
-  show();
+  
+  for (uint8_t s = 0; s < SEGMENTS; s++) {
+    uint8_t i = 0;
+    for (i; i < W-l; i++) sendPixel2(0, 0, 0);
+    sendPixel2(R, G, B);
+    for (++i; i < W; i++) sendPixel2(0, 0, 0);
+  }
 }
 
-#define THEATER_SPACING (PIXELS/25)
+const uint8_t USARGB[3][3] = {{255,0,0},{255,255,255},{0,0,255}};
 
-void theaterChase( unsigned char r , unsigned char g, unsigned char b) {
-
-//  for (int j = 0; j < 3 ; j++) {
-
-    for (int q = 0; q < THEATER_SPACING ; q++) {
-
-      unsigned int step = 0;
-
-      for (int i = 0; i < PIXELS ; i++) {
-
-        if (step == q) {sendPixel( r , g , b ); sendPixel2( r , g , b );}
-        else {sendPixel( 0 , 0 , 0 );sendPixel2( 0 , 0 , 0 );}
-
-        step++;
-        if (step == THEATER_SPACING) step = 0;
-
-      }
-      delayMicroseconds(85);
-      show();
-
-    } 
-
-//  }
-
+void USA() {
+  OFFSET += F;
+  uint8_t l = (PIXELS + (OFFSET>>4)) % W;
+  uint8_t c = 0;
+  
+  for (uint8_t s = 0; s < SEGMENTS; s++) {
+    uint8_t i = 0;
+    for (i; i < l; i++) sendPixel(0, 0, 0);
+    sendPixel(USARGB[c][0], USARGB[c][1], USARGB[c][2]); ++c %= 3;
+    for (++i; i < W; i++) sendPixel(0, 0, 0);
+  }
+  
+  for (uint8_t s = 0; s < SEGMENTS; s++) {
+    uint8_t i = 0;
+    for (i; i < W-l; i++) sendPixel2(0, 0, 0);
+    sendPixel2(USARGB[c][0], USARGB[c][1], USARGB[c][2]); ++c %= 3;
+    for (++i; i < W; i++) sendPixel2(0, 0, 0);
+  }
 }
-
-
 
 // I rewrite this one from scrtach to use high resolution for the color wheel to look nicer on a *much* bigger string
 

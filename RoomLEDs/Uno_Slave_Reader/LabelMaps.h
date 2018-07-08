@@ -22,6 +22,7 @@ const PROGMEM char modeLabels[] = {
   ,'t'//heaterChase
   ,'r'//ainbow
   ,'v'//isualizer
+  ,'U'//SA
 
   //Eye mode?
   //Paintball?
@@ -29,9 +30,10 @@ const PROGMEM char modeLabels[] = {
 };
 const modePointer modes[] = {
   []() { showColor(R, G, B); delay(100);},
-  []() { theaterChase(R, G, B); },  
+  theaterChase,
   []() { rainbowCycle(5 , 3); },
-  Chroma
+  Chroma,
+  USA
 };
 
 int8_t label2modeIndex(char label) {
