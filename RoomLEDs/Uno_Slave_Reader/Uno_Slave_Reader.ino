@@ -1,5 +1,4 @@
 volatile uint8_t* R, G, B, F, P, W;
-volatile uint8_t SEGMENTS;
 uint16_t OFFSET = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -36,21 +35,22 @@ void receiveEvent(byte length) {
     //Serial.print("; ");
 
     switch (label) {
-      case 'm':{
-        int8_t modeIndex = label2modeIndex(value);
-        if (modeIndex > -1) {
-          EEPROM.write(e_mode, modeIndex);
-          needSoftReset = true;
-          mode = modes[modeIndex];
+      case 'm': {
+          int8_t modeIndex = label2modeIndex(value);
+          if (modeIndex > -1) {
+            EEPROM.write(e_mode, modeIndex);
+            needSoftReset = true;
+            mode = modes[modeIndex];
+          }
+          FFT.begin();
+          break;
         }
-        break;
-      }
       case 'r': R = value; EEPROM.write(e_red,   R); break;
       case 'g': G = value; EEPROM.write(e_green, G); break;
       case 'b': B = value; EEPROM.write(e_blue,  B); break;
       case 'f': F = value; EEPROM.write(e_freq,  F); break;
       case 'p': P = value; EEPROM.write(e_per,   P); break;
-      case 'w': W = value; EEPROM.write(e_width, W); SEGMENTS = PIXELS / W; break;
+      case 'w': W = value; EEPROM.write(e_width, W); break;
       default: break;
     }
   }
@@ -78,17 +78,14 @@ void setup() {
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
 
-  SEGMENTS = PIXELS / W;
-
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
 
   FFT.begin();  // Init Audio-Spectrum shield
-  //      mode = modes[0];
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
   ledsetup();
-  //  showColor(0, 0, 0); //blank the display
+//    showColor(0, 0, 0); //blank the display
 }
 
 void loop() {

@@ -26,33 +26,19 @@
    referrer: 'no-referrer', // *client, no-referrer })
    */
 
-        const API_URL = "http://10.0.0.69";
-        // let cansend = true;
+        const API_URL = "http://10.0.0.69?";
+        let cansend = true;
         
-        function sendPacket(inputNode) {
-            // if (cansend) return;
-            let query = `${API_URL}?${inputNode.name}=${inputNode.value}`;
-            // for (let a of Object.keys(args)) query += `${a}=${args[a]}&`;
-            // query=query.slice(0, -1);
-            console.log(query)
-            fetch(query, {
+        async function sendPacket(inputNode) {
+            if (!cansend) return; 
+            let query = `${API_URL}${inputNode.name}=${inputNode.value}`;
+            const resp = await fetch(query, {
                 mode: 'no-cors',
-                credentials: "include"
+                credentials: "include",
             })
-            // .then(d => {cansend = true;});
+            cansend=true;
+            console.log(inputNode.value)
         }
-
-        function next() {
-            if (!cansend) return;
-            cansend = false;
-            fetch(`${API_URL}/next`, {
-                    mode: 'no-cors'
-                })
-                .then(d => d.text())
-                .then(d => {
-                    cansend = true;
-                })
-        };
     </script>
 </head>
 
@@ -60,24 +46,24 @@
     <pre></pre>
     <fieldset>
         <legend>Red</legend>
-        <input type="range" value="0" min="0" max="255" name="r" oninput="sendPacket(this)" onchange="sendPacket(this)">
+        <input type="range" value="0" min="0" max="255" name="r" oninput="sendPacket(this)" >
     </fieldset>
     <fieldset>
         <legend>Green</legend>
-        <input type="range" value="0" min="0" max="255" name="g" oninput="sendPacket(this)" onchange="sendPacket(this)">
+        <input type="range" value="0" min="0" max="255" name="g" oninput="sendPacket(this)" >
     </fieldset>
     <fieldset>
         <legend>Blue</legend>
-        <input type="range" value="0" min="0" max="255" name="b" oninput="sendPacket(this)" onchange="sendPacket(this)">
+        <input type="range" value="0" min="0" max="255" name="b" oninput="sendPacket(this)" >
     </fieldset>
     <br>
     <fieldset>
         <legend>Width</legend>
-        <input type="range" value="0" min="2" max="50" name="w" oninput="sendPacket(this)" onchange="sendPacket(this)">
+        <input type="range" value="0" min="2" max="50" name="w" oninput="sendPacket(this)" >
     </fieldset>
     <fieldset>
         <legend>Speed</legend>
-        <input type="range" value="0" min="5" max="32" name="f" oninput="sendPacket(this)" onchange="sendPacket(this)">
+        <input type="range" value="0" min="5" max="128" name="f" oninput="sendPacket(this)" >
     </fieldset>
     <br>
     <input type="button" value="Next" name="Next" onclick="next()">

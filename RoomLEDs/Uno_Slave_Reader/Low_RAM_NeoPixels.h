@@ -1,4 +1,9 @@
-#define PIXELS 300  // Number of pixels in the string
+#define PIXELS 298  // Number of pixels in the string
+#define PIXELS2 298
+#define SCLERA PIXELS
+#define IRIS 194
+#define PUPIL 104
+
 #define PIXEL_PORT  PORTB  // Port of the pin the pixels are connected to
 #define PIXEL_DDR   DDRB   // Port of the pin the pixels are connected to
 #define PIXEL_BIT   0      // Bit of the pin the pixels are connected to
@@ -111,97 +116,32 @@ void showColor( unsigned char r , unsigned char g , unsigned char b ) {
 
 void theaterChase() {
   OFFSET += F;
-  uint8_t l = (PIXELS + (OFFSET>>4)) % W;
-  
-  for (uint8_t s = 0; s < SEGMENTS; s++) {
+  uint8_t l = (PIXELS + (OFFSET >> 4)) % W;
+  uint16_t p;
+
+  for (p = 0; p < SCLERA; p += W) {
     uint8_t i = 0;
     for (i; i < l; i++) sendPixel(0, 0, 0);
     sendPixel(R, G, B);
     for (++i; i < W; i++) sendPixel(0, 0, 0);
   }
-  
-  for (uint8_t s = 0; s < SEGMENTS; s++) {
+
+  for (p = 0; p < IRIS; p += W) {
     uint8_t i = 0;
-    for (i; i < W-l; i++) sendPixel2(0, 0, 0);
+    for (i; i < W - l - 1; i++) sendPixel2(0, 0, 0);
+    sendPixel2(R, G, B);
+    for (++i; i < W; i++) sendPixel2(0, 0, 0);
+  }
+
+  for (p = 0; p < PUPIL; p += W) {
+    uint8_t i = 0;
+    for (i; i < l; i++) sendPixel2(0, 0, 0);
     sendPixel2(R, G, B);
     for (++i; i < W; i++) sendPixel2(0, 0, 0);
   }
 }
 
-const uint8_t USARGB[3][3] = {{255,0,0},{255,255,255},{0,0,255}};
-
-void USA() {
-  OFFSET += F;
-  uint8_t l = (PIXELS + (OFFSET>>4)) % W;
-  uint8_t c = 0;
-  
-  for (uint8_t s = 0; s < SEGMENTS; s++) {
-    uint8_t i = 0;
-    for (i; i < l; i++) sendPixel(0, 0, 0);
-    sendPixel(USARGB[c][0], USARGB[c][1], USARGB[c][2]); ++c %= 3;
-    for (++i; i < W; i++) sendPixel(0, 0, 0);
-  }
-  
-  for (uint8_t s = 0; s < SEGMENTS; s++) {
-    uint8_t i = 0;
-    for (i; i < W-l; i++) sendPixel2(0, 0, 0);
-    sendPixel2(USARGB[c][0], USARGB[c][1], USARGB[c][2]); ++c %= 3;
-    for (++i; i < W; i++) sendPixel2(0, 0, 0);
-  }
-}
-
-// I rewrite this one from scrtach to use high resolution for the color wheel to look nicer on a *much* bigger string
-
-void rainbowCycle(uint16_t frameAdvance, uint16_t pixelAdvance ) {
-
-  // Hue is a number between 0 and 3*256 than defines a mix of r->g->b where
-  // hue of 0 = Full red
-  // hue of 128 = 1/2 red and 1/2 green
-  // hue of 256 = Full Green
-  // hue of 384 = 1/2 green and 1/2 blue
-  // ...
-
-  uint16_t firstPixelHue = 0;     // Color for the first pixel in the string
-
-  for (uint16_t j = 0; j < 768; j++) {
-
-    uint16_t currentPixelHue = firstPixelHue;
-
-    for (uint16_t i = 0; i < PIXELS; i++) {
-
-      byte phase = currentPixelHue >> 8;
-      byte step = currentPixelHue & 0xff;
-
-      switch (phase) {
-
-        case 0:
-          sendPixel( ~step , step ,  0 );
-          sendPixel2( ~step , step ,  0 );
-          break;
-
-        case 1:
-          sendPixel( 0 , ~step , step );
-          sendPixel2( 0 , ~step , step );
-          break;
-
-        case 2:
-          sendPixel(  step , 0 , ~step );
-          sendPixel2(  step , 0 , ~step );
-          break;
-
-      }
-      if ((currentPixelHue += pixelAdvance) > 768) currentPixelHue -= 768;
-    }
-
-    show();
-
-    firstPixelHue += frameAdvance;
-    delayMicroseconds(250);
-    //    delay(wait);
-  }
-}
-
-byte rainbow(byte hue) {
+uint8_t rainbow(uint8_t hue) {
   if (hue > 170) return ~(hue + (hue << 1));
   if (hue > 85) return hue + (hue << 1);
   return 0;
@@ -209,4 +149,42 @@ byte rainbow(byte hue) {
 //p.r = rainbow(_t);
 //p.g = rainbow(_t - 85);
 //p.b = rainbow(_t - 170);
+
+uint8_t rainbow16(uint16_t hue) {
+  if (hue > (170 << 8)) return ~((hue + (hue << 1)) >> 8);
+  if (hue > (85 << 8)) return (hue + (hue << 1)) >> 8;
+  return 0;
+}
+
+void rainbowSolid(void) {
+  OFFSET += F;
+  uint8_t t = OFFSET >> 4;
+  uint8_t r = rainbow(t),
+          g = rainbow(t - 85),
+          b = rainbow(t - 170);
+  for ( uint16_t p = 0; p < PIXELS; p++ ) sendPixel(r, g, b);
+  for ( uint16_t p = 0; p < PIXELS2; p++ ) sendPixel2(r, g, b);
+}
+
+void rainbowGradient(void) {
+  OFFSET += F;
+  uint8_t t = OFFSET >> 4;
+  for ( uint16_t p = 0; p < SCLERA; p++ ) {
+    uint8_t h = map(p, 0, SCLERA, 0, 255) + t;
+    sendPixel(rainbow(h), rainbow(h - 85), rainbow(h - 170));
+  }
+  for ( uint16_t p = 0; p < IRIS; p++ ) {
+    uint8_t h = map(p, 0, IRIS, 0, 255) + t;
+    sendPixel2(rainbow(h), rainbow(h - 85), rainbow(h - 170));
+  }
+  for ( uint16_t p = 0; p < PUPIL; p++ ) {
+    uint8_t h = map(p, 0, PUPIL, 0, 255) + t;
+    sendPixel2(rainbow(h), rainbow(h - 85), rainbow(h - 170));
+  }
+}
+
+
+
+
+
 
