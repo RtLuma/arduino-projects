@@ -26,6 +26,7 @@
    referrer: 'no-referrer', // *client, no-referrer })
    */
 
+
         const API_URL = "http://10.0.0.69";
         // let cansend = true;
         
@@ -41,18 +42,6 @@
             })
             // .then(d => {cansend = true;});
         }
-
-        function next() {
-            if (!cansend) return;
-            cansend = false;
-            fetch(`${API_URL}/next`, {
-                    mode: 'no-cors'
-                })
-                .then(d => d.text())
-                .then(d => {
-                    cansend = true;
-                })
-        };
     </script>
 </head>
 
