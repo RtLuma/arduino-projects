@@ -30,7 +30,7 @@ struct spectrumShield {
 
         if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band] -= 2;
         if (lvls[channel][band] > 8) { // Fade by subtracting a proportion
-          lvls[channel][band] -= (lvls[channel][band] / 5);
+          lvls[channel][band] -= (lvls[channel][band] / 6);
         }
         else lvls[channel][band] = 0;
 
@@ -38,6 +38,7 @@ struct spectrumShield {
         //        level = 1023;
         //        level = level > MIN_CUTOFF ? level - MIN_CUTOFF : 0;
         level = level > MIN_CUTOFF ? map(level, MIN_CUTOFF, 1023, 0, 1023) : 0;
+        //level = 1023;
 
         uint32_t ratio = 1023;
 
@@ -50,9 +51,9 @@ struct spectrumShield {
         else maxs[channel][band] = level;
 
         if (ratio > lvls[channel][band]) {
-          //          lvls[channel][band] = ratio;
-          //          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
-          lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
+          lvls[channel][band] = ratio;
+          //lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
+          //lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
         }
 
       }
