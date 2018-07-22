@@ -14,9 +14,9 @@ uint8_t iris[3] = { 0 };
 uint8_t pupil[3] = { 0 };
 
 #define visualizerBlock(DIST, PIXEL_FUNCTION)\
-  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST+1);\
-  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST+1);\
-  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST+1);\
+  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST-1);\
+  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST-1);\
+  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST-1);\
   PIXEL_FUNCTION(r,g,b);\
   for (uint8_t p = 1; p < DIST; p++) {\
     r += r_step; g += g_step; b += b_step;\
