@@ -14,9 +14,9 @@ uint8_t iris[3] = { 0 };
 uint8_t pupil[3] = { 0 };
 
 #define visualizerBlock(DIST, PIXEL_FUNCTION)\
-  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST-1);\
-  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST-1);\
-  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST-1);\
+  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST+1);\
+  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST+1);\
+  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST+1);\
   PIXEL_FUNCTION(r,g,b);\
   for (uint8_t p = 1; p < DIST; p++) {\
     r += r_step; g += g_step; b += b_step;\
@@ -68,27 +68,27 @@ void Chroma(void) {
   uint8_t r, g, b;
   int8_t r_step, g_step, b_step;
   uint8_t *pixelA, *pixelB;
-//
-//  sclera[0][0][0] = 0;
-//  sclera[0][0][1] = 0;
-//  sclera[0][0][2] = 0;
-//  sclera[1][0][0] = 0;
-//  sclera[1][0][1] = 0;
-//  sclera[1][0][2] = 0;
-//
-//  sclera[0][6][0] = 0;
-//  sclera[0][6][1] = 0;
-//  sclera[0][6][2] = 0;
-//  sclera[1][6][0] = 0;
-//  sclera[1][6][1] = 0;
-//  sclera[1][6][2] = 0;
-//
-//  sclera[0][3][0] = 0;
-//  sclera[0][3][1] = 0;
-//  sclera[0][3][2] = 0;
-//  sclera[1][3][0] = 0;
-//  sclera[1][3][1] = 0;
-//  sclera[1][3][2] = 0;
+
+  sclera[0][0][0] = 0;
+  sclera[0][0][1] = 0;
+  sclera[0][0][2] = 0;
+  sclera[1][0][0] = 0;
+  sclera[1][0][1] = 0;
+  sclera[1][0][2] = 0;
+
+  sclera[0][6][0] = 0;
+  sclera[0][6][1] = 0;
+  sclera[0][6][2] = 0;
+  sclera[1][6][0] = 0;
+  sclera[1][6][1] = 0;
+  sclera[1][6][2] = 0;
+
+  sclera[0][3][0] = 0;
+  sclera[0][3][1] = 0;
+  sclera[0][3][2] = 0;
+  sclera[1][3][0] = 0;
+  sclera[1][3][1] = 0;
+  sclera[1][3][2] = 0;
 
   pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels(SECTION_SCLERA)
   pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels(SECTION_SCLERA)
