@@ -17,6 +17,7 @@
 #define CYCLES_PER_SEC (F_CPU)
 #define NS_PER_CYCLE ( NS_PER_SEC / CYCLES_PER_SEC )
 #define NS_TO_CYCLES(n) ( (n) / NS_PER_CYCLE )
+#define sendPixel1 sendPixel
 inline void sendBit( bool bitVal ) {
   if (  bitVal ) asm volatile (
       "sbi %[port], %[bit] \n\t"
@@ -81,6 +82,44 @@ inline void sendBit2( bool bitVal ) {
       [offCycles] "I" (NS_TO_CYCLES(T0L) - 2)
     );
 }
+inline void send2Bits( bool bitVal ) {
+  if (  bitVal ) asm volatile (
+      "sbi %[port], %[bit1] \n\t"
+      "sbi %[port], %[bit2] \n\t"
+      ".rept %[onCycles] \n\t"
+      "nop \n\t"
+      ".endr \n\t"
+      "cbi %[port], %[bit1] \n\t"
+      "cbi %[port], %[bit2] \n\t"
+      ".rept %[offCycles] \n\t"
+      "nop \n\t"
+      ".endr \n\t"
+      ::
+      [port]    "I" (_SFR_IO_ADDR(PIXEL_PORT)),
+      [bit1]   "I" (PIXEL_BIT),
+      [bit2]   "I" (PIXEL_BIT2),
+      [onCycles]  "I" (NS_TO_CYCLES(T1H) - 2),
+      [offCycles]   "I" (NS_TO_CYCLES(T1L) - 2)
+    );
+  else asm volatile (
+      "sbi %[port], %[bit1] \n\t"
+      "sbi %[port], %[bit2] \n\t"
+      ".rept %[onCycles] \n\t"
+      "nop \n\t"
+      ".endr \n\t"
+      "cbi %[port], %[bit1] \n\t"
+      "cbi %[port], %[bit2] \n\t"
+      ".rept %[offCycles] \n\t"
+      "nop \n\t"
+      ".endr \n\t"
+      ::
+      [port]    "I" (_SFR_IO_ADDR(PIXEL_PORT)),
+      [bit1]   "I" (PIXEL_BIT),
+      [bit2]   "I" (PIXEL_BIT2),
+      [onCycles]  "I" (NS_TO_CYCLES(T0H) - 2),
+      [offCycles] "I" (NS_TO_CYCLES(T0L) - 2)
+    );
+}
 inline void sendByte( unsigned char byte ) {
   for ( unsigned char bit = 0 ; bit < 8 ; bit++ ) {
     sendBit( bitRead( byte , 7 ) );
@@ -93,6 +132,12 @@ inline void sendByte2( unsigned char byte ) {
     byte <<= 1;
   }
 }
+inline void send2Bytes( unsigned char byte ) {
+  for ( unsigned char bit = 0 ; bit < 8 ; bit++ ) {
+    send2Bits( bitRead( byte , 7 ) );
+    byte <<= 1;
+  }
+}
 void ledsetup() {
   bitSet( PIXEL_DDR , PIXEL_BIT );
   bitSet( PIXEL_DDR , PIXEL_BIT2 );
@@ -102,6 +147,9 @@ inline void sendPixel( unsigned char r, unsigned char g , unsigned char b )  {
 }
 inline void sendPixel2( unsigned char r, unsigned char g , unsigned char b )  {
   cli(); sendByte2(g); sendByte2(r); sendByte2(b); sei();
+}
+inline void send2Pixels( unsigned char r, unsigned char g , unsigned char b )  {
+  cli(); send2Bytes(g); send2Bytes(r); send2Bytes(b); sei();
 }
 void show() {
   _delay_us( (RES / 1000UL) + 1);

@@ -16,11 +16,11 @@ void receiveEvent(byte length) {
   uint8_t i = 0;
   byte payload[length];
 
-  //  while (Wire.available()) payload[++i] = Wire.read();
-  while (Wire.available()) {
-    payload[i] = Wire.read();
-    i++;
-  }
+    while (Wire.available()) payload[i++] = Wire.read();
+//  while (Wire.available()) {
+//    payload[i] = Wire.read();
+//    i++;
+//  }
   Wire.flush();
 
   bool needSoftReset = false;

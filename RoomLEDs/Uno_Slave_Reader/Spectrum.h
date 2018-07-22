@@ -30,7 +30,7 @@ struct spectrumShield {
 
         if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band] -= 2;
         if (lvls[channel][band] > 8) { // Fade by subtracting a proportion
-          lvls[channel][band] -= (lvls[channel][band] / 5);
+          lvls[channel][band] -= (lvls[channel][band] / 6);
         }
         else lvls[channel][band] = 0;
 
