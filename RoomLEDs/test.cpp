@@ -1,102 +1,68 @@
-include <string>
+#include <string>
+#include <iostream>
 using namespace std;
 
-uint8_t rainbow(uint8_t hue) {
-  if (hue > 170) return ~(hue + (hue << 1));
-  if (hue > 85) return hue + (hue << 1);
-  return 0;
-}
-
-#define SECTION 21
-#define SECTIONODD 22
+#define SECTION 25
 #define BANDS 7
-#define SECTION 22
-
-const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
-
-void tick() { for}
 
 uint8_t sclera[2][BANDS][3] = {0};
 
-#define sendSclera pixelAr = pixelA[0];\
-  pixelAg = pixelA[1];\
-  pixelAb = pixelA[2];\
-  pixelBr = pixelB[0];\
-  pixelBg = pixelB[1];\
-  pixelBb = pixelB[2];\
-  dist = SECTION;\
-  for (uint8_t p = 0; p < SECTION; p++) {\
-    dist--;\
-    sendPixel(\
-              ((pixelAr * dist) + (pixelBr * p)) / SECTION,\
-              ((pixelAg * dist) + (pixelBg * p)) / SECTION,\
-              ((pixelAb * dist) + (pixelBb * p)) / SECTION\
-             );\
-  }
-
-void Chroma(void) {
-
-  /////////////////////////////// start computing and broadcasting each pixel on the fly
-  uint8_t band, dist;
-  uint8_t pixelAr, pixelAg, pixelAb, pixelBr, pixelBg, pixelBb;
-  uint8_t *pixelA, *pixelB;
-
-  for (band = 3; band < 6; band++) {
-    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1]; sendSclera
-  }
-
-  pixelA = sclera[0][6]; pixelB = sclera[1][6]; sendSclera
-
-  for (band; band > 3; band--) {
-    pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendSclera
-  }
-
-  for (band; band > 0; band--) {
-    pixelA = sclera[1][band]; pixelB = sclera[1][band - 1]; sendScleraOdd
-  }
-
-  pixelA = sclera[1][0]; pixelB = sclera[0][0]; sendSclera
-
-  for (band; band < 3; band++) {
-    pixelA = sclera[0][band]; pixelB = sclera[0][band + 1]; sendScleraOdd
-  }
-
-
-  uint16_t newIris[3] = { 0 };
-  uint16_t newPupil[3] = { 0 };
-  band = 0;
-  uint16_t p = 0;
-
-  for (band; band < 3; band++) {
-    newIris[0] += (sclera[0][band][0] + sclera[1][band][0]) >> 1;
-    newIris[1] += (sclera[0][band][1] + sclera[1][band][1]) >> 1;
-    newIris[2] += (sclera[0][band][2] + sclera[1][band][2]) >> 1;
-  }
-  band++;
-  for (band; band < 7; band++) {
-    newPupil[0] += (sclera[0][band][0] + sclera[1][band][0]) >> 1;
-    newPupil[1] += (sclera[0][band][1] + sclera[1][band][1]) >> 1;
-    newPupil[2] += (sclera[0][band][2] + sclera[1][band][2]) >> 1;
-  }
-
-  newIris[0] >>= 2; newIris[1] >>= 2; newIris[2] >>= 2;
-
-  iris[0] = (newIris[0] + newIris[0] + newIris[0] + iris[0]) >> 2;
-  iris[1] = (newIris[1] + newIris[1] + newIris[1] + iris[1]) >> 2;
-  iris[2] = (newIris[2] + newIris[2] + newIris[2] + iris[2]) >> 2;
-
-  newPupil[0] >>= 1; newPupil[1] >>= 1; newPupil[2] >>= 1;
-
-  pupil[0] = (newPupil[0] + newPupil[0] + newPupil[0] + pupil[0]) >> 2;
-  pupil[1] = (newPupil[1] + newPupil[1] + newPupil[1] + pupil[1]) >> 2;
-  pupil[2] = (newPupil[2] + newPupil[2] + newPupil[2] + pupil[2]) >> 2;
-
-  for (p; p < 194; p++) sendPixel2(iris[0], iris[1], iris[2]);
-  for (p; p < 298; p++) sendPixel2(pupil[0], pupil[1], pupil[2]);
+string val2block(uint8_t val) {
+  float rat = (float)val/255.0;
+  // return to_string(val) + " ";
+  if (rat > 0.999)    return "\u2588";
+  if (rat > 7.0/8.0) return "\u2587";
+  if (rat > 6.0/8.0) return "\u2586";
+  if (rat > 5.0/8.0) return "\u2585";
+  if (rat > 4.0/8.0) return "\u2584";
+  if (rat > 3.0/8.0) return "\u2584";
+  if (rat > 2.0/8.0) return "\u2583";
+  if (rat > 1.0/8.0) return "\u2582";
+    return ".";
 }
 
+void printColor(uint8_t c, uint8_t ansi) {
+  printf("%c[%dm", 0x1B, ansi);
+  cout << val2block(c);
+  printf("%c[%dm", 0x1B, 0);
+}
 
+#define sendVisualizerPixels(DIST)\
+  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST);\
+  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST);\
+  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST);\
+  printf("%d,%d,%d -> %d,%d,%d over %d steps:\n",r,g,b,pixelB[0],pixelB[1],pixelB[2],SECTION);\
+  r += r_step < 0 ? r_step*1.5 : 0;\
+  g += g_step < 0 ? g_step*1.5 : 0;\
+  b += b_step < 0 ? b_step*1.5 : 0;\
+  printColor(r, 31);\
+  for (uint8_t p = 1; p < DIST; p++) { r += r_step; printColor(r, 31); }\
+  cout << endl; printColor(g, 32);\
+  for (uint8_t p = 1; p < DIST; p++) { g += g_step; printColor(g, 32); }\
+  cout << endl; printColor(b, 34);\
+  for (uint8_t p = 1; p < DIST; p++) { b += b_step; printColor(b, 34); }\
+  cout << endl<<endl;\
+    
+//----------------------------------------------------------------------- 
 
 int main() {
-    
+
+  /////////////////////////////// start computing and broadcasting each pixel on the fly
+  uint8_t r, g, b;
+  int8_t r_step, g_step, b_step;
+  uint8_t *pixelA, *pixelB;
+  
+  sclera[0][1][0] = 255; sclera[0][1][1] = 64; sclera[0][1][2] = 0;
+  sclera[0][0][0] = 0; sclera[0][0][1] = 0; sclera[0][0][2] = 0;
+  sclera[1][0][0] = 0; sclera[1][0][1] = 255; sclera[1][0][2] = 64;
+  sclera[1][1][0] = 64; sclera[1][1][1] = 0; sclera[1][1][2] = 255;
+
+  pixelA = sclera[0][0]; pixelB = sclera[0][1]; sendVisualizerPixels(SECTION)
+  pixelA = sclera[0][1]; pixelB = sclera[0][0]; sendVisualizerPixels(SECTION)
+  pixelA = sclera[0][0]; pixelB = sclera[1][0]; sendVisualizerPixels(SECTION)
+  pixelA = sclera[1][0]; pixelB = sclera[1][1]; sendVisualizerPixels(SECTION)
+  pixelA = sclera[1][1]; pixelB = sclera[1][0]; sendVisualizerPixels(SECTION)
+  
 }
+
+
