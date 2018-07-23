@@ -28,19 +28,19 @@ void printColor(uint8_t c, uint8_t ansi) {
 }
 
 #define sendVisualizerPixels(DIST)\
-  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST);\
-  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST);\
-  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST);\
+  r = pixelA[0]; r <<= 8;\
+  g = pixelA[1]; g <<= 8;\
+  b = pixelA[1]; b <<= 8;\
   printf("%d,%d,%d -> %d,%d,%d over %d steps:\n",r,g,b,pixelB[0],pixelB[1],pixelB[2],SECTION);\
-  r += r_step < 0 ? r_step*1.5 : 0;\
-  g += g_step < 0 ? g_step*1.5 : 0;\
-  b += b_step < 0 ? b_step*1.5 : 0;\
-  printColor(r, 31);\
-  for (uint8_t p = 1; p < DIST; p++) { r += r_step; printColor(r, 31); }\
-  cout << endl; printColor(g, 32);\
-  for (uint8_t p = 1; p < DIST; p++) { g += g_step; printColor(g, 32); }\
-  cout << endl; printColor(b, 34);\
-  for (uint8_t p = 1; p < DIST; p++) { b += b_step; printColor(b, 34); }\
+  r_step = pixelB[0];r_step <<=8;r_step -= r;r_step /= (DIST-1)<<8;\
+  g_step = pixelB[1];g_step <<=8;g_step -= g;g_step /= (DIST-1)<<8;\
+  b_step = pixelB[1];b_step <<=8;b_step -= b;b_step /= (DIST-1)<<8;\
+  printColor(r>>8, 31);\
+  for (uint8_t p = 1; p < DIST; p++) { r += r_step; printColor(r>>8, 31); }\
+  cout << endl; printColor(g>>8, 32);\
+  for (uint8_t p = 1; p < DIST; p++) { g += g_step; printColor(g>>8, 32); }\
+  cout << endl; printColor(b>>8, 34);\
+  for (uint8_t p = 1; p < DIST; p++) { b += b_step; printColor(b>>8, 34); }\
   cout << endl<<endl;\
     
 //----------------------------------------------------------------------- 
@@ -48,8 +48,8 @@ void printColor(uint8_t c, uint8_t ansi) {
 int main() {
 
   /////////////////////////////// start computing and broadcasting each pixel on the fly
-  uint8_t r, g, b;
-  int8_t r_step, g_step, b_step;
+  uint16_t r, g, b;
+  int16_t r_step, g_step, b_step;
   uint8_t *pixelA, *pixelB;
   
   sclera[0][1][0] = 255; sclera[0][1][1] = 64; sclera[0][1][2] = 0;
