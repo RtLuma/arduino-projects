@@ -16,11 +16,8 @@ void receiveEvent(byte length) {
   uint8_t i = 0;
   byte payload[length];
 
-    while (Wire.available()) payload[i++] = Wire.read();
-//  while (Wire.available()) {
-//    payload[i] = Wire.read();
-//    i++;
-//  }
+  while (Wire.available()) payload[i++] = Wire.read();
+
   Wire.flush();
 
   bool needSoftReset = false;
@@ -85,7 +82,7 @@ void setup() {
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
   ledsetup();
-//    showColor(0, 0, 0); //blank the display
+  //    showColor(0, 0, 0); //blank the display
 }
 
 void loop() {

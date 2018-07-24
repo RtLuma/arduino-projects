@@ -14,26 +14,17 @@ uint8_t iris[3] = { 0 };
 uint8_t pupil[3] = { 0 };
 
 #define visualizerBlock(DIST, PIXEL_FUNCTION)\
-  r = pixelA[0]; r_step = (pixelB[0]-r)/(DIST-1);\
-  g = pixelA[1]; g_step = (pixelB[1]-g)/(DIST-1);\
-  b = pixelA[2]; b_step = (pixelB[2]-b)/(DIST-1);\
-  PIXEL_FUNCTION(r,g,b);\
+  r = pixelA[0]; r <<= 8;\
+  r_step = pixelB[0];r_step <<=8;r_step -= r;r_step /= (DIST-1)<<8;\
+  g = pixelA[1]; g <<= 8;\
+  g_step = pixelB[1];g_step <<=8;g_step -= g;g_step /= (DIST-1)<<8;\
+  b = pixelA[1]; b <<= 8;\
+  b_step = pixelB[1];b_step <<=8;b_step -= b;b_step /= (DIST-1)<<8;\
+  PIXEL_FUNCTION(r>>8,g>>8,b>>8);\
   for (uint8_t p = 1; p < DIST; p++) {\
-    r += r_step; g += g_step; b += b_step;\
-    PIXEL_FUNCTION(r,g,b);\
+    PIXEL_FUNCTION(r>>8,g>>8,b>>8);\
+    r += r_step; g += g_step; b += b_step;\    
   }
-
-#define visualizerDebug(DIST, PIXEL_FUNCTION)\
-  r = pixelA[0]; r_step = (pixelB[0]-r)/DIST;\
-  g = pixelA[1]; g_step = (pixelB[1]-g)/DIST;\
-  b = pixelA[2]; b_step = (pixelB[2]-b)/DIST;\
-  PIXEL_FUNCTION(r,g,b);\
-  for (uint8_t p = 0; p < DIST; p++) {\
-    r += r_step; g += g_step; b += b_step;\
-    PIXEL_FUNCTION(r,g,b);\
-    Serial.print("[");Serial.print(r);Serial.print(",");Serial.print(b);Serial.print(",");Serial.print(g);Serial.print("] ");\
-  }\
-  Serial.println();
 
 
 #define sendVisualizerPixels(WIDTH) visualizerBlock(WIDTH, sendPixel)
@@ -65,30 +56,30 @@ void Chroma(void) {
   }
 
   /////////////////////////////// start computing and broadcasting each pixel on the fly
-  uint8_t r, g, b;
-  int8_t r_step, g_step, b_step;
+  uint16_t r, g, b;
+  int16_t r_step, g_step, b_step;
   uint8_t *pixelA, *pixelB;
 
-  sclera[0][0][0] = 0;
-  sclera[0][0][1] = 0;
-  sclera[0][0][2] = 0;
-  sclera[1][0][0] = 0;
-  sclera[1][0][1] = 0;
-  sclera[1][0][2] = 0;
+//  sclera[0][0][0] = 0;
+//  sclera[0][0][1] = 0;
+//  sclera[0][0][2] = 0;
+//  sclera[1][0][0] = 0;
+//  sclera[1][0][1] = 0;
+//  sclera[1][0][2] = 0;
 
-  sclera[0][6][0] = 0;
-  sclera[0][6][1] = 0;
-  sclera[0][6][2] = 0;
-  sclera[1][6][0] = 0;
-  sclera[1][6][1] = 0;
-  sclera[1][6][2] = 0;
-
-  sclera[0][3][0] = 0;
-  sclera[0][3][1] = 0;
-  sclera[0][3][2] = 0;
-  sclera[1][3][0] = 0;
-  sclera[1][3][1] = 0;
-  sclera[1][3][2] = 0;
+//  sclera[0][6][0] = 0;
+//  sclera[0][6][1] = 0;
+//  sclera[0][6][2] = 0;
+//  sclera[1][6][0] = 0;
+//  sclera[1][6][1] = 0;
+//  sclera[1][6][2] = 0;
+//
+//  sclera[0][3][0] = 0;
+//  sclera[0][3][1] = 0;
+//  sclera[0][3][2] = 0;
+//  sclera[1][3][0] = 0;
+//  sclera[1][3][1] = 0;
+//  sclera[1][3][2] = 0;
 
   pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels(SECTION_SCLERA)
   pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels(SECTION_SCLERA)
