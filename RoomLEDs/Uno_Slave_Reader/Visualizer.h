@@ -14,19 +14,14 @@ uint8_t iris[3] = { 0 };
 uint8_t pupil[3] = { 0 };
 
 #define visualizerBlock(DIST, PIXEL_FUNCTION)\
-  r = pixelA[0]; r <<= 8;\
-  r_step = pixelB[0];r_step <<=8;r_step -= r;r_step /= (DIST-1)<<8;\
-  g = pixelA[1]; g <<= 8;\
-  g_step = pixelB[1];g_step <<=8;g_step -= g;g_step /= (DIST-1)<<8;\
-  b = pixelA[1]; b <<= 8;\
-  b_step = pixelB[1];b_step <<=8;b_step -= b;b_step /= (DIST-1)<<8;\
-  PIXEL_FUNCTION(r>>8,g>>8,b>>8);\
+  r = (uint16_t)pixelA[0] << 7; r_step = pixelB[0] << 7; r_step -= r; r_step /= DIST;\
+  g = (uint16_t)pixelA[1] << 7; g_step = pixelB[1] << 7; g_step -= g; g_step /= DIST;\
+  b = (uint16_t)pixelA[2] << 7; b_step = pixelB[2] << 7; b_step -= b; b_step /= DIST;\
+  PIXEL_FUNCTION(r>>7,g>>7,b>>7);\
   for (uint8_t p = 1; p < DIST; p++) {\
-    PIXEL_FUNCTION(r>>8,g>>8,b>>8);\
+    PIXEL_FUNCTION(r>>7,g>>7,b>>7);\
     r += r_step; g += g_step; b += b_step;\    
-  }
-
-
+  } delayMicroseconds(10);
 #define sendVisualizerPixels(WIDTH) visualizerBlock(WIDTH, sendPixel)
 #define sendVisualizerPixels2(WIDTH) visualizerBlock(WIDTH, sendPixel2)
 

@@ -17,7 +17,6 @@ void receiveEvent(byte length) {
   byte payload[length];
 
   while (Wire.available()) payload[i++] = Wire.read();
-
   Wire.flush();
 
   bool needSoftReset = false;
