@@ -52,7 +52,7 @@ int main() {
   int16_t r_step, g_step, b_step;
   uint8_t *pixelA, *pixelB;
   
-  sclera[0][1][0] = 255; sclera[0][1][1] = 255; sclera[0][1][2] = 255;
+  sclera[0][1][0] = 255; sclera[0][1][1] = 64; sclera[0][1][2] = 0;
   sclera[0][0][0] = 0; sclera[0][0][1] = 0; sclera[0][0][2] = 0;
   sclera[1][0][0] = 0; sclera[1][0][1] = 255; sclera[1][0][2] = 64;
   sclera[1][1][0] = 64; sclera[1][1][1] = 0; sclera[1][1][2] = 255;
