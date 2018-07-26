@@ -3,7 +3,7 @@
 #include <unistd.h>
 using namespace std;
 
-#define SECTION 50
+#define SECTION 100
 #define BANDS 7
 
 uint8_t sclera[2][BANDS][3] = {0};
@@ -26,18 +26,18 @@ void printColor(uint8_t r, uint8_t g, uint8_t b) {
   printf("%c[%dm", 0x1B, 34); cout << val2block(b);
   printf("%c[%dm", 0x1B, 0);
   fflush(stdout);
-  usleep(20000);
+  usleep(10000);
+
 }
 
 #define sendVisualizerPixels(DIST)\
-  r = pixelA[0] << 8;\
-  g = pixelA[1] << 8;\
-  b = pixelA[2] << 8;\
-  printf("%d,%d,%d -> %d,%d,%d over %d steps:\n",r>>8,g>>8,b>>8,pixelB[0],pixelB[1],pixelB[2],SECTION);\
-  r_step = (((uint16_t)pixelB[0] << 8) - ((uint16_t)pixelA[0] << 8))/DIST;\
-  g_step = (((uint16_t)pixelB[1] << 8) - ((uint16_t)pixelA[1] << 8))/DIST;\
-  b_step = (((uint16_t)pixelB[2] << 8) - ((uint16_t)pixelA[2] << 8))/DIST;\
- for (uint8_t p = 0; p < DIST; p++) {\
+  r = pixelA[0]; g = pixelA[1]; b = pixelA[2];\
+  printf("%d,%d,%d -> %d,%d,%d over %d steps\n",r,g,b,pixelB[0],pixelB[1],pixelB[2],SECTION);\
+  cin.ignore();\
+  r_step = ((int16_t)(pixelB[0] - pixelA[0]) << 8)/DIST;\
+  g_step = ((int16_t)(pixelB[1] - pixelA[1]) << 8)/DIST;\
+  b_step = ((int16_t)(pixelB[2] - pixelA[2]) << 8)/DIST;\
+  for (uint8_t p = 0; p < DIST; p++) {\
     printColor(r>>8, g>>8, b>>8);\
     r += r_step; g += g_step; b += b_step;\
   }\
