@@ -1,3 +1,5 @@
+// There's also this too https://github.com/ivanseidel/LinkedList
+
 #include<iostream>
 using namespace std;
 struct node
