@@ -45,7 +45,7 @@ class list {
 	
 	void print() {
 		node *temp = new node; temp=head; string chain="";
-		while (temp!=NULL) { chain += "[" + to_string(temp->pos) + " " + val2block(temp->mag) + "]\n"; temp=temp->next; }
+		while (temp!=NULL) { chain += "[" + to_string(temp->pos) + " " + val2block(temp->mag) + "]"; temp=temp->next; }
 		cout << chain << endl;
 		// cout << chain.substr(0,chain.length()-4) << endl;
 	}
@@ -60,25 +60,32 @@ class list {
 		node *temp=new node; temp-> mag=mag; temp->pos=0; temp->next=head; head=temp; nodes++;
 	}
 	
-	void insert(uint16_t pos, uint8_t mag) { //at position
+	bool insert(uint16_t pos, uint8_t mag) { //at position
 		node *pre=new node;
 		node *cur=new node;
 		node *temp=new node; temp->mag=mag; temp->pos=pos; temp->next=NULL;
 		cur=head;
 		nodes++;
-		if (head==NULL)	{ head=temp; tail=temp; temp=NULL; return; }
-		if (head->pos > pos) { temp->next=head; head=temp; temp=NULL; return; }
+		if (head==NULL)	{ head=temp; tail=temp; temp=NULL; return true; }
+		if (head->pos > pos) { temp->next=head; head=temp; temp=NULL; return true; }
 		while (cur->next!=NULL) {
-			if (cur->pos == pos) { nodes--; return; }
+			pre=cur;
+			cur=cur->next;
+			if (pre->pos == pos || cur->pos == pos) { 
+				temp=NULL;
+				nodes--;
+				return false; 
+				}
 			if (cur->pos > pos) {
 				pre->next=temp;
 				temp->next=cur;
-				return;
+				temp=NULL;
+				return true;
 			}
-			pre=cur;
-			cur=cur->next;
+			
 		}
 		cur->next=temp; temp->next=NULL;
+		return true;
 	}
 	
 	void shift() {		//delete first
@@ -99,8 +106,8 @@ class list {
 };
 
 
-#define SCLERA 300
-#define SPARKLES 50
+#define SCLERA 10
+#define SPARKLES 10
 
 int main() {
 	list leds;
@@ -108,10 +115,15 @@ int main() {
 	for (uint8_t r=(rand()>>23); r>0;r--) rand();
 	
 	while (leds.length() < SPARKLES) {
-		leds.insert(rand()%SCLERA,rand() >> 23);
-		// cout << to_string((uint8_t8_t)) << endl;
+		uint16_t pos = rand()%SCLERA;
+		uint8_t mag = rand() >> 23; 
+		if (leds.insert(pos, mag)) {
+			cout << to_string(pos)  << " → ";
+			// cout << to_string((uint8_t8_t)) << endl;
+			leds.print();
+			usleep(1000);
+		}
 	}
-	leds.print();
 	// cout << endl << to_string(leds.length()) << endl;
 }
 
