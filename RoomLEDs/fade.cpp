@@ -38,7 +38,7 @@ void printColor(uint8_t r, uint8_t g, uint8_t b) {
 struct node { uint8_t mag; uint16_t pos; node *next; };
 
 #define SCLERA 50
-#define SPARKLES 10
+#define SPARKLES 25
 
 
 class list { 
@@ -117,8 +117,7 @@ class list {
 		node *cur=head;
 		while (cur!=nullptr) {
 			if (cur->pos & 0x8000) {
-				cur->mag -= cur->mag >> 4;
-				if (cur->mag < 16) {
+				if (!--(cur->mag)) {
 					uint16_t del_pos = (cur->pos & 0x7fff);
 					cur = cur->next;
 					if (!cut(del_pos)) cout << "\nBad cut??? " << to_string(del_pos) << endl;
@@ -140,9 +139,9 @@ int main() {
 	for (uint8_t r=(rand()>>23); r>0; r--) rand();
 	cout << endl;
 	while (leds.length() < SPARKLES) {
-		uint8_t mag = uint16_t(leds.length() << 8) / SPARKLES; 
-		uint16_t pos = (rand()%SCLERA) | ((mag & 0x80) ? 0x8000 : 0);
-		cout << to_string(mag) << endl;
+		uint8_t mag = rand() >> 23;
+		uint16_t pos = (rand()%SCLERA) | ((rand() & 1) ? 0x8000 : 0);
+		// cout << to_string(0x7fff & pos) << (pos > 0x7fff ? ", -" : ", ") << to_string(mag) << endl;
 		leds.insert(pos, mag);
 	}
 	
@@ -152,7 +151,7 @@ int main() {
 		leds.print();
 		cout << "]";
 		fflush(stdout);
-		usleep(10000);
+		usleep(2000);
 	}
 }
 
