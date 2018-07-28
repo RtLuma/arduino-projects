@@ -8,16 +8,19 @@
 
 using namespace std;
 
+#define ZERO_SYMBOL " " 
+
 string val2block(uint8_t val) {
   // return to_string(val) + " ";
-  if (val > 223) return "\u2588";
-  if (val > 191) return "\u2587";
-  if (val > 159) return "\u2586";
-  if (val > 127) return "\u2585";
-  if (val > 95)  return "\u2584";
-  if (val > 63)  return "\u2583";
-  if (val > 31)  return "\u2582";
-  return ".";
+  if (val > 226) return "\u2588";
+  if (val > 198) return "\u2587";
+  if (val > 169) return "\u2586";
+  if (val > 141) return "\u2585";
+  if (val > 113) return "\u2584";
+  if (val > 84)  return "\u2583";
+  if (val > 56)  return "\u2582";
+  if (val > 28)  return "\u2581";
+  				 return ZERO_SYMBOL;
 } 
 
 void printColor(uint8_t r, uint8_t g, uint8_t b) {
@@ -33,6 +36,9 @@ void printColor(uint8_t r, uint8_t g, uint8_t b) {
 //Store whether fading in or out in high bit of pos
 struct node { uint8_t mag; uint16_t pos; node *next; };
 
+#define SCLERA 75
+#define SPARKLES 50
+
 
 class list { 
   private:
@@ -45,38 +51,36 @@ class list {
 	
 	void print() {
 		node *temp = new node; temp=head; string chain="";
-		while (temp!=NULL) { chain += "[" + to_string(temp->pos) + " " + val2block(temp->mag) + "]"; temp=temp->next; }
-		cout << chain << endl;
+		uint16_t p;
+		for (p=0; temp != NULL;) {
+			for (p; p < (0x7fff & temp->pos); p++) chain += ZERO_SYMBOL;
+			chain += val2block(temp->mag); p++;
+			temp=temp->next;
+		}
+		for (p; p < SCLERA; p++) chain += ZERO_SYMBOL;
+		// while (temp!=NULL) { chain += "[" + to_string(temp->pos) + val2block(temp->mag) + "]"; temp=temp->next; }
+		cout << chain;
 		// cout << chain.substr(0,chain.length()-4) << endl;
 	}
 	
-	/*            ↓ insert
-	 unshift → [chain] ← push
-	   shift ← [chain] → pop
-		          ↓ cut
-	*/
-	
-	void unshift(uint8_t mag) { //at beginning
-		node *temp=new node; temp-> mag=mag; temp->pos=0; temp->next=head; head=temp; nodes++;
-	}
-	
 	bool insert(uint16_t pos, uint8_t mag) { //at position
+		pos &= 0x7fff;
 		node *pre=new node;
 		node *cur=new node;
 		node *temp=new node; temp->mag=mag; temp->pos=pos; temp->next=NULL;
 		cur=head;
 		nodes++;
 		if (head==NULL)	{ head=temp; tail=temp; temp=NULL; return true; }
-		if (head->pos > pos) { temp->next=head; head=temp; temp=NULL; return true; }
+		if ((0x7fff & head->pos) > pos) { temp->next=head; head=temp; temp=NULL; return true; }
 		while (cur->next!=NULL) {
 			pre=cur;
 			cur=cur->next;
-			if (pre->pos == pos || cur->pos == pos) { 
+			if ((0x7fff & pre->pos) == pos || (0x7fff & cur->pos) == pos) { 
 				temp=NULL;
 				nodes--;
 				return false; 
 				}
-			if (cur->pos > pos) {
+			if ((0x7fff & cur->pos) > pos) {
 				pre->next=temp;
 				temp->next=cur;
 				temp=NULL;
@@ -88,43 +92,58 @@ class list {
 		return true;
 	}
 	
-	void shift() {		//delete first
-		node *temp=new node; temp=head; head=head->next; delete temp; nodes--;
+	bool cut(uint16_t pos) {	//delete @ position
+		node *cur=new node;
+		node *pre=new node;
+		cur=head;
+		while (cur->next != NULL) {
+			if (cur->pos == pos) {
+				pre->next=cur->next;
+				delete cur;
+				nodes--;
+				return true;
+			}
+			if (cur->pos > pos) return false;
+			pre=cur;
+			cur=cur->next;
+		}
+		return false;
 	}
 	
-	void pop() {		//delete last
-		node *current=new node; node *previous=new node; current=head;
-		while(current->next!=NULL)  { previous=current;	current=current->next; }
-		tail=previous; previous->next=NULL; delete current; nodes--;
-	}
-	
-	void cut(uint8_t pos) {	//delete @ position
-		node *current=new node; node *previous=new node; current=head;
-		for(uint8_t i=1;i<pos;i++) { previous=current; current=current->next; }
-		previous->next=current->next; nodes--;
+	void update() {
+		node *cur=head;
+		while (cur->next!=NULL) {
+			if (cur->pos & 0x8000) {
+				if (!--(cur->mag)) {
+					// cut(cur->pos);
+					cur->pos &= 0x7fff;
+				}
+			}
+			else if (!++(cur->mag)) { cur->mag = 255; cur->pos |= 0x8000; }
+			cur=cur->next;
+		}
 	}
 };
 
 
-#define SCLERA 10
-#define SPARKLES 10
-
 int main() {
 	list leds;
-	srand (time(NULL)*SCLERA); rand();
-	for (uint8_t r=(rand()>>23); r>0;r--) rand();
-	
+	srand (time(NULL)<<10); rand();
+	for (uint8_t r=(rand()>>23); r>0; r--) rand();
+	cout << endl;
 	while (leds.length() < SPARKLES) {
-		uint16_t pos = rand()%SCLERA;
+		uint16_t pos = (rand()%SCLERA) | ((rand() & 0x80000000) ? 0x8000 : 0);
 		uint8_t mag = rand() >> 23; 
-		if (leds.insert(pos, mag)) {
-			cout << to_string(pos)  << " → ";
-			// cout << to_string((uint8_t8_t)) << endl;
-			leds.print();
-			usleep(1000);
-		}
+		leds.insert(pos, mag);
 	}
-	// cout << endl << to_string(leds.length()) << endl;
+	
+	while (true) {
+		leds.update();
+		cout << "\r";
+		leds.print();
+		fflush(stdout);
+		usleep(2000);
+	}
 }
 
 
