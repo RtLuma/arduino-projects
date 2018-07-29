@@ -17,8 +17,9 @@ enum EEPROM_ADDRESS {
 /* Arduino doesn't have hashmaps.
    Best alternative is a 1:1 array correspondence.
 */
-const PROGMEM char modeLabels[] = {
+const char modeLabels[] = {
    'f'//ill color
+  ,'s'
   ,'t'//heaterChase
   ,'r'//ainbow
   ,'v'//isualizer
@@ -30,10 +31,11 @@ const PROGMEM char modeLabels[] = {
 };
 const modePointer modes[] = {
   []() { showColor(R, G, B); delay(100);},
+  Sparkle,
   theaterChase,
   rainbowGradient,
   Chroma,
-  Sparkle,
+  rainbowSolid,
 };
 
 int8_t label2modeIndex(char label) {

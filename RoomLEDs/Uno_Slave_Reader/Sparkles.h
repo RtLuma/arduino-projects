@@ -1,7 +1,7 @@
-#define SPARKLES 100
+#define SPARKLES 75
 
 struct node {
-  uint8_t mag;
+  int8_t mag;
   uint16_t pos;
   node *next;
 };
@@ -24,24 +24,8 @@ class list {
       return nodes;
     }
 
-    void display() {
-      node *temp = head;
-      uint16_t p;
-      for (p = 0; temp != nullptr;) {
-        for (p; p < (0x7fff & temp->pos); p++) send2Pixels(0, 0, 0);
-        send2Pixels(temp->mag, temp->mag, temp->mag); p++;
-        //        send2Pixels(
-        //          (uint16_t(255 * (temp->mag)) + 1) >> 8,
-        //          (uint16_t(255 * (temp->mag)) + 1) >> 8,
-        //          (uint16_t(255 * (temp->mag)) + 1) >> 8
-        //        );
-        temp = temp->next;
-      }
-      for (p; p < SCLERA; p++) send2Pixels(0, 0, 0);
-    }
-
     bool insert(uint16_t pos, uint8_t mag) { //at position
-      pos &= 0x7fff;
+      //      pos &= 0x7fff;
       node *pre;
       node *cur = head;
       node *temp = new node; temp->mag = mag; temp->pos = pos; temp->next = nullptr;
@@ -53,7 +37,7 @@ class list {
         delete temp;
         return true;
       }
-      if ((0x7fff & head->pos) > pos) {
+      if (head->pos > pos) {
         temp->next = head;
         head = temp;
         temp = nullptr;
@@ -63,12 +47,12 @@ class list {
       while (cur->next != nullptr) {
         pre = cur;
         cur = cur->next;
-        if ((0x7fff & pre->pos) == pos || (0x7fff & cur->pos) == pos) {
+        if (pre->pos == pos || cur->pos == pos) {
           delete temp;
           nodes--;
           return false;
         }
-        if ((0x7fff & cur->pos) > pos) {
+        if (cur->pos > pos) {
           if (pre != nullptr) pre->next = temp;
           temp->next = cur;
           temp = nullptr;
@@ -85,8 +69,7 @@ class list {
       node *cur = head;
       node *pre = nullptr;
       while (cur != nullptr) {
-        uint16_t actual_pos = cur->pos & 0x7fff;
-        if (actual_pos == pos) {
+        if (cur->pos == pos) {
           if (pre != nullptr) pre->next = cur->next;
           else {
             head = cur->next;
@@ -95,7 +78,7 @@ class list {
           nodes--;
           return true;
         }
-        if (actual_pos > pos) return false;
+        if (cur->pos > pos) return false;
         pre = cur;
         cur = cur->next;
       }
@@ -105,29 +88,47 @@ class list {
     void update() {
       node *cur = head;
       while (cur != nullptr) {
-        if (cur->pos & 0x8000) {
-          if (!--(cur->mag)) {
-            if (random(5) != 4) {
-              cur->mag++;
-              cur=cur->next;
-              continue;
-            }
-            uint16_t del_pos = (cur->pos & 0x7fff);
-            cur = cur->next;            
+        if (cur->mag < 0) {
+          if (!++(cur->mag)) {
+            //            if (random(5) != 4) {
+            //              cur->mag--;
+            //              cur=cur->next;
+            //              continue;
+            //            }
+            uint16_t del_pos = cur->pos;
+            cur = cur->next;
             cut(del_pos);
             bool reinsert;
             do {
-              reinsert = !insert(random(SCLERA), random(16));
+              reinsert = !insert(random(SCLERA), 0);
             } while (reinsert);
             continue;
           }
         }
-        else if (!++(cur->mag)) {
-          cur->mag = 255;
-          cur->pos |= 0x8000;
-        }
+        else ++(cur->mag);
         cur = cur->next;
       }
+    }
+
+    void display() {
+      node *temp = head;
+      uint16_t p;
+      for (p = 0; temp != nullptr;) {
+        for (p; p < (0x7fff & temp->pos); p++) send2Pixels(0, 0, 0);
+        uint8_t disp = abs(temp->mag);
+        if (disp < 128) disp <<= 1; else disp = 255;
+        
+        uint8_t t = millis() >> 6;
+        uint8_t h = map(p, 0, SCLERA, 0, 255) + t;
+        send2Pixels(
+          (uint16_t(rainbow(h) * disp) + 1) >> 8,
+          (uint16_t(rainbow(h - 85) * disp) + 1) >> 8,
+          (uint16_t(rainbow(h - 170) * disp) + 1) >> 8
+        );
+        p++;
+        temp = temp->next;
+      }
+      for (p; p < SCLERA; p++) send2Pixels(0, 0, 0);
     }
 };
 
@@ -136,6 +137,6 @@ list sparkles;
 void Sparkle(void) {
   sparkles.update();
   sparkles.display();
-//  delayMicroseconds(20);
+    delayMicroseconds(20);
 }
 
