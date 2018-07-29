@@ -1,11 +1,10 @@
 // There's also this too https://github.com/ivanseidel/LinkedList
 
-#include<iostream>
+#include <iostream>
 #include <string>
 #include <unistd.h>		//usleep
 #include <stdlib.h>		//srand, rand
 #include <time.h>       //time 
-#include <memory>		//unique_ptr
 
 using namespace std;
 
