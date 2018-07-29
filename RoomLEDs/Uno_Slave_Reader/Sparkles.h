@@ -1,4 +1,4 @@
-#define SPARKLES 75
+#define MAX_SPARKLES 180 //heap overflow n such
 
 struct node {
   int8_t mag;
@@ -11,18 +11,17 @@ class list {
     node *head, *tail;
     uint8_t nodes;
   public:
-    list() {
-      head = nullptr; tail = nullptr; nodes = 0;
-      while (nodes < SPARKLES) {
+    list() { head = nullptr; tail = nullptr; nodes = 0; }
+    
+    populate(uint8_t sparkles) {      
+      while (nodes < sparkles) {
         uint8_t m = random(256);
         uint16_t p = random(SCLERA);
         insert(p, m);
       }
     }
 
-    uint8_t length(void) {
-      return nodes;
-    }
+    terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
 
     bool insert(uint16_t pos, uint8_t mag) { //at position
       node *pre;
@@ -71,9 +70,7 @@ class list {
       while (cur != nullptr) {
         if (cur->pos == pos) {
           if (pre != nullptr) pre->next = cur->next;
-          else {
-            head = cur->next;
-          }
+          else head = cur->next;
           delete cur;
           nodes--;
           return true;
@@ -92,6 +89,7 @@ class list {
         int8_t newmag = cur->mag + 1 + (F>>3);
         
         if (cur->mag<0 && newmag>-1) {
+          if (random(5)!=4) { cur->mag=-1; cur=cur->next; continue; }
           uint16_t del_pos = cur->pos;
           cur = cur->next;
           cut(del_pos);
@@ -144,6 +142,12 @@ list sparkles;
 void Sparkle(void) {
   sparkles.update();
   sparkles.display();
-  delayMicroseconds(SCLERA - SPARKLES);
+  delayMicroseconds(MAX_SPARKLES - P);
+}
+
+void SparkleRGB(void) {
+  sparkles.update();
+  sparkles.displayRGB();
+  delayMicroseconds(MAX_SPARKLES - P);
 }
 

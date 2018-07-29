@@ -43,11 +43,18 @@ void receiveEvent(byte length) {
           FFT.begin();
           break;
         }
+      case 'p': {
+          if (value > MAX_SPARKLES) break;
+          if (value > P) sparkles.populate(value);
+          else           sparkles.terminate(value);
+          P = value;
+          EEPROM.write(e_per, P);
+          break;
+        }
       case 'r': R = value; EEPROM.write(e_red,   R); break;
       case 'g': G = value; EEPROM.write(e_green, G); break;
       case 'b': B = value; EEPROM.write(e_blue,  B); break;
       case 'f': F = value; EEPROM.write(e_freq,  F); break;
-      case 'p': P = value; EEPROM.write(e_per,   P); break;
       case 'w': W = value; EEPROM.write(e_width, W); break;
       default: break;
     }
@@ -76,6 +83,9 @@ void setup() {
   F = EEPROM_RAW[e_freq];
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
+
+  sparkles.populate(P);
+  //sparkles.populate(50);
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
