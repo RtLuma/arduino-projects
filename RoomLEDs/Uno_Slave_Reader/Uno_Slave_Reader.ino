@@ -1,4 +1,4 @@
-volatile uint8_t* R, G, B, F, P, W;
+volatile uint8_t R, G, B, F, P, W;
 uint16_t OFFSET = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 

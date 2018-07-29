@@ -19,8 +19,8 @@ enum EEPROM_ADDRESS {
 */
 const char modeLabels[] = {
    'f'//ill color
-  ,'s'
-  ,'t'//heaterChase
+  ,'s'//parkle
+  ,'t'//heater chase
   ,'r'//ainbow
   ,'v'//isualizer
   ,'R'//ainbow (solid)

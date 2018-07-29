@@ -15,7 +15,7 @@ class list {
       head = nullptr; tail = nullptr; nodes = 0;
       while (nodes < SPARKLES) {
         uint8_t m = random(256);
-        uint16_t p = random(SCLERA) | (random(2) ? 0x8000 : 0);
+        uint16_t p = random(SCLERA);
         insert(p, m);
       }
     }
@@ -25,9 +25,9 @@ class list {
     }
 
     bool insert(uint16_t pos, uint8_t mag) { //at position
-      //      pos &= 0x7fff;
       node *pre;
       node *cur = head;
+      mag |= 1;
       node *temp = new node; temp->mag = mag; temp->pos = pos; temp->next = nullptr;
       nodes++;
       if (head == nullptr)  {
@@ -88,47 +88,54 @@ class list {
     void update() {
       node *cur = head;
       while (cur != nullptr) {
-        if (cur->mag < 0) {
-          if (!++(cur->mag)) {
-            //            if (random(5) != 4) {
-            //              cur->mag--;
-            //              cur=cur->next;
-            //              continue;
-            //            }
-            uint16_t del_pos = cur->pos;
-            cur = cur->next;
-            cut(del_pos);
-            bool reinsert;
-            do {
-              reinsert = !insert(random(SCLERA), 0);
-            } while (reinsert);
-            continue;
-          }
-        }
-        else ++(cur->mag);
+
+        int8_t newmag = cur->mag + 1 + (F>>3);
+        
+        if (cur->mag<0 && newmag>-1) {
+          uint16_t del_pos = cur->pos;
+          cur = cur->next;
+          cut(del_pos);
+          bool reinsert;
+          do { reinsert = !insert(random(SCLERA), 0); } while (reinsert);
+          continue;
+        }        
+        cur->mag = newmag;
         cur = cur->next;
       }
     }
 
+#define SPARKLEBLOCK(PIXELFUNC, LENGTH, MAP_FROM, MAP_WRAP)\
+    temp=head;\
+    for (p = 0; temp != nullptr && p < LENGTH;) {\
+        for (p; p < temp->pos && p < LENGTH; p++) PIXELFUNC(0, 0, 0);\
+        uint8_t disp = abs(temp->mag); if (disp < 128) disp <<= 1; else disp = 255;\
+        uint8_t h = map(MAP_FROM, 0, MAP_WRAP, 0, 255) + (millis() >> 6);\
+        PIXELFUNC(\
+          (uint16_t(rainbow(h)       * disp) + 1) >> 8,\
+          (uint16_t(rainbow(h - 85)  * disp) + 1) >> 8,\
+          (uint16_t(rainbow(h - 170) * disp) + 1) >> 8\
+        ); p++; temp = temp->next;\
+      } for (p; p < LENGTH; p++) PIXELFUNC(0, 0, 0);\
+
     void display() {
-      node *temp = head;
+      node *temp;
       uint16_t p;
-      for (p = 0; temp != nullptr;) {
-        for (p; p < (0x7fff & temp->pos); p++) send2Pixels(0, 0, 0);
-        uint8_t disp = abs(temp->mag);
-        if (disp < 128) disp <<= 1; else disp = 255;
-        
-        uint8_t t = millis() >> 6;
-        uint8_t h = map(p, 0, SCLERA, 0, 255) + t;
+      SPARKLEBLOCK(sendPixel,  SCLERA,  p,      SCLERA)
+      SPARKLEBLOCK(sendPixel2, PIXELS2, p%IRIS, (p > IRIS ? PUPIL : IRIS))
+    }
+
+    void displayRGB() {
+      node *temp=head;
+      uint16_t p;
+      for (p = 0; temp != nullptr && p < PIXELS;) {
+        for (p; p < temp->pos && p < PIXELS; p++) send2Pixels(0, 0, 0);
+        uint8_t disp = abs(temp->mag); if (disp < 128) disp <<= 1; else disp = 255;
         send2Pixels(
-          (uint16_t(rainbow(h) * disp) + 1) >> 8,
-          (uint16_t(rainbow(h - 85) * disp) + 1) >> 8,
-          (uint16_t(rainbow(h - 170) * disp) + 1) >> 8
-        );
-        p++;
-        temp = temp->next;
-      }
-      for (p; p < SCLERA; p++) send2Pixels(0, 0, 0);
+          (uint16_t(R * disp) + 1) >> 8,
+          (uint16_t(G * disp) + 1) >> 8,
+          (uint16_t(B * disp) + 1) >> 8
+        ); p++; temp = temp->next;
+      } for (p; p < PIXELS; p++) send2Pixels(0, 0, 0);
     }
 };
 
@@ -137,6 +144,6 @@ list sparkles;
 void Sparkle(void) {
   sparkles.update();
   sparkles.display();
-    delayMicroseconds(20);
+  delayMicroseconds(SCLERA - SPARKLES);
 }
 
