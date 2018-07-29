@@ -33,7 +33,7 @@ const modePointer modes[] = {
   theaterChase,
   rainbowGradient,
   Chroma,
-  rainbowSolid,
+  Sparkle,
 };
 
 int8_t label2modeIndex(char label) {

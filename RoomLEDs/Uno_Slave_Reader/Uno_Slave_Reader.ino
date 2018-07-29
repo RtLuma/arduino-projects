@@ -7,6 +7,8 @@ uint16_t OFFSET = 0;
 #include "Low_RAM_NeoPixels.h"
 #include "Spectrum.h"
 #include "Visualizer.h"
+#include "Sparkles.h"
+
 #include "LabelMaps.h"
 
 
@@ -62,6 +64,7 @@ void receiveEvent(byte length) {
 
 void setup() {
   Serial.begin(9600);
+  randomSeed(analogRead(0));
 
   uint8_t EEPROM_RAW[e_STORED_ARGM_NUM];
   for (uint8_t i = 0; i < e_STORED_ARGM_NUM; i++) EEPROM_RAW[i] = EEPROM.read(i);

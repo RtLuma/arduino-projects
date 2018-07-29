@@ -7,11 +7,7 @@
 //const uint8_t hues[BANDS] = { 0, 37, 74, 111, 148, 185, 222 };   // Even
 uint8_t hues[BANDS] = { random(256), random(256), random(256), random(256), random(256), random(256), random(256) };   // Random
 
-extern volatile uint8_t RGB[3];
-
 uint8_t sclera[2][BANDS][3] = {0};
-uint8_t iris[3] = { 0 };
-uint8_t pupil[3] = { 0 };
 
 #define visualizerBlock(DIST, PIXEL_FUNCTION)\
   r = (uint16_t)pixelA[0] << 7; r_step = pixelB[0] << 7; r_step -= r; r_step /= DIST;\
@@ -36,8 +32,9 @@ void Chroma(void) {
       uint32_t level = FFT.lvls[channel][band] + 1;
 
       randomSeed(micros());
-      if (level < 100) hues[band] += random(-2, 2);
-      uint8_t hue = hues[band];
+      uint8_t hue = level >> 9;
+      hues[band] += random(-hue, hue)+1;
+      hue = hues[band];
 
       sclera[channel][band][0] = (rainbow(hue + 170)  * level) >> 10;
       sclera[channel][band][1] = (rainbow(hue + 85)   * level) >> 10;
@@ -55,27 +52,18 @@ void Chroma(void) {
   int16_t r_step, g_step, b_step;
   uint8_t *pixelA, *pixelB;
 
-//  sclera[0][0][0] = 0;
-//  sclera[0][0][1] = 0;
-//  sclera[0][0][2] = 0;
-//  sclera[1][0][0] = 0;
-//  sclera[1][0][1] = 0;
-//  sclera[1][0][2] = 0;
+//  pixelA = sclera[1][1]; pixelB = sclera[1][0]; sendVisualizerPixels(149)
+//  pixelA = sclera[0][0]; pixelB = sclera[0][1]; sendVisualizerPixels(149)
 
-//  sclera[0][6][0] = 0;
-//  sclera[0][6][1] = 0;
-//  sclera[0][6][2] = 0;
-//  sclera[1][6][0] = 0;
-//  sclera[1][6][1] = 0;
-//  sclera[1][6][2] = 0;
-//
-//  sclera[0][3][0] = 0;
-//  sclera[0][3][1] = 0;
-//  sclera[0][3][2] = 0;
-//  sclera[1][3][0] = 0;
-//  sclera[1][3][1] = 0;
-//  sclera[1][3][2] = 0;
+//  pixelA = sclera[1][3]; pixelB = sclera[1][2]; sendVisualizerPixels2(48)
+//  pixelA = sclera[0][2]; pixelB = sclera[0][3]; sendVisualizerPixels2(49)
+//  pixelA = sclera[0][3]; pixelB = sclera[0][4]; sendVisualizerPixels2(48)
+//  pixelA = sclera[1][4]; pixelB = sclera[1][3]; sendVisualizerPixels2(49)
 
+//  pixelA = sclera[1][6]; pixelB = sclera[1][5]; sendVisualizerPixels2(52)
+//  pixelA = sclera[0][5]; pixelB = sclera[0][6]; sendVisualizerPixels2(52)
+
+  
   pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels(SECTION_SCLERA)
   pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels(SECTION_SCLERA)
   pixelA = sclera[0][1]; pixelB = sclera[1][0]; sendVisualizerPixels(SECTION_SCLERA)
