@@ -1,4 +1,4 @@
-volatile uint8_t* R, G, B, F, P, W;
+volatile uint8_t R, G, B, F, P, W;
 uint16_t OFFSET = 0;
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
@@ -7,6 +7,8 @@ uint16_t OFFSET = 0;
 #include "Low_RAM_NeoPixels.h"
 #include "Spectrum.h"
 #include "Visualizer.h"
+#include "Sparkles.h"
+
 #include "LabelMaps.h"
 
 
@@ -41,11 +43,18 @@ void receiveEvent(byte length) {
           FFT.begin();
           break;
         }
+      case 'p': {
+          if (value > MAX_SPARKLES) break;
+          if (value > P) sparkles.populate(value);
+          else           sparkles.terminate(value);
+          P = value;
+          EEPROM.write(e_per, P);
+          break;
+        }
       case 'r': R = value; EEPROM.write(e_red,   R); break;
       case 'g': G = value; EEPROM.write(e_green, G); break;
       case 'b': B = value; EEPROM.write(e_blue,  B); break;
       case 'f': F = value; EEPROM.write(e_freq,  F); break;
-      case 'p': P = value; EEPROM.write(e_per,   P); break;
       case 'w': W = value; EEPROM.write(e_width, W); break;
       default: break;
     }
@@ -62,6 +71,7 @@ void receiveEvent(byte length) {
 
 void setup() {
   Serial.begin(9600);
+  randomSeed(analogRead(0));
 
   uint8_t EEPROM_RAW[e_STORED_ARGM_NUM];
   for (uint8_t i = 0; i < e_STORED_ARGM_NUM; i++) EEPROM_RAW[i] = EEPROM.read(i);
@@ -73,6 +83,9 @@ void setup() {
   F = EEPROM_RAW[e_freq];
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
+
+  sparkles.populate(P);
+  //sparkles.populate(50);
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event

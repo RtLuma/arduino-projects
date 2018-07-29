@@ -28,10 +28,10 @@ struct spectrumShield {
     for (byte band = 0; band < BANDS; band++)  {
       for (byte channel = 0; channel < 2; channel++) {
 
-        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band] -= 2;
+        if (maxs[channel][band] > MAX_CUTOFF) maxs[channel][band]-=2;
         if (lvls[channel][band] > 8) { // Fade by subtracting a proportion
-//          lvls[channel][band] -= (lvls[channel][band] / 7);
-            lvls[channel][band] *= 0.8;
+          lvls[channel][band] -= (lvls[channel][band] / 6);
+//            lvls[channel][band] *= 0.8;
         }
         else lvls[channel][band] = 0;
 
@@ -64,6 +64,8 @@ struct spectrumShield {
     }
     //Average top and bottom bands for visual consistency
     lvls[0][0] = lvls[1][0] = (lvls[0][0] + lvls[1][0]) >> 1;
+//    lvls[0][1] = lvls[0][0] = (lvls[0][0] + lvls[0][1]) >> 1;
+//    lvls[1][1] = lvls[1][0] = (lvls[1][0] + lvls[1][1]) >> 1;
     lvls[0][BANDS - 1] = lvls[1][BANDS - 1] = (lvls[0][BANDS - 1] + lvls[1][BANDS - 1]) >> 1;
   }
 } FFT;

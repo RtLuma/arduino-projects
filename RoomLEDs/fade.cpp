@@ -33,7 +33,6 @@ void printColor(uint8_t r, uint8_t g, uint8_t b) {
 }
 //]]]]
 
-//Store whether fading in or out in high bit of pos
 struct node { uint8_t mag; uint16_t pos; node *next; };
 
 #define SCLERA 50
@@ -45,7 +44,13 @@ class list {
   	node *head, *tail;
 	uint8_t nodes;
   public:  
-    list() { head=nullptr; tail=nullptr; nodes=0; }
+    list() { head = nullptr; tail = nullptr; nodes = 0;
+      while (nodes < SPARKLES) {
+        uint8_t mag = rand()%256;
+        uint16_t pos = (rand()%SCLERA) | (random()%2 ? 0x8000 : 0);
+        insert(pos, mag);
+      }
+	}
 	
 	uint8_t length(void) { return nodes; }
 	
@@ -121,7 +126,7 @@ class list {
 					cur = cur->next;
 					if (!cut(del_pos)) cout << "\nBad cut??? " << to_string(del_pos) << endl;
 					bool reinsert;
-					do { reinsert = !insert((rand()%SCLERA), 0); } while (reinsert);
+					do { reinsert = !insert((rand()%SCLERA), rand() & 0x10); } while (reinsert);
 					continue;
 				}
 			}
@@ -137,12 +142,7 @@ int main() {
 	srand (time(nullptr)<<10); rand();
 	for (uint8_t r=(rand()>>23); r>0; r--) rand();
 	cout << endl;
-	while (leds.length() < SPARKLES) {
-		uint8_t mag = rand() >> 23;
-		uint16_t pos = (rand()%SCLERA) | ((rand() & 1) ? 0x8000 : 0);
-		// cout << to_string(0x7fff & pos) << (pos > 0x7fff ? ", -" : ", ") << to_string(mag) << endl;
-		leds.insert(pos, mag);
-	}
+
 	
 	while (true) {
 		leds.update();
