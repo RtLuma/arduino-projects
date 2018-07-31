@@ -10,63 +10,85 @@
             text-align: center;
         }
     </style>
-    <script>
-/*
-   return fetch(url, {
-   body: JSON.stringify(data), // must match 'Content-Type' header
-   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-   credentials: 'same-origin', // include, same-origin, *omit
-   headers: {
-   'user-agent': 'Mozilla/4.0 MDN Example',
-   'content-type': 'application/json'
-   },
-   method: 'POST', // *GET, POST, PUT, DELETE, etc.
-   mode: 'cors', // no-cors, cors, *same-origin
-   redirect: 'follow', // manual, *follow, error
-   referrer: 'no-referrer', // *client, no-referrer })
-   */
+    <script type="text/javascript" src="colorpicker.min.js"></script>
+    <style type="text/css">
+        #picker {
+            display: inline-block;
+            width: 80%;
+            height: 40%
+        }
+        
+        #slide {
+            display: inline-block;
+            width: 10%;
+            height: 40%;
+        }
+    </style>`
+    <!-- <fieldset> -->
+    <!-- <legend>RGB</legend> -->
+    <div id="picker"></div>
+    <div id="slide"></div>
+    <!-- </fieldset> -->
 
+    <script type="text/javascript">
         const API_URL = "http://10.0.0.69?";
         let cansend = true;
-        async function sendPacket(inputNode) {
-            if (!cansend) return; 
-            let query = `${API_URL}${inputNode.name}=${inputNode.value}`;
+
+        async function sendPacket(data) {
+            if (!cansend) return;
+
+            let query = API_URL;
+            for (const [key, value] of Object.entries(data)) query += `${key}=${value}&`;
+            query = query.slice(0, -1);
+            console.log(query)
+
             const resp = await fetch(query, {
                 mode: 'no-cors',
                 credentials: "include",
             })
-            cansend=true;
-            console.log(inputNode.value)
+            const body = await resp.text();
+            cansend = true;
+            console.log(body)
         }
+
+        function debug(e) {
+            console.log(e.value)
+        }
+
+        ColorPicker(
+            document.getElementById('slide'),
+            document.getElementById('picker'),
+            (hex, hsv, rgb) => { document.body.style.backgroundColor = hex; sendPacket(rgb); });
+        /*
+                   return fetch(url, {
+                   body: JSON.stringify(data), // must match 'Content-Type' header
+                   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                   credentials: 'same-origin', // include, same-origin, *omit
+                   headers: {
+                   'user-agent': 'Mozilla/4.0 MDN Example',
+                   'content-type': 'application/json'
+                   },
+                   method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                   mode: 'cors', // no-cors, cors, *same-origin
+                   redirect: 'follow', // manual, *follow, error
+                   referrer: 'no-referrer', // *client, no-referrer })
+                   */
     </script>
 </head>
 
 <body>
-    <pre></pre>
-    <fieldset>
-        <legend>Red</legend>
-        <input type="range" value="0" min="0" max="255" name="r" oninput="sendPacket(this)" >
-    </fieldset>
-    <fieldset>
-        <legend>Green</legend>
-        <input type="range" value="0" min="0" max="255" name="g" oninput="sendPacket(this)" >
-    </fieldset>
-    <fieldset>
-        <legend>Blue</legend>
-        <input type="range" value="0" min="0" max="255" name="b" oninput="sendPacket(this)" >
-    </fieldset>
     <br>
     <fieldset>
         <legend>Width</legend>
-        <input type="range" value="0" min="2" max="50" name="w" oninput="sendPacket(this)" >
+        <input type="range" value="0" min="2" max="50" name="w" oninput="sendPacket({[this.name]:this.value})">
     </fieldset>
     <fieldset>
         <legend>Speed</legend>
-        <input type="range" value="0" min="5" max="128" name="f" oninput="sendPacket(this)" >
+        <input type="range" value="0" min="5" max="128" name="f" oninput="sendPacket({[this.name]:this.value})">
     </fieldset>
     <fieldset>
         <legend>Population</legend>
-        <input type="range" value="20" min="20" max="180" name="p" oninput="sendPacket(this)" >
+        <input type="range" value="20" min="20" max="180" name="p" oninput="sendPacket({[this.name]:this.value})">
     </fieldset>
     <br>
     <input type="button" value="Next" name="Next" onclick="next()">
