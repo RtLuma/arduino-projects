@@ -14,14 +14,14 @@
     <style type="text/css">
         #picker {
             display: inline-block;
-            width: 80%;
-            height: 40%
+            width: 50%;
+            height: 70%
         }
         
         #slide {
             display: inline-block;
             width: 10%;
-            height: 40%;
+            height: 70%;
         }
     </style>`
     <!-- <fieldset> -->
@@ -91,7 +91,7 @@
         <input type="range" value="20" min="20" max="180" name="p" oninput="sendPacket({[this.name]:this.value})">
     </fieldset>
     <br>
-    <input type="button" value="Next" name="Next" onclick="next()">
+    <input type="button" value="Next" name="Next" onclick='sendPacket({m:"v"})'>
 </body>
 
 </html>
