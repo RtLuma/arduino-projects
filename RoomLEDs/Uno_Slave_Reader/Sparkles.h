@@ -107,7 +107,7 @@ class list {
     for (p = 0; temp != nullptr && p < LENGTH;) {\
         for (p; p < temp->pos && p < LENGTH; p++) PIXELFUNC(0, 0, 0);\
         uint8_t disp = abs(temp->mag); if (disp < 128) disp <<= 1; else disp = 255;\
-        uint8_t h = map(MAP_FROM, 0, MAP_WRAP, 0, 255) + t;\
+        uint8_t h = (((uint16_t)MAP_FROM << 8) /  MAP_WRAP) + t;\
         PIXELFUNC(\
           (uint16_t(rainbow(h)       * disp) + 1) >> 8,\
           (uint16_t(rainbow(h - 85)  * disp) + 1) >> 8,\
