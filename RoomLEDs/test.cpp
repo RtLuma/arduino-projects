@@ -65,8 +65,6 @@ void printArray(uint32_t arr[], int length) {
 	cout << endl;
 }
 
-//Store whether fading in or out in high bit of pos
-
 #define SCLERA 300
 #define SPARKLES 25
 
