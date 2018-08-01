@@ -44,7 +44,7 @@ struct spectrumShield {
         uint32_t ratio = 1023;
 
         if (level < maxs[channel][band]) {
-          for (byte power = 0; power < 7; power++) {
+          for (byte power = 0; power < 5; power++) {
             ratio *= level; // Raise ratio to power without overflow
             ratio /= maxs[channel][band];
           }
@@ -53,8 +53,8 @@ struct spectrumShield {
 
         if (ratio > lvls[channel][band]) {
           lvls[channel][band] = ratio;
-          //lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
-          //lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
+//          lvls[channel][band] += ratio + (ratio << 1); lvls[channel][band] >>= 2;
+//          lvls[channel][band] += ratio; lvls[channel][band] >>= 1;
         }
 
       }
