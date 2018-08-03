@@ -18,7 +18,6 @@ void printColor(uint8_t r, uint8_t g, uint8_t b) { printf("\033[38;2;%d;%d;%dmâ–
 void printLine(uint8_t* A, uint8_t* B, uint16_t DIM) {
   uint16_t r, g, b;
   int16_t r_step, g_step, b_step;
-  DIM <<= 1;
   r = A[0] << 8; g = A[1] << 8; b = A[2] << 8;
   r_step = (((uint16_t)B[0] << 8) - r)/DIM;
   g_step = (((uint16_t)B[1] << 8) - g)/DIM;
@@ -34,9 +33,11 @@ void printSquare(uint8_t* A, uint8_t* B, uint16_t DIM) {
   r_step = (((uint16_t)B[0] << 8) - r)/DIM;
   g_step = (((uint16_t)B[1] << 8) - g)/DIM;
   b_step = (((uint16_t)B[2] << 8) - b)/DIM;
-  for (uint16_t i=0; i < DIM; i++) { 
+  for (uint16_t i=0; i < DIM>>1; i++) { 
     A[0] = r >> 8; A[1] = g >> 8; A[2] = b >> 8;
+    B[0] = ~(r >> 8); B[1] = ~(g >> 8); B[2] = ~(b >> 8);
     printLine(A, B, DIM);
+    r += r_step; g += g_step; b += b_step;
     r += r_step; g += g_step; b += b_step;
   }
  printf("\n");
