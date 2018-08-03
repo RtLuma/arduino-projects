@@ -1,7 +1,6 @@
-// There's also this too https://github.com/ivanseidel/LinkedList
-
 #include <iostream>
 #include <string>
+#include <sys/ioctl.h>
 #include <unistd.h>		//usleep
 #include <stdlib.h>		//srand, rand
 #include <time.h>       //time 
@@ -16,8 +15,11 @@ uint8_t R, G, B;
 string val2block(uint8_t val) {  if (val > 223) return "\u2588";  if (val > 191) return "\u2587";  if (val > 159) return "\u2586";  if (val > 127) return "\u2585";  if (val > 95)  return "\u2584";  if (val > 63)  return "\u2583";  if (val > 31)  return "\u2582";  return " ";} 
 
 void printSparkle(int8_t mag) {
-	uint8_t disp = abs(temp->mag); if (disp < 128) disp <<= 1; else disp = 255;\
-	printf("\033[38;2;%d;%d;%dm%s\033[0;m", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8, val2block(mag));
+	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;\
+	printf("\033[38;2;%d;%d;%dm", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
+	cout << val2block(disp);
+	printf("\033[0;m");
+	
 } //]]
 
 struct node { int8_t mag; uint16_t pos; node *next; };
@@ -29,22 +31,24 @@ class list {
   public:  
 	list() { head = nullptr; tail = nullptr; nodes = 0; }
     
-    populate(uint8_t sparkles) {      
+    void populate(uint8_t sparkles) {      
       while (nodes < sparkles) {
-        uint8_t m = random(256);
-        uint16_t p = random(PIXELS);
+        uint8_t m = (rand()%256);
+        uint16_t p = (rand()%PIXELS);
         insert(p, m);
       }
     }
+
+    void terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
 	
 	void print() {
 		node *temp = head;
 		uint16_t p;
 		for (p=0; temp != nullptr;) {
-			for (p; p < temp->pos; p++) printf(ZERO_SYMBOL);
+			for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
 			printSparkle(temp->mag); p++; temp=temp->next;
 		}
-		for (p; p < PIXELS; p++) printf(ZERO_SYMBOL);
+		for (; p < PIXELS; p++) printf(ZERO_SYMBOL);
 	}
 	
 	   bool insert(uint16_t pos, uint8_t mag) { //at position
@@ -110,15 +114,15 @@ class list {
       node *cur = head;
       while (cur != nullptr) {
 
-        int8_t newmag = cur->mag + 1 + (F>>3);
+        int8_t newmag = cur->mag + 1;
         
         if (cur->mag<0 && newmag>-1) {
-          if (random(5)!=4) { cur->mag=-1; cur=cur->next; continue; }
+          if ((rand()%5)!=4) { cur->mag=-1; cur=cur->next; continue; }
           uint16_t del_pos = cur->pos;
           cur = cur->next;
           cut(del_pos);
           bool reinsert;
-          do { reinsert = !insert(random(PIXELS), 0); } while (reinsert);
+          do { reinsert = !insert((rand()%PIXELS), 0); } while (reinsert);
           continue;
         }        
         cur->mag = newmag;
@@ -129,19 +133,26 @@ class list {
 
 struct winsize w;
 
+#define SPARKLES 50
+
 int main() {
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	list sparkles;
-	sparkles.populate(w.ws_col);
+	PIXELS = w.ws_col-2;
+	sparkles.populate(SPARKLES);
 	srand(time(NULL)); rand();
-	for (uint8_t r=(rand()>>23); r>0; r--) rand();
+	for (uint8_t r=rand(); r>0; r--) rand();
 	
 	while (true) {
-		sparkles.update();
-		cout << "\r[";
-		sparkles.print();
-		cout << "]";
-		fflush(stdout);
-		usleep(2000);
+		R=rand(); G=rand(); B=rand();
+		for (uint8_t i = 1; i; i++) {
+			sparkles.update();
+			cout << "\r[";
+			sparkles.print();
+			cout << "]";
+			fflush(stdout);
+			usleep(10000);
+		}
+		printf("\n");
 	}
 }

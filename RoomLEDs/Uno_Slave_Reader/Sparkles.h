@@ -13,7 +13,7 @@ class list {
   public:
     list() { head = nullptr; tail = nullptr; nodes = 0; }
     
-    populate(uint8_t sparkles) {      
+    void populate(uint8_t sparkles) {      
       while (nodes < sparkles) {
         uint8_t m = random(256);
         uint16_t p = random(SCLERA);
@@ -21,7 +21,7 @@ class list {
       }
     }
 
-    terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
+    void terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
 
     bool insert(uint16_t pos, uint8_t mag) { //at position
       node *pre;
