@@ -12,6 +12,9 @@ uint8_t R, G, B;
 
 #define ZERO_SYMBOL " " 
 
+uint8_t rainbow(uint8_t hue) { if (hue > 170) return ~(hue + (hue << 1)); if (hue > 85) return hue + (hue << 1); return 0; }
+void rainbowRGB(uint8_t rgb[3], uint8_t hue) { rgb[0] = rainbow(hue+170); rgb[1] = rainbow(hue+85); rgb[2] = rainbow(hue); }
+
 string val2block(uint8_t val) {  if (val > 223) return "\u2588";  if (val > 191) return "\u2587";  if (val > 159) return "\u2586";  if (val > 127) return "\u2585";  if (val > 95)  return "\u2584";  if (val > 63)  return "\u2583";  if (val > 31)  return "\u2582";  return " ";} 
 
 void printSparkle(int8_t mag) {
@@ -148,16 +151,20 @@ class list {
 
 struct winsize w;
 
-#define SPARKLES 20
+#define SPARKLES 3
 
 int main() {
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+  
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	list sparkles;
 	PIXELS = w.ws_col-2;
 	sparkles.populate(SPARKLES);
 	srand(time(NULL)); rand();
 	for (uint8_t r=rand(); r>0; r--) rand();
-		R=rand(); G=rand(); B=rand();
+		// R=rand(); G=rand(); B=rand();
+  uint8_t rgb[3];
+  rainbowRGB(rgb, rand());
+  R=rgb[0]; G=rgb[1]; B=rgb[2];
 	
 	while (true) {
 			sparkles.update();
