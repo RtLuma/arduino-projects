@@ -28,6 +28,8 @@ uint8_t printGrad(node* A, node* B) {
   int16_t mag = A->mag << 8;
   uint16_t dist = B->pos - A->pos;
   int16_t mag_step = int16_t((B->mag<<8) - mag)/dist;
+  //  printf("$");
+  //  mag += mag_step;
  for (uint16_t p = 0; p < dist; p++) { 
    printSparkle(mag>>8);
    mag += mag_step;
@@ -54,9 +56,9 @@ class list {
 	
 	void print() {
 		node *temp = head;
-		uint16_t p;
-		for (p=0; temp->next != nullptr;) {
-			// for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
+		uint16_t p=0;
+		for (; temp->next != nullptr;) {
+			for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
 			p += printGrad(temp, temp->next);
 			// printSparkle(temp->mag);
       temp=temp->next;
