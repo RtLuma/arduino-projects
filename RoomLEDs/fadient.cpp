@@ -24,6 +24,17 @@ void printSparkle(int8_t mag) {
 
 struct node { int8_t mag; uint16_t pos; node *next; };
 
+uint8_t printGrad(node* A, node* B) {
+  int16_t mag = A->mag << 8;
+  uint16_t dist = B->pos - A->pos;
+  int16_t mag_step = int16_t((B->mag<<8) - mag)/dist;
+ for (uint16_t p = 0; p < dist; p++) { 
+   printSparkle(mag>>8);
+   mag += mag_step;
+   }
+  return dist;
+}
+
 class list { 
   private:
   	node *head, *tail;
@@ -44,9 +55,11 @@ class list {
 	void print() {
 		node *temp = head;
 		uint16_t p;
-		for (p=0; temp != nullptr;) {
-			for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
-			printSparkle(temp->mag); p++; temp=temp->next;
+		for (p=0; temp->next != nullptr;) {
+			// for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
+			p += printGrad(temp, temp->next);
+			// printSparkle(temp->mag);
+      temp=temp->next;
 		}
 		for (; p < PIXELS; p++) printf(ZERO_SYMBOL);
 	}
@@ -142,17 +155,15 @@ int main() {
 	sparkles.populate(SPARKLES);
 	srand(time(NULL)); rand();
 	for (uint8_t r=rand(); r>0; r--) rand();
+		R=rand(); G=rand(); B=rand();
 	
 	while (true) {
-		R=rand(); G=rand(); B=rand();
-		for (uint8_t i = 1; i; i++) {
 			sparkles.update();
 			cout << "\r[";
 			sparkles.print();
 			cout << "]";
 			fflush(stdout);
 			usleep(10000);
-		}
-		printf("\n");
+      printf("\r");
 	}
 }
