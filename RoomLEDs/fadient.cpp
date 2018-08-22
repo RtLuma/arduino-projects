@@ -25,15 +25,26 @@ void printSparkle(int8_t mag) {
 	
 } //]]
 
+void printSpawn(int8_t mag) {
+	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;\
+	printf("\033[48;2;%d;%d;%dm", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
+	cout << "*";
+	printf("\033[0;m");
+	
+} //]]
+
 struct node { int8_t mag; uint16_t pos; node *next; };
 
 uint8_t printGrad(node* A, node* B) {
   int16_t mag = A->mag << 8;
   uint16_t dist = B->pos - A->pos;
   int16_t mag_step = int16_t((B->mag<<8) - mag)/dist;
-  //  printf("$");
-  //  mag += mag_step;
- for (uint16_t p = 0; p < dist; p++) { 
+  uint16_t p = 
+  // 0;
+  1;
+  printSpawn(mag>>8);
+  mag += mag_step;
+ for (; p < dist; p++) { 
    printSparkle(mag>>8);
    mag += mag_step;
    }
@@ -151,7 +162,7 @@ class list {
 
 struct winsize w;
 
-#define SPARKLES 3
+#define SPARKLES 15
 
 int main() {
   
