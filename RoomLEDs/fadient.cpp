@@ -27,8 +27,10 @@ void printSparkle(int8_t mag) {
 
 void printSpawn(int8_t mag) {
 	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;\
-	printf("\033[48;2;%d;%d;%dm", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
-	cout << "*";
+	// printf("\033[48;2;%d;%d;%dm", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
+	printf("\033[38;2;255;255;255m");
+	cout << val2block(disp);
+	// cout << "*";
 	printf("\033[0;m");
 	
 } //]]
