@@ -94,6 +94,7 @@ class list {
       node *temp = new node; temp->mag = mag; temp->pos = pos; temp->next = nullptr;
       nodes++;
       do {
+        printf("%d ", cur->pos);
         if (cur->pos == pos) { delete temp; nodes--; return false; }
         if (cur->pos > pos) {
           if (pre) pre->next = temp;
@@ -187,7 +188,9 @@ int main() {
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	list sparkles;
 	PIXELS = w.ws_col-2;
+  printf("nice2\n");
 	sparkles.populate(SPARKLES);
+  printf("nice\n");
 	srand(time(NULL)); rand();
 	for (uint8_t r=rand(); r>0; r--) rand();
 		// R=rand(); G=rand(); B=rand();
@@ -195,13 +198,13 @@ int main() {
   rainbowRGB(rgb, rand());
   R=rgb[0]; G=rgb[1]; B=rgb[2];
 	
-	while (true) {
-			sparkles.update();
-			cout << "\r[";
-			sparkles.print();
-			cout << "]";
-			fflush(stdout);
-			usleep(10000);
-      printf("\r");
-	}
+	// while (true) {
+	// 		sparkles.update();
+	// 		cout << "\r[";
+	// 		sparkles.print();
+	// 		cout << "]";
+	// 		fflush(stdout);
+	// 		usleep(10000);
+  //     printf("\r");
+	// }
 }
