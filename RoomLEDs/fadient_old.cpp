@@ -41,28 +41,24 @@ uint8_t printGrad(node* A, node* B) {
   int16_t mag = A->mag << 8;
   uint16_t dist = B->pos - A->pos;
   int16_t mag_step = int16_t((B->mag<<8) - mag)/dist;
-  uint16_t p = 1;
+  uint16_t p = 
+  // 0;
+  1;
   printSpawn(mag>>8);
   mag += mag_step;
-  for (; p < dist; p++) { 
-    printSparkle(mag>>8);
-    mag += mag_step;
-  }
+ for (; p < dist; p++) { 
+   printSparkle(mag>>8);
+   mag += mag_step;
+   }
   return dist;
 }
 
 class list { 
   private:
-  	node *head;
-    uint8_t nodes;
+  	node *head, *tail;
+	uint8_t nodes;
   public:  
-    list() { 
-      head = new node;
-      head->pos=0;
-      head->mag=1;
-      head->next=head;
-      nodes = 0;
-      }
+	list() { head = nullptr; tail = nullptr; nodes = 0; }
     
     void populate(uint8_t sparkles) {      
       while (nodes < sparkles) {
@@ -77,7 +73,7 @@ class list {
 	void print() {
 		node *temp = head;
 		uint16_t p=0;
-		for (; temp->next != head;) {
+		for (; temp->next != nullptr;) {
 			for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
 			p += printGrad(temp, temp->next);
 			// printSparkle(temp->mag);
@@ -87,57 +83,74 @@ class list {
 	}
 	
 	   bool insert(uint16_t pos, uint8_t mag) { //at position
-      if (pos > PIXELS || pos < 0) return false;
-      node *pre = nullptr;
+      node *pre;
       node *cur = head;
       mag |= 1;
       node *temp = new node; temp->mag = mag; temp->pos = pos; temp->next = nullptr;
       nodes++;
-      do {
-        if (cur->pos == pos) { delete temp; nodes--; return false; }
+      if (head == nullptr)  {
+        head = temp;
+        tail = temp;
+        temp = nullptr;
+        delete temp;
+        return true;
+      }
+      if (head->pos > pos) {
+        temp->next = head;
+        head = temp;
+        temp = nullptr;
+        delete temp;
+        return true;
+      }
+      while (cur->next != nullptr) {
+        pre = cur;
+        cur = cur->next;
+        if (pre->pos == pos || cur->pos == pos) {
+          delete temp;
+          nodes--;
+          return false;
+        }
         if (cur->pos > pos) {
-          if (pre) pre->next = temp;
+          if (pre != nullptr) pre->next = temp;
           temp->next = cur;
           temp = nullptr;
           delete temp;
           return true;
-        } 
-      } while (cur->next != head);
-      cur->next = temp; temp->next = head;
-      temp = nullptr;
-      delete temp;
+        }
+
+      }
+      cur->next = temp; temp->next = nullptr;
       return true;
     }
     
-    // bool insertAlive(uint16_t pos) {
-    //   node *pre = nullptr;
-    //   node *cur = head;
-    //   node *nxt = head->next;
-    //   node *temp = new node;
-    //   while (cur->next != nullptr) {
-    //     if (cur->pos == pos || nxt->pos == pos) {
-    //       delete temp;
-    //       nodes--;
-    //       return false;
-    //     }
-    //     if (nxt->pos > pos) { //Insert between existing
+    bool insertAlive(uint16_t pos) {
+      node *pre = tail;
+      node *cur = head;
+      node *nxt = head->next;
+      while (cur->next != nullptr) {
+        if (cur->pos == pos || nxt->pos == pos) {
+          delete temp;
+          nodes--;
+          return false;
+        }
+        if (nxt->pos > pos) { //Insert between existing
         
-    //     // Calculate mag
+        // Calculate mag
         
-    //       cur->next = temp;
-    //       temp->next = nxt;
-    //       temp = nullptr;
-    //       delete temp;
-    //       return true;
-    //     }
-    //     pre = cur;
-    //     cur = cur->next        
-    //     nxt = cur->next;
-    //     if (nxt == nullptr) nxt = head;
-    //   }
-    //   cur->next = temp; temp->next = nullptr;
-    //   return true;
-    // }
+          cur->next = temp;
+          temp->next = nxt;
+          temp = nullptr;
+          delete temp;
+          return true;
+        }
+        pre = cur;
+        cur = cur->next        
+        nxt = cur->next;
+        if (nxt == nullptr) nxt = head;
+      }
+      cur->next = temp; temp->next = nullptr;
+      return true;
+    }
 
     bool cut(uint16_t pos) {  //delete @ position
       node *cur = head;
