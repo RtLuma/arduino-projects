@@ -57,7 +57,7 @@ public:
     // }
 
     bool insert(uint16_t pos, uint8_t mag) { //at position
-        printf("Inserting @ %d\n",pos);
+        // printf("Inserting @ %d\n",pos);
         if (pos > PIXELS || pos < 0) return false;
         node *pre = nullptr;
         node *cur = head;
@@ -68,15 +68,17 @@ public:
         temp->next = nullptr;
         nodes++;
         do {
-            if (cur->pos == pos) { delete temp; nodes--; printf("\t%d invalid\n", pos); return false; }
+            if (cur->pos == pos) { delete temp; nodes--; 
+            // printf("\t%d invalid\n", pos);
+            return false; }
             if (cur->pos > pos) {
                 if (pre) pre->next = temp;
                 temp->next = cur;
                 // temp = nullptr;
                 // delete temp;
                 
-                if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
-                else printf("\t%d before %d\n",pos, cur->pos);
+                // if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
+                // else printf("\t%d before %d\n",pos, cur->pos);
                 
                 return true;
             }
@@ -89,7 +91,7 @@ public:
         // temp = nullptr;
         // delete temp;
         
-        printf("\t%d after %d\n", pos, pre->pos);
+        // printf("\t%d after %d\n", pos, pre->pos);
         
         return true;
     }
@@ -112,25 +114,14 @@ public:
         return false;
     }
     
-    // bool checkOrder() {
-    //     node *cur = head;
-    //     do {
-    //         if (cur->pos == pos) { delete temp; nodes--; printf("\t%d invalid\n", pos); return false; }
-    //         if (cur->pos > pos) {
-    //             if (pre) pre->next = temp;
-    //             temp->next = cur;
-    //             // temp = nullptr;
-    //             // delete temp;
-                
-    //             if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
-    //             else printf("\t%d before %d\n",pos, cur->pos);
-                
-    //             return true;
-    //         }
-    //         pre = cur;
-    //         cur=cur->next;
-    //     } while (cur != head);
-    // }
+    bool checkOrder() {
+        node *cur = head;
+        do {
+            if (cur->next->pos - cur->pos != 1) return false;
+            cur=cur->next;
+        } while (cur->next != head);
+        return true;
+    }
 };
 
 struct winsize w;
@@ -149,21 +140,23 @@ int main() {
     
     uint8_t i_s[SCRAMBLE];
     for (uint8_t i=0; i < SCRAMBLE; i++) i_s[i]=i+1;
-    for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");
-    for (uint8_t i=0; i < SCRAMBLE; i++) {
-        uint8_t r1 = rand()%SCRAMBLE;
-        uint8_t r2 = rand()%SCRAMBLE;
-        if (r1 > PIXELS || r2 > PIXELS) {i--; continue;}
-        printf("[%d %d]",r1,r2);
-        uint8_t t = i_s[r1]; 
-        i_s[r1] = i_s[r2];
-        i_s[r2] = t;
-    }printf("\n");
-    for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");
-    
-    for (uint8_t i=0; i < SCRAMBLE; i++) {
-        sparkles.insert(i_s[i], 0);
+    for (uint32_t T=0; T<1000000; T++) {
+        for (uint8_t i=0; i < SCRAMBLE; i++) {
+            uint8_t r1 = rand()%SCRAMBLE;
+            uint8_t r2 = rand()%SCRAMBLE;
+            if (r1 > PIXELS || r2 > PIXELS) {i--; continue;}
+            uint8_t t = i_s[r1]; 
+            i_s[r1] = i_s[r2];
+            i_s[r2] = t;
+        }
+        for (uint8_t i=0; i < SCRAMBLE; i++) sparkles.insert(i_s[i], 0);
+        
+        if (!sparkles.checkOrder()) {
+            printf("Weak!\n");
+            exit(1);
+        }
     }
-    sparkles.print();
+    
+    // sparkles.print();
     
 }
