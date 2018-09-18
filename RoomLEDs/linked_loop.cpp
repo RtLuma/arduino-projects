@@ -125,7 +125,7 @@ public:
 
 struct winsize w;
 
-#define SPARKLES 100
+#define SPARKLES 50
 #define SCRAMBLE SPARKLES-1
 
 int main() {
@@ -133,11 +133,11 @@ int main() {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = SPARKLES*2;
     // PIXELS = w.ws_col-2;
-    for (uint32_t T=0; T<10000; T++) {
+    for (uint32_t T=0; T<1000; T++) {
     
         list sparkles;
 
-        srand(time(NULL)); rand();
+        srand(time(NULL)*T); rand();
     
         uint8_t i_s[SCRAMBLE];
         for (uint8_t i=0; i < SCRAMBLE; i++) i_s[i]=i+1;
@@ -149,8 +149,8 @@ int main() {
             i_s[r1] = i_s[r2];
             i_s[r2] = t;
         }
-        for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");       
-        for (uint8_t i=0; i < SCRAMBLE; i++) sparkles.insert(i_s[i], 0);
+        // for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");       
+        for (uint8_t i=0; i < SCRAMBLE; i++) { sparkles.insert(i_s[i], 0); sparkles.print(); }
         
         if (!sparkles.checkOrder()) {
             printf("Weak!\n");
