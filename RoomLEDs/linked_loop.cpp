@@ -149,13 +149,14 @@ int main() {
             i_s[r1] = i_s[r2];
             i_s[r2] = t;
         }
+        for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");       
         for (uint8_t i=0; i < SCRAMBLE; i++) sparkles.insert(i_s[i], 0);
         
         if (!sparkles.checkOrder()) {
             printf("Weak!\n");
             exit(1);
         }
-        sparkles.print();
+        // sparkles.print();
     }
     
     // sparkles.print();
