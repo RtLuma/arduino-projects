@@ -74,8 +74,8 @@ public:
             if (cur->pos > pos) {
                 if (pre) pre->next = temp;
                 temp->next = cur;
-                // temp = nullptr;
-                // delete temp;
+                temp = nullptr;
+                delete temp;
                 
                 // if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
                 // else printf("\t%d before %d\n",pos, cur->pos);
@@ -87,9 +87,8 @@ public:
         } while (cur != head);
         pre->next = temp;
         temp->next = cur;
-        
-        // temp = nullptr;
-        // delete temp;
+        temp = nullptr;
+        delete temp;
         
         // printf("\t%d after %d\n", pos, pre->pos);
         
@@ -132,15 +131,16 @@ struct winsize w;
 int main() {
 
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    list sparkles;
     PIXELS = SPARKLES*2;
     // PIXELS = w.ws_col-2;
+    for (uint32_t T=0; T<10000; T++) {
     
-    srand(time(NULL)); rand();
+        list sparkles;
+
+        srand(time(NULL)); rand();
     
-    uint8_t i_s[SCRAMBLE];
-    for (uint8_t i=0; i < SCRAMBLE; i++) i_s[i]=i+1;
-    for (uint32_t T=0; T<1000000; T++) {
+        uint8_t i_s[SCRAMBLE];
+        for (uint8_t i=0; i < SCRAMBLE; i++) i_s[i]=i+1;
         for (uint8_t i=0; i < SCRAMBLE; i++) {
             uint8_t r1 = rand()%SCRAMBLE;
             uint8_t r2 = rand()%SCRAMBLE;
@@ -155,6 +155,7 @@ int main() {
             printf("Weak!\n");
             exit(1);
         }
+        sparkles.print();
     }
     
     // sparkles.print();
