@@ -112,25 +112,25 @@ public:
         return false;
     }
     
-    bool checkOrder() {
-        node *cur = head;
-        do {
-            if (cur->pos == pos) { delete temp; nodes--; printf("\t%d invalid\n", pos); return false; }
-            if (cur->pos > pos) {
-                if (pre) pre->next = temp;
-                temp->next = cur;
-                // temp = nullptr;
-                // delete temp;
+    // bool checkOrder() {
+    //     node *cur = head;
+    //     do {
+    //         if (cur->pos == pos) { delete temp; nodes--; printf("\t%d invalid\n", pos); return false; }
+    //         if (cur->pos > pos) {
+    //             if (pre) pre->next = temp;
+    //             temp->next = cur;
+    //             // temp = nullptr;
+    //             // delete temp;
                 
-                if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
-                else printf("\t%d before %d\n",pos, cur->pos);
+    //             if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
+    //             else printf("\t%d before %d\n",pos, cur->pos);
                 
-                return true;
-            }
-            pre = cur;
-            cur=cur->next;
-        } while (cur != head);
-    }
+    //             return true;
+    //         }
+    //         pre = cur;
+    //         cur=cur->next;
+    //     } while (cur != head);
+    // }
 };
 
 struct winsize w;
