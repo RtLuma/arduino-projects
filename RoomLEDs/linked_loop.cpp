@@ -120,7 +120,7 @@ int main() {
     // uint16_t SCRAMBLE = PIXELS/3-1;
     
     for (uint32_t T=0; T<1000; T++) { // Run test a bunch of times to avoid serendipity
-        printf("Test %d #############################\n", T);
+        printf("Test %d #############################\n\n", T);
         list sparkles;
         printf("%d\t", (sparkles.getHead())->pos);
         sparkles.proxPrint();
@@ -149,9 +149,18 @@ int main() {
         // LL should be full, make sure it's in exact sequential order.
         if (!sparkles.checkSequence()) { printf("seq"); printf(TEST_FAIL_MSG); exit(1); }
         
-        // Now to empty it out
+        // #################################################################################### Now to empty it out
         
-        for (uint8_t i=1; i < SCRAMBLE; i++) {  // Should be fine to cut in the same random order
+        for (uint8_t i=0; i < SCRAMBLE; i++) {  //Randomly scramble all indices
+            uint8_t r1 = rand()%SCRAMBLE;
+            uint8_t r2 = rand()%SCRAMBLE;
+            if (r1 > PIXELS || r2 > PIXELS) {i--; continue;}
+            uint8_t t = i_s[r1]; 
+            i_s[r1] = i_s[r2];
+            i_s[r2] = t;
+        }
+        
+        for (uint8_t i=1; i < SCRAMBLE; i++) {  // Cut the random order, should still preserve consistency
             sparkles.cut(i_s[i]);
             printf("-%d\t", i_s[i]);
             sparkles.proxPrint();
