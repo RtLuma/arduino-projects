@@ -13,9 +13,8 @@ uint8_t R, G, B;
 #define ZERO_SYMBOL " "
 
 struct node {
-    int8_t mag;
-    uint16_t pos;
-    node *next;
+    int8_t mag; uint16_t pos; node *next;
+    node(int8_t mag, uint16_t pos, node *next) { this->mag=mag; this->pos=pos; this->next=next; }
 };
 
 class list {
@@ -26,7 +25,7 @@ private:
 public:
     list() {
         head = new node;
-        head->pos=10;
+        head->pos=0;
         head->mag=1;
         head->next=head;
         nodes = 0;
@@ -62,20 +61,25 @@ public:
         node *pre = nullptr;
         node *cur = head;
         mag |= 1;
-        node *temp = new node;
-        temp->mag = mag;
-        temp->pos = pos;
-        temp->next = nullptr;
+        // node *temp = new node;
+        // temp->mag = mag;
+        // temp->pos = pos;
+        // temp->next = nullptr;
         nodes++;
         do {
-            if (cur->pos == pos) { delete temp; nodes--; 
-            // printf("\t%d invalid\n", pos);
-            return false; }
+            
+            if (cur->pos == pos) {
+                nodes--; 
+                // printf("\t%d invalid\n", pos);
+                return false;
+            }
+            
             if (cur->pos > pos) {
-                if (pre) pre->next = temp;
-                temp->next = cur;
-                temp = nullptr;
-                delete temp;
+                if (pre) pre->next = new node(mag, pos, cur);
+                else new node(mag, pos, head);
+                // temp->next = cur;
+                // temp = nullptr;
+                // delete temp;
                 
                 // if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
                 // else printf("\t%d before %d\n",pos, cur->pos);
@@ -85,10 +89,10 @@ public:
             pre = cur;
             cur=cur->next;
         } while (cur != head);
-        pre->next = temp;
-        temp->next = cur;
-        temp = nullptr;
-        delete temp;
+        pre->next = new node(mag, pos, cur);
+        // temp->next = cur;
+        // temp = nullptr;
+        // delete temp;
         
         // printf("\t%d after %d\n", pos, pre->pos);
         
