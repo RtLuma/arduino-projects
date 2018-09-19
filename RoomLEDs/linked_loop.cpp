@@ -57,17 +57,17 @@ public:
     // }
 
     bool insert(uint16_t pos, uint8_t mag) { 
-        if (pos > PIXELS || pos == head->pos) return false;
+        if (pos > PIXELS || pos == head->pos)                                        return false;
         mag |= 1; nodes++; node *cur=head;
         
-        if (pos < head->pos) { head = new node(mag,pos,head); tail->next=head; return true; }
+        if (pos < head->pos) { head = new node(mag,pos,head); tail->next=head;       return true;  }
         
-        do { if (cur->next->pos == pos) { nodes--; return false; }
-             if (cur->next->pos > pos) { cur->next = new node(mag, pos, cur->next); return true; }
+        do { if (cur->next->pos == pos) { nodes--;                                   return false; }
+             if (cur->next->pos >  pos) { cur->next = new node(mag, pos, cur->next); return true;  }
              cur = cur->next;
         } while (cur->next != head);
         
-        cur->next = new node(mag, pos, cur->next); tail=cur->next; return true;
+        cur->next = new node(mag, pos, cur->next); tail=cur->next;                   return true;
     }
 
     bool cut(uint16_t pos) {  //delete @ position
