@@ -11,21 +11,24 @@ uint16_t PIXELS;
 uint8_t R, G, B;
 
 #define ZERO_SYMBOL " "
+#define SCRAMBLE 20
 
 struct node {
     int8_t mag; uint16_t pos; node *next;
     node(int8_t mag, uint16_t pos, node *next) { this->mag=mag; this->pos=pos; this->next=next; }
-    node() { this->mag=0; this->pos=0; this->next=this; }
+    node() { this->mag=0; this->pos=rand()%SCRAMBLE; this->next=this; }
 };
 
 class list {
 private:
     node *head;
+    node *tail;
     uint8_t nodes;
 
 public:
     list() {
         head = new node;
+        tail = head;
         nodes = 0;
     }
 
@@ -54,23 +57,29 @@ public:
     // }
 
     bool insert(uint16_t pos, uint8_t mag) { 
-        if (pos > PIXELS || pos < 0) return false;
-        node *pre = nullptr;
-        node *cur = head;
+        if (pos > PIXELS || pos < 0 || pos == head->pos) return false;
         mag |= 1;
         nodes++;
+        node *cur=head;
+        
+        if (pos < head->pos) {
+            head = new node(mag,pos,head);
+            tail->next=head;
+            return true;
+        }
+        
         do {
-            if (cur->pos == pos) { nodes--; return false; }
-            
-            if (cur->pos > pos) {
-                if (pre) pre->next = new node(mag, pos, cur);
-                else new node(mag, pos, head);
+            if (cur->next->pos == pos) { nodes--; return false; }
+            if (cur->next->pos > pos) {
+                cur->next = new node(mag, pos, cur->next);
                 return true;
             }
-            pre = cur;
-            cur=cur->next;
-        } while (cur != head);
-        pre->next = new node(mag, pos, cur);
+            cur = cur->next;
+        } while (cur->next != head);
+        
+        //next == head, cur is last node
+        cur->next = new node(mag, pos, cur->next);
+        tail=cur->next;
         return true;
     }
 
@@ -105,18 +114,17 @@ public:
 struct winsize w;
 
 // #define SPARKLES 50
-#define SCRAMBLE 20
 
 int main() {
 
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
     // uint16_t SCRAMBLE = PIXELS/3-1;
-    for (uint32_t T=0; T<100; T++) {
+    for (uint32_t T=0; T<1000; T++) {
     
         list sparkles;
 
-        srand(time(NULL)*T); rand();
+        srand(time(NULL)*T*T*T); rand();
     
         uint8_t i_s[SCRAMBLE];
         for (uint8_t i=0; i < SCRAMBLE; i++) i_s[i]=i+1;
