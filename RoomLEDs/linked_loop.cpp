@@ -15,6 +15,7 @@ uint8_t R, G, B;
 struct node {
     int8_t mag; uint16_t pos; node *next;
     node(int8_t mag, uint16_t pos, node *next) { this->mag=mag; this->pos=pos; this->next=next; }
+    node() { this->mag=0; this->pos=0; this->next=this; }
 };
 
 class list {
@@ -25,9 +26,6 @@ private:
 public:
     list() {
         head = new node;
-        head->pos=0;
-        head->mag=1;
-        head->next=head;
         nodes = 0;
     }
 
@@ -77,9 +75,6 @@ public:
             if (cur->pos > pos) {
                 if (pre) pre->next = new node(mag, pos, cur);
                 else new node(mag, pos, head);
-                // temp->next = cur;
-                // temp = nullptr;
-                // delete temp;
                 
                 // if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
                 // else printf("\t%d before %d\n",pos, cur->pos);
@@ -90,9 +85,6 @@ public:
             cur=cur->next;
         } while (cur != head);
         pre->next = new node(mag, pos, cur);
-        // temp->next = cur;
-        // temp = nullptr;
-        // delete temp;
         
         // printf("\t%d after %d\n", pos, pre->pos);
         
@@ -130,7 +122,7 @@ public:
 struct winsize w;
 
 // #define SPARKLES 50
-#define SCRAMBLE 23
+#define SCRAMBLE 20
 
 int main() {
 
@@ -161,7 +153,7 @@ int main() {
         }
         
         if (!sparkles.checkOrder()) {
-            printf("Weak!\n");
+            printf("\n\n\n\n\n\nWeak!\n\n\n\n\n");
             exit(1);
         }
         printf("\n");
