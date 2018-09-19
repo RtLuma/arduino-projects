@@ -53,41 +53,24 @@ public:
     //     return true;
     // }
 
-    bool insert(uint16_t pos, uint8_t mag) { //at position
-        // printf("Inserting @ %d\n",pos);
+    bool insert(uint16_t pos, uint8_t mag) { 
         if (pos > PIXELS || pos < 0) return false;
         node *pre = nullptr;
         node *cur = head;
         mag |= 1;
-        // node *temp = new node;
-        // temp->mag = mag;
-        // temp->pos = pos;
-        // temp->next = nullptr;
         nodes++;
         do {
-            
-            if (cur->pos == pos) {
-                nodes--; 
-                // printf("\t%d invalid\n", pos);
-                return false;
-            }
+            if (cur->pos == pos) { nodes--; return false; }
             
             if (cur->pos > pos) {
                 if (pre) pre->next = new node(mag, pos, cur);
                 else new node(mag, pos, head);
-                
-                // if (pre) printf("\t%d between %d and %d\n",pos, pre->pos, cur->pos);
-                // else printf("\t%d before %d\n",pos, cur->pos);
-                
                 return true;
             }
             pre = cur;
             cur=cur->next;
         } while (cur != head);
         pre->next = new node(mag, pos, cur);
-        
-        // printf("\t%d after %d\n", pos, pre->pos);
-        
         return true;
     }
 
