@@ -26,7 +26,7 @@ private:
 public:
     list() {
         head = new node;
-        head->pos=0;
+        head->pos=10;
         head->mag=1;
         head->next=head;
         nodes = 0;
@@ -125,15 +125,15 @@ public:
 
 struct winsize w;
 
-#define SPARKLES 50
-#define SCRAMBLE SPARKLES-1
+// #define SPARKLES 50
+#define SCRAMBLE 23
 
 int main() {
 
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-    PIXELS = SPARKLES*2;
-    // PIXELS = w.ws_col-2;
-    for (uint32_t T=0; T<1000; T++) {
+    PIXELS = w.ws_col-2;
+    // uint16_t SCRAMBLE = PIXELS/3-1;
+    for (uint32_t T=0; T<100; T++) {
     
         list sparkles;
 
@@ -150,12 +150,17 @@ int main() {
             i_s[r2] = t;
         }
         // for (uint8_t i=0; i < SCRAMBLE; i++) printf("%d ", i_s[i]); printf("\n");       
-        for (uint8_t i=0; i < SCRAMBLE; i++) { sparkles.insert(i_s[i], 0); sparkles.print(); }
+        for (uint8_t i=0; i < SCRAMBLE; i++) {
+            sparkles.insert(i_s[i], 0);
+            printf("%d\t", i_s[i]);
+            sparkles.print();
+        }
         
         if (!sparkles.checkOrder()) {
             printf("Weak!\n");
             exit(1);
         }
+        printf("\n");
         // sparkles.print();
     }
     
