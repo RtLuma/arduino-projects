@@ -143,7 +143,7 @@ int main() {
             sparkles.insert(i_s[i], 0);
             printf("%d\t", i_s[i]);
             sparkles.proxPrint();
-            // if (!sparkles.checkSort()) { printf("sort"); printf(TEST_FAIL_MSG); exit(1); }
+            if (!sparkles.checkSort()) { printf("sort"); printf(TEST_FAIL_MSG); exit(1); }
         }
         
         // LL should be full, make sure it's in exact sequential order.
