@@ -13,6 +13,7 @@ uint8_t R, G, B;
 #define ZERO_SYMBOL "."
 #define TEST_FAIL_MSG "\n\n\n\n\n\nWeak!\n\n\n\n\n"
 #define SCRAMBLE 20
+// string val2block(uint8_t val) { return "\u2588"; } 
 string val2block(uint8_t val) {if (val > 223) return "\u2588";  if (val > 191) return "\u2587";  if (val > 159) return "\u2586";  if (val > 127) return "\u2585";  if (val > 95)  return "\u2584";  if (val > 63)  return "\u2583";  if (val > 31)  return "\u2582";  return " ";} 
 
 void printSparkle(int8_t mag) {
@@ -46,18 +47,7 @@ uint8_t printGrad(node* A, node* B) {
   return dist;
 }
 
-int8_t spawnMag(node* A, node* B, uint16_t pos) {
-    // return 0;
-    int16_t dist =  B->pos - A->pos;
-    int16_t distA = pos - A->pos;
-    int16_t distB = B->pos - pos;
-    if (dist > 0) {
-    int16_t magA = (distA * A->mag) ; 
-    int16_t magB = (distB * B->mag) ; 
-    return -(magA + magB) / dist;
-    }
-    else return 0;
-}    
+int8_t interMag(node* A, node* B, uint16_t pos) { return -(int16_t(B->mag - A->mag)*(pos - A->pos)/(B->pos - A->pos) + A->mag); }    
     
 
 class list {
@@ -96,7 +86,7 @@ public:
         nodes++; node *pre = tail; node *cur = head;
         if (pos < head->pos) {
             
-            head = new node(spawnMag(pre, cur->next, pos),pos,head);
+            head = new node(interMag(pre, cur->next, pos),pos,head);
             
             tail->next=head;
             return true;
@@ -104,20 +94,15 @@ public:
         do {
             if (cur->next->pos == pos) { nodes--; return false; }
             if (cur->next->pos >  pos) {
-            
-            
-            cur->next = new node(spawnMag(pre, cur->next, pos),pos,cur->next);
-
-            return true;
+                cur->next = new node(interMag(pre, cur->next, pos),pos,cur->next);
+                return true;
             }
-            pre = cur;
-            cur = cur->next;
+            pre = cur; cur = cur->next;
         } while(cur->next != head);
-        cur->next = new node(spawnMag(pre, cur->next, pos), pos, cur->next); tail=cur->next;                   return true;
+        cur->next = new node(interMag(pre, cur->next, pos), pos, cur->next); tail=cur->next;                   return true;
         return true;
     }
 
-    
     bool cut(uint16_t pos) {  //delete @ position
         if (pos > PIXELS || pos < head->pos)                                        return false;
         node *cur = head;
@@ -144,17 +129,18 @@ public:
     }
     
     void update() {             // Kill on < midpoint
+      node *pre = tail;
       node *cur = head;
       do {
         int8_t newmag = cur->mag + 1;
         
-        if (cur->mag<0 && newmag>-1) {
+        if (cur->mag<0 && abs(newmag) < abs(interMag(pre, cur->next, cur->pos)) ) {
           uint16_t del_pos = cur->pos; cur = cur->next; cut(del_pos);
           bool reinsert; do { reinsert = !insertAlive((rand()%PIXELS)); } while (reinsert);
           continue;
         }        
         cur->mag = newmag;
-        cur = cur->next;
+        pre = cur; cur = cur->next;
       } while(cur->next != head);
     }   
     
@@ -162,7 +148,7 @@ public:
 
 struct winsize w;
 
-#define SPARKLES 15
+#define SPARKLES 10
 
 int main() {
     srand(time(NULL));
