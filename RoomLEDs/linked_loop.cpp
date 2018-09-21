@@ -27,8 +27,8 @@ void printSparkle(int8_t mag) {
 void printSpawn(int8_t mag) {
 	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;
     printf("\033[38;2;255;255;255m");
-	// cout << val2block(disp);
-	cout << "!";
+	cout << val2block(disp);
+	// cout << "!";
 	printf("\033[0;m");
 	
 } //]]
@@ -43,7 +43,8 @@ uint16_t recent = 0;
 
 uint8_t printGrad(node* A, node* B) {
   uint16_t mag = abs(A->mag) << 8; uint16_t dist = B->pos - A->pos;
-  int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist; uint16_t p = 1;
+  int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
+  uint16_t p = 1;
   printSpawn(mag>>8);
 //   if (A->pos == recent) printSpawn(mag>>8);
 //   else printSparkle(mag>>8);
@@ -53,13 +54,13 @@ uint8_t printGrad(node* A, node* B) {
 }
 
 int8_t interMag(node* A, node* B, uint16_t pos) {
-    int16_t mA = A->mag << 8;
-    int16_t mB = B->mag << 8;
-    int16_t dM = mB - mA;
-    printf("%d - %d = %d\n",mB, mA, dM);
-    uint16_t dA = pos - A->pos;
-    uint16_t D = B->pos - A->pos;
-    return -(((dM*dA/D)>>8) + A->mag);
+    uint16_t mag = abs(A->mag) << 8;
+    uint16_t dist = B->pos - A->pos;
+    uint16_t dFromA = pos - A->pos;
+    int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
+    mag += mag_step * dFromA;
+    mag >>= 8;
+    return A->mag > 0 ? -mag : mag;
 }    
     
 
@@ -84,6 +85,8 @@ public:
 		for (; p < PIXELS; p++) printf(ZERO_SYMBOL);
 	}
     
+    void printProx() { node *cur = head; do { printf("[%d,%d] ", cur->pos, cur->mag); cur=cur->next; } while (cur != head); printf("\n"); }
+    
 
     bool insert(uint16_t pos, int8_t mag) { // bool 'alive' instead of mag arg
         nodes++; node *cur=head;
@@ -96,10 +99,10 @@ public:
     
     bool insertAlive(uint16_t pos) {
         if (pos > PIXELS || pos == head->pos) return false;
-        nodes++; node *pre = tail; node *cur = head;
+        nodes++; node *cur = head;
         if (pos < head->pos) {
             
-            head = new node(interMag(pre, cur->next, pos),pos,head);
+            head = new node(-interMag(cur, cur->next, pos),pos,head);
             
             tail->next=head;
             return true;
@@ -107,12 +110,12 @@ public:
         do {
             if (cur->next->pos == pos) { nodes--; return false; }
             if (cur->next->pos >  pos) {
-                cur->next = new node(interMag(pre, cur->next, pos),pos,cur->next);
+                cur->next = new node(-interMag(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
-            pre = cur; cur = cur->next;
+            cur = cur->next;
         } while(cur->next != head);
-        cur->next = new node(interMag(pre, cur->next, pos), pos, cur->next); tail=cur->next;
+        cur->next = new node(-interMag(cur, cur->next, pos), pos, cur->next); tail=cur->next;
         return true;
     }
 
@@ -169,26 +172,29 @@ int main() {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	list sparkles;
 	PIXELS = w.ws_col-2;
-	// sparkles.populate(SPARKLES);
-    // sparkles.insert(PIXELS,1);
+	sparkles.populate(SPARKLES);
+    sparkles.insert(PIXELS,1);
     // R=rand(); G=rand(); B=rand();
     R=255; G=64; B=0;
-	// while (true) {
-    //     sparkles.update();
-    //     cout << "\r[";
-    //     sparkles.print();
-    //     cout << "]";
-    //     fflush(stdout);
-    //     usleep(100000);
-    //     printf("\r");
-	// }
+	while (true) {
+        sparkles.update();
+        cout << "\r[";
+        sparkles.print();
+        cout << "]";
+        fflush(stdout);
+        usleep(10000);
+        printf("\r");
+	}
     
-    sparkles.insert(10, 97);
-    sparkles.insert(45, -82);
-    sparkles.insert(80, 120);
-    cout << "\r["; sparkles.print(); cout << "]\n";
-    sparkles.insertAlive(30);
-    sparkles.insertAlive(64);
-    cout << "\r["; sparkles.print(); cout << "]\n";
+    // sparkles.insert(rand()%PIXELS, rand());
+    // sparkles.insert(rand()%PIXELS, rand());
+    // sparkles.insert(rand()%PIXELS, rand());
+    // cout << "\r["; sparkles.print(); cout << "]\n";
+    // sparkles.insertAlive(rand()%PIXELS);
+    // sparkles.insertAlive(rand()%PIXELS);
+    // sparkles.insertAlive(rand()%PIXELS);
+    // sparkles.insertAlive(rand()%PIXELS);
+    // sparkles.insertAlive(rand()%PIXELS);
+    // cout << "\r["; sparkles.print(); cout << "]\n";
     
 }
