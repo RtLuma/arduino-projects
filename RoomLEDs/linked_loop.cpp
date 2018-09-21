@@ -27,7 +27,8 @@ void printSparkle(int8_t mag) {
 void printSpawn(int8_t mag) {
 	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;
     printf("\033[38;2;255;255;255m");
-	cout << val2block(disp);
+	// cout << val2block(disp);
+	cout << "!";
 	printf("\033[0;m");
 	
 } //]]
@@ -38,16 +39,28 @@ struct node {
     node() { this->mag=0; this->pos=rand()%SCRAMBLE; this->next=this; }
 };
 
+uint16_t recent = 0;
+
 uint8_t printGrad(node* A, node* B) {
-  int16_t mag = A->mag << 8; uint16_t dist = B->pos - A->pos;
-  int16_t mag_step = int16_t((B->mag<<8) - mag)/dist; uint16_t p = 1;
-//   printSpawn(mag>>8); mag += mag_step;
-  printSparkle(mag>>8); mag += mag_step;
+  uint16_t mag = abs(A->mag) << 8; uint16_t dist = B->pos - A->pos;
+  int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist; uint16_t p = 1;
+  printSpawn(mag>>8);
+//   if (A->pos == recent) printSpawn(mag>>8);
+//   else printSparkle(mag>>8);
+  mag += mag_step;
   for (; p < dist; p++) { printSparkle(mag>>8); mag += mag_step; }
   return dist;
 }
 
-int8_t interMag(node* A, node* B, uint16_t pos) { return -(int16_t(B->mag - A->mag)*(pos - A->pos)/(B->pos - A->pos) + A->mag); }    
+int8_t interMag(node* A, node* B, uint16_t pos) {
+    int16_t mA = A->mag << 8;
+    int16_t mB = B->mag << 8;
+    int16_t dM = mB - mA;
+    printf("%d - %d = %d\n",mB, mA, dM);
+    uint16_t dA = pos - A->pos;
+    uint16_t D = B->pos - A->pos;
+    return -(((dM*dA/D)>>8) + A->mag);
+}    
     
 
 class list {
@@ -72,7 +85,7 @@ public:
 	}
     
 
-    bool insert(uint16_t pos, uint8_t mag) { // bool 'alive' instead of mag arg
+    bool insert(uint16_t pos, int8_t mag) { // bool 'alive' instead of mag arg
         nodes++; node *cur=head;
         if (pos < head->pos) { head = new node(mag,pos,head); tail->next=head;       return true;  }
         do { if (cur->next->pos == pos) {                                   nodes--; return false; }
@@ -99,12 +112,12 @@ public:
             }
             pre = cur; cur = cur->next;
         } while(cur->next != head);
-        cur->next = new node(interMag(pre, cur->next, pos), pos, cur->next); tail=cur->next;                   return true;
+        cur->next = new node(interMag(pre, cur->next, pos), pos, cur->next); tail=cur->next;
         return true;
     }
 
     bool cut(uint16_t pos) {  //delete @ position
-        if (pos > PIXELS || pos < head->pos)                                        return false;
+        if (pos > PIXELS || pos < head->pos) return false;
         node *cur = head;
         if (pos == head->pos) {
             nodes--;
@@ -136,7 +149,8 @@ public:
         
         if (cur->mag<0 && abs(newmag) < abs(interMag(pre, cur->next, cur->pos)) ) {
           uint16_t del_pos = cur->pos; cur = cur->next; cut(del_pos);
-          bool reinsert; do { reinsert = !insertAlive((rand()%PIXELS)); } while (reinsert);
+          bool reinsert; do { del_pos = rand()%PIXELS; reinsert = !insertAlive(del_pos); } while (reinsert);
+          recent = del_pos;
           continue;
         }        
         cur->mag = newmag;
@@ -155,16 +169,26 @@ int main() {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	list sparkles;
 	PIXELS = w.ws_col-2;
-	sparkles.populate(SPARKLES);
-    sparkles.insert(PIXELS,1);
-    R=rand(); G=rand(); B=rand();
-	while (true) {
-        sparkles.update();
-        cout << "\r[";
-        sparkles.print();
-        cout << "]";
-        fflush(stdout);
-        usleep(10000);
-        printf("\r");
-	}
+	// sparkles.populate(SPARKLES);
+    // sparkles.insert(PIXELS,1);
+    // R=rand(); G=rand(); B=rand();
+    R=255; G=64; B=0;
+	// while (true) {
+    //     sparkles.update();
+    //     cout << "\r[";
+    //     sparkles.print();
+    //     cout << "]";
+    //     fflush(stdout);
+    //     usleep(100000);
+    //     printf("\r");
+	// }
+    
+    sparkles.insert(10, 97);
+    sparkles.insert(45, -82);
+    sparkles.insert(80, 120);
+    cout << "\r["; sparkles.print(); cout << "]\n";
+    sparkles.insertAlive(30);
+    sparkles.insertAlive(64);
+    cout << "\r["; sparkles.print(); cout << "]\n";
+    
 }
