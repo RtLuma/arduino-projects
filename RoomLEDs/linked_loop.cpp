@@ -102,7 +102,7 @@ public:
         nodes++; node *cur = head;
         if (pos < head->pos) {
             
-            head = new node(-interMag(cur, cur->next, pos),pos,head);
+            head = new node(interMag(cur, cur->next, pos),pos,head);
             
             tail->next=head;
             return true;
@@ -110,12 +110,12 @@ public:
         do {
             if (cur->next->pos == pos) { nodes--; return false; }
             if (cur->next->pos >  pos) {
-                cur->next = new node(-interMag(cur, cur->next, pos),pos,cur->next);
+                cur->next = new node(interMag(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
             cur = cur->next;
         } while(cur->next != head);
-        cur->next = new node(-interMag(cur, cur->next, pos), pos, cur->next); tail=cur->next;
+        cur->next = new node(interMag(cur, cur->next, pos), pos, cur->next); tail=cur->next;
         return true;
     }
 
@@ -150,7 +150,7 @@ public:
       do {
         int8_t newmag = cur->mag + 1;
         
-        if (cur->mag<0 && abs(newmag) < abs(interMag(pre, cur->next, cur->pos)) ) {
+        if (cur->mag<0 && abs(newmag) < abs(interMag(pre, cur->next, cur->pos)) ) { // Regular insert on regular death?
           uint16_t del_pos = cur->pos; cur = cur->next; cut(del_pos);
           bool reinsert; do { del_pos = rand()%PIXELS; reinsert = !insertAlive(del_pos); } while (reinsert);
           recent = del_pos;
