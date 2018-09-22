@@ -163,7 +163,7 @@ public:
 
 struct winsize w;
 
-#define SPARKLES 10
+#define SPARKLES 25
 
 int main() {
     srand(time(NULL));
