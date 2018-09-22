@@ -10,7 +10,7 @@ using namespace std;
 uint16_t PIXELS;
 uint8_t R, G, B;
 
-#define ZERO_SYMBOL "."
+#define ZERO_SYMBOL " "
 #define TEST_FAIL_MSG "\n\n\n\n\n\nWeak!\n\n\n\n\n"
 #define SCRAMBLE 20
 // string val2block(uint8_t val) { return "\u2588"; } 
@@ -39,19 +39,18 @@ struct node {
     node() { this->mag=0; this->pos=rand()%SCRAMBLE; this->next=this; }
 };
 
-uint16_t recent = 0;
-
 uint8_t printGrad(node* A, node* B) {
   uint16_t mag = abs(A->mag) << 8; uint16_t dist = B->pos - A->pos;
   int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
   uint16_t p = 1;
-  printSpawn(mag>>8);
-//   if (A->pos == recent) printSpawn(mag>>8);
-//   else printSparkle(mag>>8);
+//   printSpawn(mag>>8);
+  printSparkle(mag>>8);
   mag += mag_step;
   for (; p < dist; p++) { printSparkle(mag>>8); mag += mag_step; }
   return dist;
 }
+
+#define EPS 1
 
 int8_t interMag(node* A, node* B, uint16_t pos) {
     uint16_t mag = abs(A->mag) << 8;
@@ -60,7 +59,7 @@ int8_t interMag(node* A, node* B, uint16_t pos) {
     int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
     mag += mag_step * dFromA;
     mag >>= 8;
-    return A->mag > 0 ? -mag : mag;
+    return rand() & 1 ? -mag : mag;
 }    
     
 
@@ -108,11 +107,11 @@ public:
             return true;
         }
         do {
-            if (cur->next->pos == pos) { nodes--; return false; }
-            if (cur->next->pos >  pos) {
+            if (cur->next->pos - pos >  0) {
                 cur->next = new node(interMag(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
+            if (cur->next->pos == pos) { nodes--; return false; }
             cur = cur->next;
         } while(cur->next != head);
         cur->next = new node(interMag(cur, cur->next, pos), pos, cur->next); tail=cur->next;
@@ -150,10 +149,9 @@ public:
       do {
         int8_t newmag = cur->mag + 1;
         
-        if (cur->mag<0 && abs(newmag) < abs(interMag(pre, cur->next, cur->pos)) ) { // Regular insert on regular death?
+        if (abs(abs(newmag) - abs(interMag(pre, cur->next, cur->pos))) < EPS ) { // Regular insert on regular death?
           uint16_t del_pos = cur->pos; cur = cur->next; cut(del_pos);
           bool reinsert; do { del_pos = rand()%PIXELS; reinsert = !insertAlive(del_pos); } while (reinsert);
-          recent = del_pos;
           continue;
         }        
         cur->mag = newmag;
@@ -174,15 +172,15 @@ int main() {
 	PIXELS = w.ws_col-2;
 	sparkles.populate(SPARKLES);
     sparkles.insert(PIXELS,1);
-    // R=rand(); G=rand(); B=rand();
-    R=255; G=64; B=0;
+    R=rand(); G=rand(); B=rand();
+    // R=255; G=64; B=0;
 	while (true) {
         sparkles.update();
         cout << "\r[";
         sparkles.print();
         cout << "]";
         fflush(stdout);
-        usleep(10000);
+        usleep(20000);
         printf("\r");
 	}
     
