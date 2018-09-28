@@ -24,7 +24,7 @@ int main() {
         sparkles.print();
         cout << "]";
         fflush(stdout);
-        usleep(10000);
+        usleep(20000);
         printf("\r");
 	}
     
