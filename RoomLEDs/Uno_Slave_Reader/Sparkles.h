@@ -13,7 +13,7 @@ class list {
   public:
     list() { head = nullptr; tail = nullptr; nodes = 0; }
     
-    void populate(uint8_t sparkles) {      
+    populate(uint8_t sparkles) {      
       while (nodes < sparkles) {
         uint8_t m = random(256);
         uint16_t p = random(SCLERA);
@@ -21,7 +21,7 @@ class list {
       }
     }
 
-    void terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
+    terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
 
     bool insert(uint16_t pos, uint8_t mag) { //at position
       node *pre;
@@ -86,7 +86,7 @@ class list {
       node *cur = head;
       while (cur != nullptr) {
 
-        int8_t newmag = cur->mag + 1 + (F>>3);
+        int8_t newmag = cur->mag + 1 + (F>>5);
         
         if (cur->mag<0 && newmag>-1) {
           if (random(5)!=4) { cur->mag=-1; cur=cur->next; continue; }
@@ -120,7 +120,8 @@ class list {
       uint16_t p;
       uint8_t t = millis() >> 6;
       SPARKLEBLOCK(sendPixel,  SCLERA,  p,      SCLERA)
-      SPARKLEBLOCK(sendPixel2, PIXELS2, p%IRIS, (p > IRIS ? PUPIL : IRIS))
+      SPARKLEBLOCK(sendPixel2, IRIS,    p,      IRIS)
+//      SPARKLEBLOCK(sendPixel2, PIXELS2, p%IRIS, (p > IRIS ? PUPIL : IRIS))
     }
 
     void displayRGB() {
@@ -149,6 +150,7 @@ void sparkle(void) {
 void sparkleRGB(void) {
   sparkles.update();
   sparkles.displayRGB();
+  delay(20);
   delayMicroseconds(MAX_SPARKLES - P);
 }
 

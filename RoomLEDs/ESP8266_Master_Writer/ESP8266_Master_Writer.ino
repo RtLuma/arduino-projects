@@ -26,8 +26,8 @@ void setup() {
   Serial.begin(9600);
 
   server.on("/", []() {
-    if (!server.authenticate(www_username, www_password))
-      return server.requestAuthentication();
+//    if (!server.authenticate(www_username, www_password))
+//      return server.requestAuthentication();
     String message = "";
     bool succesfulQuery = true;
 

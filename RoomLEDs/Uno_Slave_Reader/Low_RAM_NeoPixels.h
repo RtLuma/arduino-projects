@@ -8,7 +8,7 @@
 #define PIXEL_DDR   DDRB   // Port of the pin the pixels are connected to
 #define PIXEL_BIT   0      // Bit of the pin the pixels are connected to
 #define PIXEL_BIT2   1     // Bit of the pin the second pixels are connected to
-#define T1H  900    // Width of a 1 bit in ns
+#define T1H  850    // Width of a 1 bit in ns
 #define T1L  600    // Width of a 1 bit in ns
 #define T0H  350    // Width of a 0 bit in ns
 #define T0L  800    // Width of a 0 bit in ns

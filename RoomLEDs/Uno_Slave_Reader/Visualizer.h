@@ -17,7 +17,7 @@ uint8_t sclera[2][BANDS][3] = {0};
   for (uint8_t p = 1; p < DIST; p++) {\
     PIXEL_FUNCTION(r>>7,g>>7,b>>7);\
     r += r_step; g += g_step; b += b_step;\
-  } delayMicroseconds(10);
+  } 
 #define sendVisualizerPixels(WIDTH) visualizerBlock(WIDTH, sendPixel)
 #define sendVisualizerPixels2(WIDTH) visualizerBlock(WIDTH, sendPixel2)
 
@@ -93,21 +93,6 @@ void visualizer(void) {
   pixelA = sclera[0][6]; pixelB = sclera[0][5]; sendVisualizerPixels2(SECTION_IRIS)
   pixelA = sclera[0][5]; pixelB = sclera[0][4]; sendVisualizerPixels2((SECTION_IRIS + 0))
   pixelA = sclera[0][4]; pixelB = sclera[0][3]; sendVisualizerPixels2((SECTION_IRIS + 1))
-
-  pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels2((SECTION_PUPIL + 1))
-  pixelA = sclera[0][1]; pixelB = sclera[0][0]; sendVisualizerPixels2((SECTION_PUPIL + 2))
-
-  pixelA = sclera[1][0]; pixelB = sclera[1][1]; sendVisualizerPixels2((SECTION_PUPIL + 1))
-  pixelA = sclera[1][1]; pixelB = sclera[1][2]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[1][2]; pixelB = sclera[1][3]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[1][3]; pixelB = sclera[1][4]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[1][4]; pixelB = sclera[1][5]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[1][5]; pixelB = sclera[1][6]; sendVisualizerPixels2((SECTION_PUPIL + 2))
-
-  pixelA = sclera[0][6]; pixelB = sclera[0][5]; sendVisualizerPixels2(SECTION_PUPIL)
-  pixelA = sclera[0][5]; pixelB = sclera[0][4]; sendVisualizerPixels2((SECTION_PUPIL + 1))
-  pixelA = sclera[0][4]; pixelB = sclera[0][3]; sendVisualizerPixels2(SECTION_PUPIL + 1)
 
 }
 
