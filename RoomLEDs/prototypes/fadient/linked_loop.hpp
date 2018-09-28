@@ -9,8 +9,8 @@ uint8_t R, G, B;
 using voidF = void(*)(int8_t) ;
 
 
-std::string val2block(uint8_t val) { return "\u2588"; } 
-// std::string val2block(uint8_t val) {if (val > 223) return "\u2588";if (val > 191) return "\u2587";if (val > 159) return "\u2586";if (val > 127) return "\u2585";if (val > 95)  return "\u2584";if (val > 63)  return "\u2583";if (val > 31)  return "\u2582";return ZERO_SYMBOL;} 
+// std::string val2block(uint8_t val) { return "\u2588"; } 
+std::string val2block(uint8_t val) {if (val > 223) return "\u2588";if (val > 191) return "\u2587";if (val > 159) return "\u2586";if (val > 127) return "\u2585";if (val > 95)  return "\u2584";if (val > 63)  return "\u2583";if (val > 31)  return "\u2582";return ZERO_SYMBOL;} 
 
 void printSparkle(int8_t mag) {
 	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;
@@ -105,8 +105,11 @@ public:
             tail->next=head;
             return true;
         }
+        #define WIDTH 3
         do {
-            if (cur->next->pos - pos >  0) {
+            if (cur->next->pos > pos ) {
+                if (cur->next->pos - pos < WIDTH) { nodes--; return false; }
+                if (pos - cur->pos < WIDTH) { nodes--; return false; }
                 cur->next = new node(interMag(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
