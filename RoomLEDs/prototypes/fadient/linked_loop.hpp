@@ -9,8 +9,8 @@ uint8_t R, G, B;
 using voidF = void(*)(int8_t) ;
 
 
-std::string val2block(uint8_t val) { return "\u2588"; } 
-// std::string val2block(uint8_t val) {if (val > 223) return "\u2588";if (val > 191) return "\u2587";if (val > 159) return "\u2586";if (val > 127) return "\u2585";if (val > 95)  return "\u2584";if (val > 63)  return "\u2583";if (val > 31)  return "\u2582";return ZERO_SYMBOL;} 
+// std::string val2block(uint8_t val) { return "\u2588"; } 
+std::string val2block(uint8_t val) {if (val > 223) return "\u2588";if (val > 191) return "\u2587";if (val > 159) return "\u2586";if (val > 127) return "\u2585";if (val > 95)  return "\u2584";if (val > 63)  return "\u2583";if (val > 31)  return "\u2582";return ZERO_SYMBOL;} 
 
 void printSparkle(int8_t mag) {
 	uint8_t disp = abs(mag); if (disp < 128) disp <<= 1; else disp = 255;
@@ -38,6 +38,7 @@ struct node {
 int8_t interMag(node* A, node* B, uint16_t pos) {
     uint16_t mag = abs(A->mag) << 8;
     uint16_t dist = B->pos - A->pos;
+    if (!dist) return 0;
     uint16_t dFromA = pos - A->pos;
     int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
     mag += mag_step * dFromA;
@@ -57,12 +58,21 @@ public:
         // nodePrint = printSpawn;
     }
     auto getHead()  { return head;  }
+    auto getTail()  { return tail;  }
     auto getNodes() { return nodes; }
-    void populate (uint8_t sparkles) { while (nodes < sparkles) insert(rand()%PIXELS, rand()%256); }
+    void populate (uint8_t sparkles) { while (nodes < sparkles) insert(rand()%PIXELS, rand()); }
     void terminate(uint8_t sparkles) { while (nodes > sparkles) cut(head->pos); }
-
+    
     void print() {
 		node *temp = head; uint16_t p=0;
+        if (head->pos > 0) {
+            head->pos += PIXELS;
+            node first(interMag(tail, head, PIXELS), 0, head);
+            temp=&first;
+            head->pos -= PIXELS;
+            p=printGrad(temp, head);
+            temp=head;
+        }        
 		for (; temp->next != head;) {
 			for (; p < temp->pos; p++) printf(ZERO_SYMBOL);
 			p += printGrad(temp, temp->next);
@@ -73,6 +83,7 @@ public:
     
     uint8_t printGrad(node* A, node* B) {
         uint16_t mag = abs(A->mag) << 8; uint16_t dist = B->pos - A->pos;
+        if (!dist) return 0;
         int16_t mag_step = int16_t(abs(B->mag<<8) - mag)/dist;
         uint16_t p = 1;
         //   printSparkle(mag>>8);
