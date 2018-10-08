@@ -9,16 +9,15 @@ extern uint8_t R, G, B;
 
 struct monode {
     uint16_t pos;
-    uint8_t rgb[3];
+    uint8_t rgb[3]={0};
     int8_t sat;     //mag for discrete mode, target for continuous
     monode *next;
     monode() {
         this->sat=0;
-        this->hue=0;
         this->pos=0;
         this->next=this;
     }
-    
+    //?
     monode(int8_t sat, uint16_t pos, monode *next) {
         this->sat=sat;
         this->pos=pos;
