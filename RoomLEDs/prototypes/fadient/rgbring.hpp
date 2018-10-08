@@ -7,37 +7,37 @@ extern uint8_t R, G, B;
 #define RGB_ZERO_SYMBOL " "
 #define RGB_GRADIENT_WIDTH 3
 
-struct monode {
+struct rgbnode {
     uint16_t pos;
     uint8_t rgb[3]={0};
     int8_t sat;     //mag for discrete mode, target for continuous
-    monode *next;
-    monode() {
+    rgbnode *next;
+    rgbnode() {
         this->sat=0;
         this->pos=0;
         this->next=this;
     }
     //?
-    monode(int8_t sat, uint16_t pos, monode *next) {
+    rgbnode(int8_t sat, uint16_t pos, rgbnode *next) {
         this->sat=sat;
         this->pos=pos;
         this->next=next;
     }
 };
 
-class MonoRing {
+class TriRing {
 // using voidF = void(*)(void) ;
     
     
 private:
-    monode *head; monode *tail; uint8_t nodes;
+    rgbnode *head; rgbnode *tail; uint8_t nodes;
     
 public:
-    // void (MonoRing::update)(void);
-    // void (MonoRing::print)(void);
+    // void (TriRing::update)(void);
+    // void (TriRing::print)(void);
     
-    MonoRing() {
-        head = new monode;
+    TriRing() {
+        head = new rgbnode;
         tail = head;
         nodes = 1;
     }
@@ -45,7 +45,7 @@ public:
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(rand()%PIXELS, rand()); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
-    int8_t interpolate(monode* A, monode* B, uint16_t pos) {
+    int8_t interpolate(rgbnode* A, rgbnode* B, uint16_t pos) {
         uint16_t sat = abs(A->sat) << 8;
         uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
@@ -57,7 +57,7 @@ public:
     }    
     
     void updateDiscrete(void) {
-      monode *n = head;
+      rgbnode *n = head;
       do {
         int8_t newsat = n->sat + 1;
         
@@ -72,7 +72,7 @@ public:
     }
         
     void printDiscrete() {
-		monode *n = head;
+		rgbnode *n = head;
 		uint16_t p=0;
 		for (; n->next != head;) {
 			for (; p < n->pos; p++) printf(RGB_ZERO_SYMBOL);
@@ -84,7 +84,7 @@ public:
 	}
     
     void updateContinuous() {
-      monode *pre = tail, *cur = head;
+      rgbnode *pre = tail, *cur = head;
       do {
         int8_t newsat = cur->sat + 1;
         
@@ -99,9 +99,9 @@ public:
     }
     
     void printContinuous() {
-        monode *n = head;
+        rgbnode *n = head;
         head->pos += PIXELS;
-        monode origin(interpolate(tail, head, PIXELS), 0, head);
+        rgbnode origin(interpolate(tail, head, PIXELS), 0, head);
         head->pos -= PIXELS;
         
         uint16_t p=0;
@@ -127,7 +127,7 @@ public:
         printf("\033[38;2;%d;%d;%dm█\033[0;m", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
     } //]]
     
-    uint8_t printGradient(monode* A, monode* B) {
+    uint8_t printGradient(rgbnode* A, rgbnode* B) {
         uint16_t sat = abs(A->sat) << 8; uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
         int16_t sat_step = int16_t(abs(B->sat<<8) - sat)/dist;
@@ -140,20 +140,20 @@ public:
     }
     
     bool insert(uint16_t pos, int8_t sat) { // bool 'alive' instead of sat arg
-        nodes++; monode *cur=head;
-        if (pos < head->pos) { head = new monode(sat,pos,head); tail->next=head;       return true;  }
+        nodes++; rgbnode *cur=head;
+        if (pos < head->pos) { head = new rgbnode(sat,pos,head); tail->next=head;       return true;  }
         do { if (cur->next->pos == pos) {                                   nodes--; return false; }
-             if (cur->next->pos >  pos) { cur->next = new monode(sat, pos, cur->next); return true;  }
+             if (cur->next->pos >  pos) { cur->next = new rgbnode(sat, pos, cur->next); return true;  }
              cur = cur->next; } while (cur->next != head);
-        cur->next = new monode(sat, pos, cur->next); tail=cur->next;                   return true;
+        cur->next = new rgbnode(sat, pos, cur->next); tail=cur->next;                   return true;
     }
     
     bool inject(uint16_t pos) {
         if (pos > PIXELS || pos == head->pos) return false;
-        monode *cur = head;
+        rgbnode *cur = head;
         nodes++; 
         if (pos < head->pos) {
-            head = new monode(interpolate(cur, cur->next, pos),pos,head);
+            head = new rgbnode(interpolate(cur, cur->next, pos),pos,head);
             tail->next=head;
             return true;
         }
@@ -161,23 +161,23 @@ public:
             if (cur->next->pos > pos ) {
                 if (cur->next->pos - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 if (pos - cur->pos       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
-                cur->next = new monode(interpolate(cur, cur->next, pos),pos,cur->next);
+                cur->next = new rgbnode(interpolate(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
             if (cur->next->pos == pos) { nodes--; return false; }
             cur = cur->next;
         } while(cur->next != head);
-        cur->next = new monode(interpolate(cur, cur->next, pos), pos, cur->next);
+        cur->next = new rgbnode(interpolate(cur, cur->next, pos), pos, cur->next);
         tail=cur->next;
         return true;
     }
     
     bool remove(uint16_t pos) {  //delete @ position
         if (pos > PIXELS || pos < head->pos) return false;
-        monode *cur = head;
+        rgbnode *cur = head;
         if (pos == head->pos) {
             nodes--;
-            monode* temp=head->next;
+            rgbnode* temp=head->next;
             delete head; head=temp;
             tail->next=head;
             return true;
@@ -185,7 +185,7 @@ public:
         do {
             if (cur->next->pos >  pos) return false;
             if (cur->next->pos == pos) {
-                monode *temp = cur->next->next; 
+                rgbnode *temp = cur->next->next; 
                 delete cur->next;
                 cur->next = temp;
                 nodes--;
