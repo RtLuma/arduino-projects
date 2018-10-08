@@ -2,7 +2,7 @@
 #include <unistd.h>		//usleep
 #include <stdlib.h>		//srand, rand
 #include <time.h>       //time 
-#include "linked_loop.hpp"
+#include "ring.hpp"
 // #include "cxxopts.hpp"
 
 using namespace std;
@@ -19,10 +19,15 @@ int main() {
 	sparkles.populate(SPARKLES);
     R=rand(); G=rand(); B=rand();
 	while (true) {
-        sparkles.update();
+            
+            sparkles.update();
+        
         cout << "\r[";
-        sparkles.print();
+        
+            sparkles.print();
+        
         cout << "]";
+        
         fflush(stdout);
         usleep(20000);
         printf("\r");
