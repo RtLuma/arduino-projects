@@ -4,15 +4,17 @@
 extern uint16_t PIXELS;
 extern uint8_t R, G, B;
 
-#define ZERO_SYMBOL " "
-#define GRADIENT_WIDTH 3
+#define RGB_ZERO_SYMBOL " "
+#define RGB_GRADIENT_WIDTH 3
 
 struct monode {
     uint16_t pos;
-    int8_t sat;
+    uint8_t rgb[3];
+    int8_t sat;     //mag for discrete mode, target for continuous
     monode *next;
     monode() {
         this->sat=0;
+        this->hue=0;
         this->pos=0;
         this->next=this;
     }
@@ -74,12 +76,12 @@ public:
 		monode *n = head;
 		uint16_t p=0;
 		for (; n->next != head;) {
-			for (; p < n->pos; p++) printf(ZERO_SYMBOL);
+			for (; p < n->pos; p++) printf(RGB_ZERO_SYMBOL);
 			printNode(n->sat);
             p++;
             n=n->next;
 		}
-		for (; p < PIXELS; p++) printf(ZERO_SYMBOL);
+		for (; p < PIXELS; p++) printf(RGB_ZERO_SYMBOL);
 	}
     
     void updateContinuous() {
@@ -158,8 +160,8 @@ public:
         }
         do {
             if (cur->next->pos > pos ) {
-                if (cur->next->pos - pos < GRADIENT_WIDTH) { nodes--; return false; }
-                if (pos - cur->pos       < GRADIENT_WIDTH) { nodes--; return false; }
+                if (cur->next->pos - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
+                if (pos - cur->pos       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 cur->next = new monode(interpolate(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
