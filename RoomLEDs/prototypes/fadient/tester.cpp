@@ -25,11 +25,30 @@ int main() {
     R = rand(); G = rand(); B = rand();
     
     // MonoRing leds;
-    leds.populate(SPARKLES);
-    printf("\n");
+    mleds.populate(SPARKLES);
     
-    if (DISCRETE) display = monoDiscrete;
-    else display = monoContinuous;
+    uint8_t mode = ((uint8_t)TRICHROMATIC << 1) + (uint8_t)DISCRETE;
+    
+    switch (mode) {
+        case 0: //0b00
+            display = monoContinuous;
+            break;
+    
+        case 1: //0b01
+            display = monoDiscrete;
+            break;
+            
+        case 2: //0b10
+            display = monoContinuous;
+            break;
+            
+        case 3: //0b11
+            display = monoDiscrete;
+            break;
+    
+        default:
+            break;
+    }
     
     while (true) {
         printf("\r[");

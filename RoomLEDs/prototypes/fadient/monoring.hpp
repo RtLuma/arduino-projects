@@ -195,7 +195,7 @@ public:
         } while (cur->next != head);
         return false;
     }
-} leds;
+} mleds;
 
-void monoDiscrete(void) { leds.updateDiscrete(); leds.printDiscrete(); }
-void monoContinuous(void) { leds.updateContinuous(); leds.printContinuous(); }
+void monoDiscrete(void) { mleds.updateDiscrete(); mleds.printDiscrete(); }
+void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous(); }

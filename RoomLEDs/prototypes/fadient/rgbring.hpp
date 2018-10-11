@@ -198,5 +198,5 @@ public:
     }
 } leds;
 
-void monoDiscrete(void) { leds.updateDiscrete(); leds.printDiscrete(); }
-void monoContinuous(void) { leds.updateContinuous(); leds.printContinuous(); }
+void rgbDiscrete(void) { leds.updateDiscrete(); leds.printDiscrete(); }
+void rgbContinuous(void) { leds.updateContinuous(); leds.printContinuous(); }
