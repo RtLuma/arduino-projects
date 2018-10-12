@@ -6,7 +6,7 @@
 uint8_t rgb[3]={0,0,0}, RGB[3]={255,128,0},_RGB[3]={0,128,255};
 uint16_t RGB_[3] = {0};
 
-#define CONVERGE 10
+// #define CONVERGE 10
 
 bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
     for (uint8_t i=0; i<3; i++) if (rgb[i] != RGB[i]) return false;
@@ -18,7 +18,8 @@ void converge(uint8_t rgb[3], uint8_t RGB[3]) {
             int16_t delta = RGB[i]-rgb[i];
             if (!delta) continue;
             bool delta2 = (1<<16) & delta;
-            delta /= CONVERGE;
+            delta >>= 4;
+            // delta /= CONVERGE;
             if (!delta) delta = delta2 ? -1 : 1;
             rgb[i] += delta;
     }

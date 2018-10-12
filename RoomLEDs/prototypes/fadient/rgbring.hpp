@@ -10,14 +10,13 @@ extern uint8_t R, G, B;
 struct rgbnode {
     uint16_t pos;
     uint8_t rgb[3]={0};
-    int8_t sat;     //mag for discrete mode, target for continuous
+    int8_t sat;
     rgbnode *next;
     rgbnode() {
         this->sat=0;
         this->pos=0;
         this->next=this;
     }
-    //?
     rgbnode(int8_t sat, uint16_t pos, rgbnode *next) {
         this->sat=sat;
         this->pos=pos;
@@ -26,16 +25,11 @@ struct rgbnode {
 };
 
 class TriRing {
-// using voidF = void(*)(void) ;
-    
     
 private:
     rgbnode *head; rgbnode *tail; uint8_t nodes;
     
 public:
-    // void (TriRing::update)(void);
-    // void (TriRing::print)(void);
-    
     TriRing() {
         head = new rgbnode;
         tail = head;
@@ -45,16 +39,42 @@ public:
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(rand()%PIXELS, rand()); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
-    int8_t interpolate(rgbnode* A, rgbnode* B, uint16_t pos) {
-        uint16_t sat = abs(A->sat) << 8;
+    void interpolate(rgbnode* A, rgbnode* B, uint16_t pos) {
         uint16_t dist = B->pos - A->pos;
-        if (!dist) return 0;
+        if (!dist) return;
+        
+        uint8_t Argb = A->rgb;
+        uint8_t Brgb = B->rgb;
+        
+        uint16_t R = Argb[0] << 8;
+        uint16_t G = Argb[1] << 8;
+        uint16_t B = Argb[2] << 8;
+        
         uint16_t dFromA = pos - A->pos;
-        int16_t sat_step = int16_t(abs(B->sat<<8) - sat)/dist;
-        sat += sat_step * dFromA;
-        sat >>= 8;
-        return rand() & 1 ? -sat : sat;
+        
+        int16_t Rstep = int16_t((Brgb[0]<<8) - R)/dist;
+        int16_t Gstep = int16_t((Brgb[1]<<8) - G)/dist;
+        int16_t Bstep = int16_t((Brgb[2]<<8) - B)/dist;
+        
+        R += Rstep * dFromA;
+        G += Gstep * dFromA;
+        B += Bstep * dFromA;
+        
+        Argb[0] = R>>8;        
+        Argb[1] = G>>8;        
+        Argb[2] = B>>8;        
     }    
+    
+    void blend(uint8_t rgb[3], uint8_t RGB[3]) {
+        for (uint8_t i=0; i<3; i++) {
+                int16_t delta = RGB[i]-rgb[i];
+                if (!delta) continue;
+                bool delta2 = (1<<16) & delta;
+                delta >>= 4;
+                if (!delta) delta = delta2 ? -1 : 1;
+                rgb[i] += delta;
+        }
+    }
     
     void updateDiscrete(void) {
       rgbnode *n = head;

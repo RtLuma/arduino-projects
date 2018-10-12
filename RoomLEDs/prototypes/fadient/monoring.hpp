@@ -45,9 +45,9 @@ public:
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
     int8_t interpolate(monode* A, monode* B, uint16_t pos) {
-        uint16_t sat = abs(A->sat) << 8;
         uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
+        uint16_t sat = abs(A->sat) << 8;
         uint16_t dFromA = pos - A->pos;
         int16_t sat_step = int16_t(abs(B->sat<<8) - sat)/dist;
         sat += sat_step * dFromA;
