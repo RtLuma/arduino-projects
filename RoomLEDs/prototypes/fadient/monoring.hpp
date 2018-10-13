@@ -62,7 +62,7 @@ public:
         
         if (n->sat<0 && newsat>-1) {
           uint16_t del_pos = n->pos; n = n->next; remove(del_pos);
-          bool reinject; do { del_pos = rand()%PIXELS; reinject = !insert(del_pos, 0); } while (reinject);
+          bool reinject; do { reinject = !insert(rand()%PIXELS, 0); } while (reinject);
           continue;
         }        
         n->sat = newsat;

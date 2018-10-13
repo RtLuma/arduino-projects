@@ -2,6 +2,7 @@
 #include <unistd.h>		//usleep
 #include <time.h>       //time 
 #include "monoring.hpp"     //the linked list
+#include "rgbring.hpp"     //the linked list
 
 
 using namespace std;
@@ -14,7 +15,7 @@ uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
 
-#define DISCRETE false
+#define DISCRETE true
 #define TRICHROMATIC true
 
 int main() {
@@ -24,26 +25,27 @@ int main() {
     srand(time(NULL));
     R = rand(); G = rand(); B = rand();
     
-    // MonoRing leds;
-    mleds.populate(SPARKLES);
-    
     uint8_t mode = ((uint8_t)TRICHROMATIC << 1) + (uint8_t)DISCRETE;
     
     switch (mode) {
         case 0: //0b00
             display = monoContinuous;
+            mleds.populate(SPARKLES);
             break;
     
         case 1: //0b01
             display = monoDiscrete;
+            mleds.populate(SPARKLES);
             break;
             
         case 2: //0b10
             display = monoContinuous;
+            cleds.populate(SPARKLES);
             break;
             
         case 3: //0b11
-            display = monoDiscrete;
+            display = rgbDiscrete;
+            cleds.populate(SPARKLES);
             break;
     
         default:
@@ -55,7 +57,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(20000);
+        usleep(5000);
         printf("\r");
     }
 }
