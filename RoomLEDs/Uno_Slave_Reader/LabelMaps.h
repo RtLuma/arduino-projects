@@ -20,7 +20,7 @@ enum EEPROM_ADDRESS {
 const char modeLabels[] = {
    'f'//ill color
   ,'s'//parkle
-  ,'S'//parkle (rainbow)
+  ,'g'//radient
   ,'v'//isualizer 
   ,'V'//isualizer (rainbow)
   ,'t'//heater chase
@@ -33,8 +33,8 @@ const char modeLabels[] = {
 };
 const modePointer modes[] = {
   []() { showColor(R, G, B); delay(100);},
-  sparkleRGB,
   sparkle,
+  gradient,
   []() { solidVisualizer(); visualizer(); },
   []() { chromaVisualizer(); visualizer(); },
   theaterChase,
