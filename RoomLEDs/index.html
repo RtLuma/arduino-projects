@@ -6,7 +6,7 @@
         fieldset {
         display: inline;
         }
-        img { width: 95vw; }
+        img { width: 97vw; }
         legend {
         text-align: center;
         }
@@ -14,35 +14,40 @@
         <script type="text/javascript">
             const API_URL="http://192.168.0.69?";
             let cansend=true;
-            
+
             async function sendPacket(data) {
                 if (!cansend) return;
                 let query=API_URL;
-            
                 for (const [key, value] of Object.entries(data)) query+=`${key}=${value}&`;
                 query = query.slice(0, -1);
-            
-                console.log(query);
                 const resp = await fetch(query, {mode: 'no-cors', credentials: "include"} )
                 const body = await resp.text();
                 cansend=true;
-                console.log(body)
             }
         const cv = document.createElement("CANVAS");
         const ctx = cv.getContext('2d');
-            
+
         window.addEventListener('DOMContentLoaded', () => {
             const hsv = document.getElementById("colorpicker");
             hsv.onload = e => {
                 cv.width = hsv.width;
                 cv.height = hsv.height;
                 ctx.drawImage(hsv, 0, 0, hsv.width, hsv.height);
-                console.log(hsv.height)
-                hsv.onmousemove = e => {
+                
+                var getMousePixel = function(e) {
                             let rgb = ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
+                            let packet = { r: rgb[0], g: rgb[1], b:rgb[2]};
                             document.body.style.backgroundColor = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`
                             console.log(rgb[0],rgb[1],rgb[2]);
+                            sendPacket(packet);
                 };
+                
+                hsv.ondblclick = e => {
+                    if (!hsv.onmousemove) hsv.onmousemove = getMousePixel;
+                    else hsv.onmousemove = null;
+                }
+                
+                hsv.onclick = getMousePixel;
             };
         });
         </script>
@@ -50,7 +55,7 @@
     <body>
         <fieldset>
             <legend>RGB</legend>
-            <img id="colorpicker" src="hsv.png"></img>
+            <img draggable="true" id="colorpicker" src="hsv.png"></img>
         </fieldset>
         <br>
         <fieldset>
