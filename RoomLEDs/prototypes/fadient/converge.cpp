@@ -8,21 +8,17 @@ uint16_t RGB_[3] = {0};
 
 // #define CONVERGE 10
 
-bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
-    for (uint8_t i=0; i<3; i++) if (rgb[i] != RGB[i]) return false;
-    return true;
-}
-
-void converge(uint8_t rgb[3], uint8_t RGB[3]) {
+bool converge(uint8_t rgb[3], uint8_t RGB[3]) {
+    uint8_t trues=0;
     for (uint8_t i=0; i<3; i++) {
-            int16_t delta = RGB[i]-rgb[i];
-            if (!delta) continue;
-            bool delta2 = (1<<16) & delta;
-            delta >>= 4;
-            // delta /= CONVERGE;
-            if (!delta) delta = delta2 ? -1 : 1;
-            rgb[i] += delta;
+        int16_t delta = RGB[i]-rgb[i];
+        if (!delta) { trues++; continue; }
+        bool delta2 = (1<<16) & delta;
+        delta >>= 4;
+        if (!delta) delta = delta2 ? -1 : 1;
+        rgb[i] += delta;
     }
+    return trues > 2;
 }
 
 
@@ -31,9 +27,10 @@ int main() {
     srand(time(NULL));
     for (uint32_t T=0; T<1000; T++) {
         for (uint8_t i=0; i<3; i++) { rgb[i]=rand(); RGB[i]=rand(); _RGB[i]=rand(); RGB_[i]=rand();}
-        while((!comp(rgb,RGB)) && (!comp(RGB,_RGB))) {
-            converge(rgb, RGB);
-            converge(RGB, _RGB);
+        bool test1=false, test2=false;
+        while(!(test1 && test2)) {
+            test1 = converge(rgb, RGB);
+            test2 = converge(RGB, _RGB);
             for (uint8_t i=0; i<3; i++) {
                 RGB_[i]+=int16_t(rand()%512) * (rand() &  1 ? 1 : -1);
                 _RGB[i] = RGB_[i] >> 8;

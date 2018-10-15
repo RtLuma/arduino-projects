@@ -15,7 +15,7 @@ uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
 
-#define DISCRETE true
+#define DISCRETE false
 #define TRICHROMATIC true
 
 int main() {
@@ -39,7 +39,7 @@ int main() {
             break;
             
         case 2: //0b10
-            display = monoContinuous;
+            display = rgbContinuous;
             cleds.populate(SPARKLES);
             break;
             
@@ -57,7 +57,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(5000);
+        usleep(20000);
         printf("\r");
     }
 }
