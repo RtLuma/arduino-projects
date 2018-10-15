@@ -57,7 +57,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(100000);
+        usleep(10000);
         printf("\r");
     }
 }
