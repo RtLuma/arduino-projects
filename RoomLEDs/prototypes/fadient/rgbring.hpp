@@ -45,8 +45,9 @@ public:
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
     void interpolate(uint16_t pos, rgbnode* nA, uint8_t ABrgb[3], rgbnode* nB) {
-        uint16_t dist = nB->pos - nA->pos;
+        uint16_t dist = (nB->pos & 32767) - (nA->pos & 32767);
         if (!dist) return;
+        pos &= 32767;
         
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
@@ -55,7 +56,7 @@ public:
         uint16_t G = Argb[1] << 8;
         uint16_t B = Argb[2] << 8;
         
-        uint16_t dFromA = pos - nA->pos;
+        uint16_t dFromA = pos - (nA->pos & 32767);
         
         int16_t Rstep = int16_t((Brgb[0]<<8) - R)/dist;
         int16_t Gstep = int16_t((Brgb[1]<<8) - G)/dist;
@@ -172,7 +173,7 @@ public:
     } //]]
     
     uint8_t printGradient(rgbnode* nA, rgbnode* nB) {
-        uint16_t dist = nB->pos - nA->pos;
+        uint16_t dist = (nB->pos & 32767) - (nA->pos & 32767);
         if (!dist) return 0;
         
         uint8_t* Argb = nA->rgb;
