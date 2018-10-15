@@ -218,7 +218,7 @@ public:
         if (pos < head->pos) {
             head = new rgbnode(rand(), pos, head);
             // head->pos += PIXELS:                 //Fix this shit nigga
-            interpolate(head->pos, tail, head->rgb, cur->next);
+            interpolate(head->pos, cur, head->rgb, cur->next);
             // head->pos -= PIXELS:
             tail->next=head;
             return true;
