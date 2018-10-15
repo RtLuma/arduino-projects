@@ -120,7 +120,7 @@ public:
         if (dying) { // Fade out
             interpolate(cur->pos, pre, newrgb, cur->next);
             if (blend(cur->rgb, newrgb)) {
-                uint16_t del_pos = cur->pos; cur = cur->next; remove(del_pos);
+                uint16_t del_pos = cur->pos & 32767; cur = cur->next; remove(del_pos);
                 bool reinject; do { del_pos = rand()%PIXELS; reinject = !inject(del_pos); } while (reinject);
                 continue;
             }
@@ -138,10 +138,15 @@ public:
     
     void printContinuous() {
         rgbnode *n = head;
+        
+        head->pos &= 32767;
         head->pos += PIXELS;
+        
         rgbnode origin(0, 0, head);
         interpolate(PIXELS, tail, origin.rgb, head);
+
         head->pos -= PIXELS;
+        head->pos |= 32768;
         
         uint16_t p=0;
         
@@ -205,18 +210,18 @@ public:
     
     bool insert(uint16_t pos, int8_t hue) {
         nodes++; rgbnode *cur=head;
-        if (pos < head->pos) { head = new rgbnode(hue,pos,head); tail->next=head;       return true;  }
-        do { if (cur->next->pos == pos) {                                   nodes--;    return false; }
-             if (cur->next->pos >  pos) { cur->next = new rgbnode(hue, pos, cur->next); return true;  }
+        if (pos < head->pos & 32767) { head = new rgbnode(hue,pos,head); tail->next=head;       return true;  }
+        do { if (cur->next->pos & 32767 == pos) {                                   nodes--;    return false; }
+             if (cur->next->pos & 32767 >  pos) { cur->next = new rgbnode(hue, pos, cur->next); return true;  }
              cur = cur->next; } while (cur->next != head);
         cur->next = new rgbnode(hue, pos, cur->next); tail=cur->next;                   return true;
     }
     
     bool inject(uint16_t pos) {
-        if (pos > PIXELS || pos == head->pos) return false;
+        if (pos > PIXELS || pos == head->pos & 32767) return false;
         rgbnode *cur = head;
         nodes++; 
-        if (pos < head->pos) {
+        if (pos < head->pos & 32767) {
             head = new rgbnode(rand(), pos, head);
             // head->pos += PIXELS:                 //Fix this shit nigga
             interpolate(head->pos, cur, head->rgb, cur->next);
@@ -225,14 +230,14 @@ public:
             return true;
         }
         do {
-            if (cur->next->pos > pos ) {
-                if (cur->next->pos - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
-                if (pos - cur->pos       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
+            if (cur->next->pos & 32767 > pos ) {
+                if ((cur->next->pos & 32767) - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
+                if (pos - (cur->pos & 32767)       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 cur->next = new rgbnode(rand(), pos, cur->next);
                 interpolate(cur->pos, cur, cur->rgb, cur->next);
                 return true;
             }
-            if (cur->next->pos == pos) { nodes--; return false; }
+            if (cur->next->pos & 32767 == pos) { nodes--; return false; }
             cur = cur->next;
         } while(cur->next != head);
         cur->next = new rgbnode(rand(), pos, cur->next);
@@ -242,9 +247,9 @@ public:
     }
     
     bool remove(uint16_t pos) {  //delete @ position
-        if (pos > PIXELS || pos < head->pos) return false;
+        if (pos > PIXELS || pos < head->pos & 32767) return false;
         rgbnode *cur = head;
-        if (pos == head->pos) {
+        if (pos == head->pos & 32767) {
             nodes--;
             rgbnode* temp=head->next;
             delete head; head=temp;
@@ -252,8 +257,8 @@ public:
             return true;
         }
         do {
-            if (cur->next->pos >  pos) return false;
-            if (cur->next->pos == pos) {
+            if (cur->next->pos & 32767 >  pos) return false;
+            if (cur->next->pos & 32767 == pos) {
                 rgbnode *temp = cur->next->next; 
                 delete cur->next;
                 cur->next = temp;
