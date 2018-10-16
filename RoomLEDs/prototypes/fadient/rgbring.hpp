@@ -131,7 +131,7 @@ public:
         }
         
         pre = cur; cur = cur->next;
-      } while(cur->next != head);
+      } while(cur!= head);
     }
     
     void printContinuous() {
