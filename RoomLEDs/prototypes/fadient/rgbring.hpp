@@ -15,7 +15,7 @@ struct rgbnode {
     int8_t  hue;
     rgbnode *next;
     rgbnode() {
-        this->hue=0;
+        this->hue=rand();
         this->pos=0;
         this->next=this;
     }
@@ -27,8 +27,9 @@ struct rgbnode {
         // rgb[1]=rainbow(hue+85);
         // rgb[2]=rainbow(hue);
     }
+    uint16_t getPos(void) { return pos & 32767; }
 };
-
+ 
 class TriRing {
     
 private:
@@ -45,9 +46,8 @@ public:
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
     void interpolate(uint16_t pos, rgbnode* nA, uint8_t ABrgb[3], rgbnode* nB) {
-        uint16_t dist = (nB->pos & 32767) - (nA->pos & 32767);
+        uint16_t dist = nB->getPos() - nA->getPos();
         if (!dist) return;
-        pos &= 32767;
         
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
@@ -56,7 +56,7 @@ public:
         uint16_t G = Argb[1] << 8;
         uint16_t B = Argb[2] << 8;
         
-        uint16_t dFromA = pos - (nA->pos & 32767);
+        uint16_t dFromA = pos - nA->getPos();
         
         int16_t Rstep = int16_t((Brgb[0]<<8) - R)/dist;
         int16_t Gstep = int16_t((Brgb[1]<<8) - G)/dist;
@@ -77,8 +77,8 @@ public:
             int16_t delta = RGB[i]-rgb[i];
             if (!delta) { trues++; continue; }
             bool delta2 = (1<<16) & delta;
-            delta >>= 4;
-            if (!delta) delta = delta2 ? -1 : 1;
+            delta >>= 3;
+            if (!delta) delta = delta2 ? 1 : -1;
             rgb[i] += delta;
         }
         return trues > 2;
@@ -113,15 +113,13 @@ public:
     
     void updateContinuous() {
       rgbnode *pre = tail, *cur = head;
+      uint8_t newrgb[3];
       do {
-        bool dying = cur->pos & 32768;
-        uint8_t newrgb[3];
-        
-        if (dying) { // Fade out
+        if (cur->pos & 32768) { // Fade out
             interpolate(cur->pos, pre, newrgb, cur->next);
             if (blend(cur->rgb, newrgb)) {
-                uint16_t del_pos = cur->pos & 32767; cur = cur->next; remove(del_pos);
-                bool reinject; do { del_pos = rand()%PIXELS; reinject = !inject(del_pos); } while (reinject);
+                uint16_t del_pos = cur->getPos(); cur = cur->next; remove(del_pos);
+                bool reinject; do { reinject = !inject(rand()%PIXELS); } while (reinject);
                 continue;
             }
         }                
@@ -164,11 +162,6 @@ public:
         p=printGradient(tail, n);
 	}
     
-    void printNodeRGB(rgbnode* n) {
-        uint8_t* rgb=n->rgb;
-        printf("\033[38;2;%d;%d;%dm█\033[0;m", rgb[0], rgb[1], rgb[2]);
-    }
-    
     void printNode(rgbnode* n) {
         uint8_t disp = abs(n->hue);
         if (disp < 128) disp <<= 1;
@@ -178,29 +171,29 @@ public:
     } //]]
     
     uint8_t printGradient(rgbnode* nA, rgbnode* nB) {
-        uint16_t dist = (nB->pos & 32767) - (nA->pos & 32767);
+        uint16_t dist = nB->getPos() - nA->getPos();
         if (!dist) return 0;
         
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
         
-        uint16_t R = Argb[0] << 8;
-        uint16_t G = Argb[1] << 8;
-        uint16_t B = Argb[2] << 8;
+        uint16_t R = Argb[0] << 7;
+        uint16_t G = Argb[1] << 7;
+        uint16_t B = Argb[2] << 7;
         
-        int16_t Rstep = int16_t((Brgb[0]<<8) - R)/dist;
-        int16_t Gstep = int16_t((Brgb[1]<<8) - G)/dist;
-        int16_t Bstep = int16_t((Brgb[2]<<8) - B)/dist;
+        int16_t Rstep = ((((int16_t)Brgb[0])<<7) - R)/dist;
+        int16_t Gstep = ((((int16_t)Brgb[1])<<7) - G)/dist;
+        int16_t Bstep = ((((int16_t)Brgb[2])<<7) - B)/dist;
         
         R += Rstep;
         G += Gstep;
         B += Bstep;
 
         uint16_t p = 1;
-        printf("\033[38;2;255;255;255m█\033[0;m");
+        printf("\033[38;2;%d;%d;%dm#\033[0;m", R>>7, G>>7, B>>7);
         
         for (; p < dist; p++) { 
-            printf("\033[38;2;%d;%d;%dm█\033[0;m", R>>8, G>>8, B>>8);
+            printf("\033[38;2;%d;%d;%dm█\033[0;m", R>>7, G>>7, B>>7);
             R += Rstep;
             G += Gstep;
             B += Bstep;
@@ -210,34 +203,34 @@ public:
     
     bool insert(uint16_t pos, int8_t hue) {
         nodes++; rgbnode *cur=head;
-        if (pos < (head->pos & 32767)) { head = new rgbnode(hue,pos,head); tail->next=head;       return true;  }
-        do { if ((cur->next->pos & 32767) == pos) {                                   nodes--;    return false; }
-             if ((cur->next->pos & 32767) >  pos) { cur->next = new rgbnode(hue, pos, cur->next); return true;  }
+        if (pos < head->getPos()) { head = new rgbnode(hue,pos,head); tail->next=head;       return true;  }
+        do { if (cur->next->getPos() == pos) {                                   nodes--;    return false; }
+             if (cur->next->getPos() >  pos) { cur->next = new rgbnode(hue, pos, cur->next); return true;  }
              cur = cur->next; } while (cur->next != head);
         cur->next = new rgbnode(hue, pos, cur->next); tail=cur->next;                   return true;
     }
     
     bool inject(uint16_t pos) {
-        if (pos > PIXELS || pos == (head->pos & 32767)) return false;
+        if (pos > PIXELS || pos == head->getPos()) return false;
         rgbnode *cur = head;
         nodes++; 
-        if (pos < (head->pos & 32767)) {
+        if (pos < head->getPos()) {
             head = new rgbnode(rand(), pos, head);
             // head->pos += PIXELS:                 //Fix this shit nigga
-            interpolate(head->pos, cur, head->rgb, cur->next);
+            interpolate(head->getPos(), cur, head->rgb, cur->next);
             // head->pos -= PIXELS:
             tail->next=head;
             return true;
         }
         do {
-            if ((cur->next->pos & 32767) > pos ) {
-                if ((cur->next->pos & 32767) - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
-                if (pos - (cur->pos & 32767)       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
+            if (cur->next->getPos() > pos ) {
+                if (cur->next->getPos() - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
+                if (pos - cur->getPos()       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 cur->next = new rgbnode(rand(), pos, cur->next);
-                interpolate(cur->pos, cur, cur->rgb, cur->next);
+                interpolate(cur->getPos(), cur, cur->rgb, cur->next);
                 return true;
             }
-            if ((cur->next->pos & 32767) == pos) { nodes--; return false; }
+            if (cur->next->getPos() == pos) { nodes--; return false; }
             cur = cur->next;
         } while(cur->next != head);
         cur->next = new rgbnode(rand(), pos, cur->next);
@@ -247,9 +240,9 @@ public:
     }
     
     bool remove(uint16_t pos) {  //delete @ position
-        if (pos > PIXELS || pos < (head->pos & 32767)) return false;
+        if (pos > PIXELS || pos < head->getPos()) return false;
         rgbnode *cur = head;
-        if (pos == (head->pos & 32767)) {
+        if (pos == head->getPos()) {
             nodes--;
             rgbnode* temp=head->next;
             delete head; head=temp;
@@ -257,8 +250,8 @@ public:
             return true;
         }
         do {
-            if ((cur->next->pos & 32767) >  pos) return false;
-            if ((cur->next->pos & 32767) == pos) {
+            if (cur->next->getPos() >  pos) return false;
+            if (cur->next->getPos() == pos) {
                 rgbnode *temp = cur->next->next; 
                 delete cur->next;
                 cur->next = temp;

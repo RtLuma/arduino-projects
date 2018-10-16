@@ -10,7 +10,7 @@ using voidF = void(*)(void) ;
 
 struct winsize w;
 
-uint16_t SPARKLES = 15;
+uint16_t SPARKLES = 4;
 uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
@@ -19,7 +19,6 @@ voidF display;
 #define TRICHROMATIC true
 
 int main() {
-    srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
     srand(time(NULL));
@@ -57,7 +56,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(50000);
+        usleep(100000);
         printf("\r");
     }
 }
