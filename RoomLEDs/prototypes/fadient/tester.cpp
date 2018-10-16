@@ -10,7 +10,7 @@ using voidF = void(*)(void) ;
 
 struct winsize w;
 
-uint16_t SPARKLES = 15;
+uint16_t SPARKLES = 20;
 uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
