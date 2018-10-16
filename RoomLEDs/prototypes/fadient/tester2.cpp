@@ -10,7 +10,7 @@ using voidF = void(*)(void) ;
 
 struct winsize w;
 
-uint16_t SPARKLES = 4;
+uint16_t SPARKLES = 15;
 uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
@@ -39,7 +39,7 @@ int main() {
             
         case 2: //0b10
             display = rgbContinuous;
-            cleds.populate(SPARKLES);
+            cleds.populate(SPARKLES);            
             break;
             
         case 3: //0b11
@@ -56,7 +56,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(100000);
+        usleep(50000);
         printf("\r");
     }
 }

@@ -52,36 +52,39 @@ public:
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
         
-        uint16_t R = Argb[0] << 8;
-        uint16_t G = Argb[1] << 8;
-        uint16_t B = Argb[2] << 8;
+        uint16_t R = Argb[0] << 7;
+        uint16_t G = Argb[1] << 7;
+        uint16_t B = Argb[2] << 7;
         
         uint16_t dFromA = pos - nA->getPos();
         
-        int16_t Rstep = int16_t((Brgb[0]<<8) - R)/dist;
-        int16_t Gstep = int16_t((Brgb[1]<<8) - G)/dist;
-        int16_t Bstep = int16_t((Brgb[2]<<8) - B)/dist;
+        int16_t Rstep = ((((int16_t)Brgb[0])<<7) - R)/dist;
+        int16_t Gstep = ((((int16_t)Brgb[1])<<7) - G)/dist;
+        int16_t Bstep = ((((int16_t)Brgb[2])<<7) - B)/dist;
         
         R += Rstep * dFromA;
         G += Gstep * dFromA;
         B += Bstep * dFromA;
         
-        ABrgb[0] = R>>8;        
-        ABrgb[1] = G>>8;        
-        ABrgb[2] = B>>8;
+        ABrgb[0] = R>>7;        
+        ABrgb[1] = G>>7;        
+        ABrgb[2] = B>>7;
     }    
     
-    bool blend(uint8_t rgb[3], uint8_t RGB[3]) {
-        uint8_t trues=0;
+    bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
+        for (uint8_t i=0; i<3; i++) if (abs(rgb[i] - RGB[i]) > 3) return false;
+        return true;
+    }
+    
+    void blend(uint8_t rgb[3], uint8_t RGB[3]) {
         for (uint8_t i=0; i<3; i++) {
             int16_t delta = RGB[i]-rgb[i];
-            if (!delta) { trues++; continue; }
-            bool delta2 = (1<<16) & delta;
-            delta >>= 3;
-            if (!delta) delta = delta2 ? 1 : -1;
+            if (!delta) continue;
+            bool delta2 = delta < 0;
+            delta >>= 5;
+            if (!delta) delta = delta2 ? -1 : 1;
             rgb[i] += delta;
         }
-        return trues > 2;
     }
     
     void updateDiscrete(void) {
@@ -116,9 +119,12 @@ public:
       uint8_t newrgb[3];
       do {
         if (cur->pos & 32768) { // Fade out
-            interpolate(cur->pos, pre, newrgb, cur->next);
-            if (blend(cur->rgb, newrgb)) {
-                uint16_t del_pos = cur->getPos(); cur = cur->next; remove(del_pos);
+            interpolate(cur->getPos(), pre, newrgb, cur->next);
+            blend(cur->rgb, newrgb);
+            if (comp(cur->rgb, newrgb)) {
+                uint16_t del_pos = cur->getPos();
+                cur = cur->next;
+                remove(del_pos);
                 bool reinject; do { reinject = !inject(rand()%PIXELS); } while (reinject);
                 continue;
             }
@@ -127,11 +133,20 @@ public:
             newrgb[0]=rainbow(cur->hue+170);
             newrgb[1]=rainbow(cur->hue+85);
             newrgb[2]=rainbow(cur->hue);
-            if (blend(cur->rgb, newrgb)) cur->pos |= 32768; // Set decay flag
+            blend(cur->rgb, newrgb);
+            if (comp(cur->rgb, newrgb)) cur->pos |= 32768; // Set decay flag
         }
         
         pre = cur; cur = cur->next;
       } while(cur!= head);
+    }
+    
+    void scramble() {
+        rgbnode *n = head;
+        do {
+            
+        
+        } while(n->next != head);
     }
     
     void printContinuous() {
@@ -190,7 +205,8 @@ public:
         B += Bstep;
 
         uint16_t p = 1;
-        printf("\033[38;2;%d;%d;%dm#\033[0;m", R>>7, G>>7, B>>7);
+        if (nA->pos & 32768) printf("\033[38;2;%d;%d;%dmX\033[0;m", R>>7, G>>7, B>>7);
+        else printf("\033[38;2;%d;%d;%dm@\033[0;m", R>>7, G>>7, B>>7);
         
         for (; p < dist; p++) { 
             printf("\033[38;2;%d;%d;%dm█\033[0;m", R>>7, G>>7, B>>7);
@@ -234,7 +250,7 @@ public:
             cur = cur->next;
         } while(cur->next != head);
         cur->next = new rgbnode(rand(), pos, cur->next);
-        interpolate(cur->pos, cur, cur->rgb, cur->next);
+        interpolate(cur->getPos(), cur, cur->rgb, cur->next);
         tail=cur->next;
         return true;
     }
