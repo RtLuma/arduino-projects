@@ -10,7 +10,7 @@ using voidF = void(*)(void) ;
 
 struct winsize w;
 
-uint16_t SPARKLES = 20;
+uint16_t SPARKLES = 10;
 uint16_t PIXELS;
 uint8_t R, G, B;
 voidF display;
@@ -22,6 +22,7 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
+    SPARKLES = PIXELS/6;
     srand(time(NULL));
     R = rand(); G = rand(); B = rand();
     
