@@ -215,7 +215,7 @@ public:
             B += Bstep;
         }
         return dist;
-    }
+    }//]]]]]]
     
     bool insert(uint16_t pos, int8_t hue) {
         nodes++; rgbnode *cur=head;
@@ -243,7 +243,11 @@ public:
                 if (cur->next->getPos() - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 if (pos - cur->getPos()       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 cur->next = new rgbnode(rand(), pos, cur->next);
-                interpolate(cur->getPos(), cur, cur->rgb, cur->next);
+                uint8_t rgb[3];
+                interpolate(cur->getPos(), cur, rgb, cur->next);
+                cur->rgb[0] = rgb[0];
+                cur->rgb[1] = rgb[1];
+                cur->rgb[2] = rgb[2];
                 return true;
             }
             if (cur->next->getPos() == pos) { nodes--; return false; }
