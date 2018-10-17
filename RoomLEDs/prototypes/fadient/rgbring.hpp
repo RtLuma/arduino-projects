@@ -53,6 +53,8 @@ public:
     
     void interpolate(uint16_t pos, rgbnode* nA, uint8_t ABrgb[3], rgbnode* nB) {
         uint16_t dist = nB->getPos() - nA->getPos();
+        if (!dist) return;
+        
         
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
@@ -77,7 +79,8 @@ public:
     }    
     
     bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
-        for (uint8_t i=0; i<3; i++) if (abs(rgb[i] - RGB[i]) > 1) return false;
+        // for (uint8_t i=0; i<3; i++) if (! abs(rgb[i] - RGB[i])) return false;
+        for (uint8_t i=0; i<3; i++) if (abs(rgb[i] - RGB[i])) return false;
         return true;
     }
     
@@ -85,10 +88,11 @@ public:
         for (uint8_t i=0; i<3; i++) {
             int16_t delta = RGB[i]-rgb[i];
             if (!delta) continue;
-            bool delta2 = delta < 0;
-            delta >>= 5;
-            if (!delta) delta = delta2 ? -1 : 1;
-            rgb[i] += delta;
+            // bool delta2 = delta < 0;
+            // delta >>= 6;
+            // if (!delta) delta = delta2 ? -1 : 1;
+            
+            rgb[i] += delta > 0 ? 1 : -1;
         }
     }
     
@@ -146,20 +150,11 @@ public:
       } while(cur!= head);
     }
     
-    void scramble() {
-        rgbnode *n = head;
-        do {
-            
-        
-        } while(n->next != head);
-    }
-    
     void printContinuous() {
         rgbnode *n = head;
         
         head->pos &= 32767;
         head->pos += PIXELS;
-        
         rgbnode origin(0, 0, head);
         interpolate(PIXELS, tail, origin.rgb, head);
 
@@ -221,6 +216,21 @@ public:
         return dist;
     }
     
+    void scramble() {
+        rgbnode *n = head->next, *p = head;
+        do {
+            n->rgb[0] = rand();
+            n->rgb[1] = rand();
+            n->rgb[2] = rand();
+            
+            n->pos = (p->pos + n->next->pos) >> 1;
+            // n->pos |= rand() & 1 ? 32767 : 0;
+            
+            p=n;
+            n=n->next;
+        } while(n->next != tail);
+    }
+    
     bool insert(uint16_t pos, int8_t hue) {
         nodes++; rgbnode *cur=head;
         if (pos < head->getPos()) { head = new rgbnode(hue,pos,head); tail->next=head;       return true;  }
@@ -235,18 +245,18 @@ public:
         rgbnode *cur = head;
         nodes++; 
         if (pos < head->getPos()) {
-            // head->pos += PIXELS:                 //Fix this shit nigga
+            uint16_t headpos = head->pos;
+            head->pos = head->getPos() + PIXELS;
             uint8_t rgb[3];
-            interpolate(head->getPos(), cur, rgb, cur->next);
+            interpolate(pos+PIXELS, tail, rgb, head);
+            head->pos = headpos;
+            //Head changes right here u idiot
             head = new rgbnode(rand(), pos, rgb, head);
-            // head->pos -= PIXELS:
-            tail->next=head;
+            tail->next = head;
             return true;
         }
         do {
             if (cur->next->getPos() > pos ) {
-                if (cur->next->getPos() - pos < RGB_GRADIENT_WIDTH) { nodes--; return false; }
-                if (pos - cur->getPos()       < RGB_GRADIENT_WIDTH) { nodes--; return false; }
                 uint8_t rgb[3];
                 interpolate(cur->getPos(), cur, rgb, cur->next);
                 pos = (cur->getPos() + cur->next->getPos())>>1;

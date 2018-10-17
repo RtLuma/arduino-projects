@@ -22,7 +22,7 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
-    SPARKLES = PIXELS/6;
+    SPARKLES = PIXELS/15;
     srand(time(NULL));
     R = rand(); G = rand(); B = rand();
     
@@ -42,6 +42,7 @@ int main() {
         case 2: //0b10
             display = rgbContinuous;
             cleds.populate(SPARKLES);
+            cleds.scramble();
             break;
             
         case 3: //0b11
@@ -58,7 +59,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(50000);
+        usleep(25000);
         printf("\r");
     }
 }
