@@ -22,7 +22,7 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
-    SPARKLES = PIXELS/15;
+    SPARKLES = PIXELS/20;
     srand(time(NULL));
     R = rand(); G = rand(); B = rand();
     
@@ -59,7 +59,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(50000);
+        usleep(20000);
         printf("\r");
     }
 }

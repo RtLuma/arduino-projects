@@ -55,27 +55,39 @@ public:
         uint16_t dist = nB->getPos() - nA->getPos();
         if (!dist) return;
         
-        
         uint8_t* Argb = nA->rgb;
         uint8_t* Brgb = nB->rgb;
         
-        uint16_t R = Argb[0] << 7;
-        uint16_t G = Argb[1] << 7;
-        uint16_t B = Argb[2] << 7;
+        int16_t R = Brgb[0] - Argb[0];
+        int16_t G = Brgb[1] - Argb[1];
+        int16_t B = Brgb[2] - Argb[2];
         
         uint16_t dFromA = pos - nA->getPos();
         
-        int16_t Rstep = ((((int16_t)Brgb[0])<<7) - R)/dist;
-        int16_t Gstep = ((((int16_t)Brgb[1])<<7) - G)/dist;
-        int16_t Bstep = ((((int16_t)Brgb[2])<<7) - B)/dist;
+        R *= dFromA; G *= dFromA; B *= dFromA;
+        R /= dist; G /= dist; B /= dist;
         
-        R += Rstep * dFromA;
-        G += Gstep * dFromA;
-        B += Bstep * dFromA;
+        ABrgb[0] += R;        
+        ABrgb[1] += G;        
+        ABrgb[2] += B;
         
-        ABrgb[0] = R>>7;        
-        ABrgb[1] = G>>7;        
-        ABrgb[2] = B>>7;
+        // uint16_t R = Argb[0] << 7;
+        // uint16_t G = Argb[1] << 7;
+        // uint16_t B = Argb[2] << 7;
+        
+        // uint16_t dFromA = pos - nA->getPos();
+        
+        // int16_t Rstep = ((((int16_t)Brgb[0])<<7) - R)/dist;
+        // int16_t Gstep = ((((int16_t)Brgb[1])<<7) - G)/dist;
+        // int16_t Bstep = ((((int16_t)Brgb[2])<<7) - B)/dist;
+        
+        // R += Rstep * dFromA;
+        // G += Gstep * dFromA;
+        // B += Bstep * dFromA;
+        
+        // ABrgb[0] = R>>7;        
+        // ABrgb[1] = G>>7;        
+        // ABrgb[2] = B>>7;
     }    
     
     bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
@@ -88,11 +100,12 @@ public:
         for (uint8_t i=0; i<3; i++) {
             int16_t delta = RGB[i]-rgb[i];
             if (!delta) continue;
-            // bool delta2 = delta < 0;
-            // delta >>= 6;
-            // if (!delta) delta = delta2 ? -1 : 1;
-            
-            rgb[i] += delta > 0 ? 1 : -1;
+            bool delta2 = delta < 0;
+            delta /= 64;
+            if (!delta) delta = delta2 ? -1 : 1;
+            rgb[i] += delta;
+
+            // rgb[i] += delta > 0 ? 1 : -1;
         }
     }
     
@@ -126,6 +139,8 @@ public:
     void updateContinuous() {
       rgbnode *pre = tail, *cur = head;
       uint8_t newrgb[3];
+      interpolate(cur->getPos(), pre, newrgb, cur->next);
+      blend(cur->rgb, newrgb);
       do {
         if (cur->pos & 32768) { // Fade out
             interpolate(cur->getPos(), pre, newrgb, cur->next);
@@ -151,19 +166,23 @@ public:
     }
     
     void printContinuous() {
-        rgbnode *n = head;
+        rgbnode *n;
         
-        head->pos &= 32767;
-        head->pos += PIXELS;
-        rgbnode origin(0, 0, head);
-        interpolate(PIXELS, tail, origin.rgb, head);
+        uint16_t headpos = head->pos;
+        head->pos = head->getPos() + PIXELS;
 
-        head->pos -= PIXELS;
-        head->pos |= 32768;
+        rgbnode origin(0, 0, head);
+
+        if (head->getPos()) n = &origin;
+        else n=head;
+
+        interpolate(PIXELS, tail, n->rgb, head);
+
+        head->pos = headpos;
+
         
         uint16_t p=0;
         
-        n=&origin;
         p=printGradient(n, head);
         n=head;
                 
