@@ -204,8 +204,9 @@ public:
         G += Gstep;
         B += Bstep;
 
-        uint16_t p = 0;
-        // uint16_t p = 1;if (nA->pos & 32768) printf("\033[38;2;%d;%d;%dmX\033[0;m", R>>7, G>>7, B>>7); else printf("\033[38;2;%d;%d;%dm@\033[0;m", R>>7, G>>7, B>>7);
+        // uint16_t p = 0;
+        
+        uint16_t p = 1; printf("\033[48;2;%d;%d;%d;38;2;255;255;255m\%s\033[0;m", R>>7, G>>7, B>>7, nA->pos & 32768 ? "X" : "@");
         
         for (; p < dist; p++) { 
             printf("\033[38;2;%d;%d;%dm█\033[0;m", R>>7, G>>7, B>>7);
@@ -258,8 +259,8 @@ public:
         do {
             if (cur->next->getPos() > pos ) {
                 uint8_t rgb[3];
-                interpolate(cur->getPos(), cur, rgb, cur->next);
                 pos = (cur->getPos() + cur->next->getPos())>>1;
+                interpolate(pos, cur, rgb, cur->next);
                 cur->next = new rgbnode(rand(), pos, rgb, cur->next);
                 return true;
             }
@@ -267,7 +268,7 @@ public:
             cur = cur->next;
         } while(cur->next != head);
         uint8_t rgb[3];
-        interpolate(cur->getPos(), cur, rgb, cur->next);
+        interpolate(pos, cur, rgb, cur->next);
         cur->next = new rgbnode(rand(), pos, rgb, cur->next);
         tail=cur->next;
         return true;

@@ -59,7 +59,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(25000);
+        usleep(50000);
         printf("\r");
     }
 }
