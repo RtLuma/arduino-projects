@@ -11,7 +11,7 @@ uint8_t rainbow(uint8_t hue) { if (hue > 170) return ~(hue + (hue << 1)); if (hu
 
 struct rgbnode {
     uint16_t pos;
-    uint8_t rgb[3];
+    uint8_t rgb[3]={255,255,255};
     int8_t  hue;
     rgbnode *next;
     rgbnode() {
@@ -29,9 +29,10 @@ struct rgbnode {
         this->hue=hue;
         this->pos=pos;
         this->next=next;
-        this->rgb[0]=rgb[0];
-        this->rgb[1]=rgb[1];
-        this->rgb[2]=rgb[2];
+        uint8_t r= rgb[0], g=rgb[1], b=rgb[2];
+        this->rgb[0]=r;
+        this->rgb[1]=g;
+        this->rgb[2]=b;
     }
     uint16_t getPos(void) { return pos & 32767; }
 };
@@ -117,12 +118,11 @@ public:
     void updateContinuous() {
       rgbnode *pre = tail, *cur = head;
       uint8_t newrgb[3];
-      interpolate(cur->getPos(), pre, newrgb, cur->next);
-      blend(cur->rgb, newrgb);
+    //   interpolate(cur->getPos(), pre, newrgb, cur->next);
+    //   blend(cur->rgb, newrgb);
       do {
         if (cur->pos & 32768) { // Fade out
             interpolate(cur->getPos(), pre, newrgb, cur->next);
-            // blend(cur->rgb, newrgb);
             if (blend(cur->rgb, newrgb)) {
                 uint16_t del_pos = cur->getPos();
                 cur = cur->next;
@@ -135,7 +135,6 @@ public:
             newrgb[0]=rainbow(cur->hue+170);
             newrgb[1]=rainbow(cur->hue+85);
             newrgb[2]=rainbow(cur->hue);
-            // blend(cur->rgb, newrgb);
             if (blend(cur->rgb, newrgb)) cur->pos |= 32768; // Set decay flag
         }
         
@@ -250,7 +249,7 @@ public:
             interpolate(pos+PIXELS, tail, rgb, head);
             head->pos = headpos;
             //Head changes right here u idiot
-            head = new rgbnode(rand(), pos, rgb, head);
+            head = new rgbnode(0, pos, rgb, head);
             tail->next = head;
             return true;
         }
@@ -259,6 +258,7 @@ public:
                 uint8_t rgb[3];
                 pos = (cur->getPos() + cur->next->getPos())>>1;
                 interpolate(pos, cur, rgb, cur->next);
+                pos |= 32768;
                 cur->next = new rgbnode(0, pos, rgb, cur->next);
                 return true;
             }
@@ -267,7 +267,7 @@ public:
         } while(cur->next != head);
         uint8_t rgb[3];
         interpolate(pos, cur, rgb, cur->next);
-        cur->next = new rgbnode(rand(), pos, rgb, cur->next);
+        cur->next = new rgbnode(0, pos, rgb, cur->next);
         tail=cur->next;
         return true;
     }
