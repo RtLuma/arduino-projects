@@ -14,18 +14,6 @@ bool comp(uint8_t rgb[3], uint8_t RGB[3]) {
     return true;
 }
 
-void converge(uint8_t rgb[3], uint8_t RGB[3]) {
-    for (uint8_t i=0; i<3; i++) {
-            int16_t delta = RGB[i]-rgb[i];
-            if (!delta) continue;
-            bool delta2 = (1<<16) & delta;
-            delta >>= 4;
-            if (!delta) delta = delta2 ? -1 : 1;
-            rgb[i] += delta;
-    }
-}
-
-
 int main() {
     uint32_t frames=0;
     srand(time(NULL));
