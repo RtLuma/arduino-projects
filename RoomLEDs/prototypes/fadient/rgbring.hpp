@@ -259,7 +259,7 @@ public:
                 pos = (cur->getPos() + cur->next->getPos())>>1;
                 interpolate(pos, cur, rgb, cur->next);
                 pos |= 32768;
-                cur->next = new rgbnode(0, pos, rgb, cur->next);
+                cur->next = new rgbnode(rand(), pos, rgb, cur->next);
                 return true;
             }
             if (cur->next->getPos() == pos) { nodes--; return false; }
