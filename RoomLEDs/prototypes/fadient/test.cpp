@@ -20,46 +20,46 @@ int main() {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
     srand(time(NULL));
-
-    // P = PIXELS/10;
-    P = 20;
+    P = PIXELS/10;
+    // P = 20;
     R = rand(); G = rand(); B = rand();
-    Ring ring(P);
+    Ring ring;
+    ring.init(P);
+    ring.print();
     
     // Test node bitfield getters & setters work as expected
+    // These should be idempotent
     uint32_t n;
-    ring.col(n, 197); ring.lum(n, 230); ring.pos(n, 254);
-    if (ring.col(n) != 197) { printf("dicks0\n"); exit(1); }
-    if (ring.lum(n) != 230) { printf("dicks0\n"); exit(1); }
-    if (ring.pos(n) != 254) { printf("dicks0\n"); exit(1); }
+    uint16_t pos = rand()%PIXELS;
+    uint8_t  hue = rand()>>24;
+    uint8_t  lum = rand()>>24;
+    Ring::hue(n, hue); Ring::lum(n, lum); Ring::pos(n, pos);
+    if (Ring::hue(n) != hue) { printf("Node ops\n"); exit(1); }
+    if (Ring::lum(n) != lum) { printf("Node ops\n"); exit(1); }
+    if (Ring::pos(n) != pos) { printf("Node ops\n"); exit(1); }
         
     // Make sure we can construct the dang thing
-    uint8_t coP = P;
-    ring.populate(coP);
-    if (ring.nodes != P) { printf("dicks1\n"); exit(1); }
+    ring.populate(P);
+    Ring::hue(ring.ring[0], hue);
+    Ring::lum(ring.ring[0], lum);
+    Ring::pos(ring.ring[0], pos);
+    if (ring.nodes != P) { printf("Population\n"); exit(1); }
+    // This should also sort the nodes on position
+    ring.print();
     
-    // Test that sorting works
-    for (uint8_t i=0; i < P; i++) {
-        uint32_t n;
-        ring.col(n, rand()%3); ring.lum(n, rand()>>24); ring.pos(n, rand()>>16);
-        ring.ring[i]=n;
-    };
-    ring.sort();
+    printf("%d\n", pos);
     for (uint8_t i=1; i < P; i++)
-        if (ring.ring[i] < ring.ring[i-1]) { printf("dicks2\n"); exit(1); }
+        if (Ring::pos(ring.ring[i]) < Ring::pos(ring.ring[i-1])) {
+            printf("Sorting: %d < %d\n", ring.ring[i], ring.ring[i-1]);
+            exit(1);
+        }
     
-    //Try "resizing"
+    //Try "resizing". These will just segfault if things go wrong.
     uint32_t before = ring.ring[5];
     ring.populate(255);
-    if (ring.ring[254] != 0) { printf("dicks3\n"); exit(1); }
     
     ring.pos(ring.ring[254], 200);
     uint32_t after = ring.ring[5];
-    if (before != after) { printf("dicks4\n"); exit(1); }
+    if (before != after) { printf("Resize stability\n"); exit(1); }
     
-    ring.populate(P-1); //Should zero mem
-    if (ring.ring[P-1] != 0) { printf("dicks5\n"); exit(1); }
-    
-    
- 
 }

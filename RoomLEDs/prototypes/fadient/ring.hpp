@@ -7,43 +7,66 @@ extern uint8_t R, G, B, P;
 #define ZERO_SYMBOL " "
 #define GRADIENT_WIDTH 3
 
-/*  32-bit node protocol:
-  |Position.........| type   |  Lum   |
+/*  32-bit node protohue:
+  |Position.........| hue   |  Lum   |
   |######## ########|########|########| */
 
 struct Ring {
     uint32_t* ring; uint8_t nodes;
     
-    Ring(uint8_t p) { ring = new uint32_t; nodes = p; }
+    Ring() { ring = new uint32_t; nodes = 0; }
     
     //node ops [
-        uint16_t pos(uint32_t node) { return (node & 0xffff0000) >> 16; }
-        uint16_t lum(uint32_t node) { return (node & 0x0000ff00) >> 8;  }
-        uint16_t col(uint32_t node) { return  node & 0x000000ff;        }
-        void pos(uint32_t& node, uint16_t p) { node &= 0x0000ffff; node |= (uint32_t)p << 16; }
-        void lum(uint32_t& node, uint8_t l)  { node &= 0xffff00ff; node |= (uint32_t)l << 8;  }
-        void col(uint32_t& node, uint8_t c)  { node &= 0xffffff00; node |= c;                 }
+        static uint16_t pos(uint32_t n) { return  (n &  0xffff0000) >> 16; }
+        static uint16_t lum(uint32_t n) { return  (n &  0x0000ff00) >> 8;  }
+        static uint16_t hue(uint32_t n) { return   n &  0x000000ff;        }
+        static void pos(uint32_t& n, uint16_t p) { n &= 0x0000ffff; n |= (uint32_t)p << 16; }
+        static void lum(uint32_t& n, uint8_t  l) { n &= 0xffff00ff; n |= (uint32_t)l << 8;  }
+        static void hue(uint32_t& n, uint8_t  h) { n &= 0xffffff00; n |= h;                 }
     //]
     
     void sort() { // Insertion sort
         uint8_t i, j; uint32_t k; 
         for (i = 1; i < nodes; i++) { 
-            j = i-1;
-            k = ring[i];
+            j = i-1; k = ring[i];
             while (j >= 0 && pos(ring[j]) > pos(k)) { ring[j+1] = ring[j]; j--; } 
             ring[j+1] = k; 
         } 
     } 
         
+    void init(uint8_t n) {
+        for (uint8_t i=0; i < n; i++) initNode(ring[i]);
+        sort();
+        nodes=n;
+    }
+    
     void populate (uint8_t desiredNodes) { 
-        if (desiredNodes > nodes) for (uint8_t i=nodes; i < desiredNodes; i++) ring[i] = 0;
-        else for (uint8_t i=nodes; i > desiredNodes; i--) ring[i-1] = 0;
+        if (desiredNodes > nodes) for (uint8_t i=nodes; i < desiredNodes; i++) initNode(ring[i]);
+        sort();
         nodes = desiredNodes;
     }
     
-    void printNode(uint32_t n) { printf("[%d]", lum(n)); }
+    void initNode(uint32_t& n) {
+        // n =  (rand()%PIXELS) << 16;
+        // n += (rand() >> 24) << 8;
+        // n +=  rand() >> 24;
+        pos(n, rand()%PIXELS);
+        hue(n, rand());
+        lum(n, rand());
+        printf("init: %03d, %03d @ %03d\n", lum(n), hue(n), pos(n));
+    }
     
-    void print() { for (uint8_t i=0; i < nodes; i++) printNode(ring[i]); printf("\n"); }    
+    void printNode(uint32_t n) { printf("[%03d]", pos(n)); }
+    // void printNode(uint32_t n) { printf("[%03d,%03d@%03d]", lum(n),hue(n),pos(n)); }
+    
+    void print() {
+        for (uint8_t i=0; i < nodes; i++) printNode(ring[i]);
+        printf("\n");
+    }    
+    
+    void displayNode(uint32_t n) {}
+    void display() {}
+    
     
     // void insert() {
     //     uint8_t i = rand()%P;
