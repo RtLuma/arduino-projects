@@ -20,12 +20,10 @@ int main() {
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
     srand(time(NULL));
-    P = PIXELS/10;
-    // P = 20;
+    // P = PIXELS/10;
+    P = 12;
     R = rand(); G = rand(); B = rand();
     Ring ring;
-    ring.init(P);
-    ring.print();
     
     // Test node bitfield getters & setters work as expected
     // These should be idempotent
@@ -39,27 +37,37 @@ int main() {
     if (Ring::pos(n) != pos) { printf("Node ops\n"); exit(1); }
         
     // Make sure we can construct the dang thing
+    ring.init(P);
+    // if (ring.nodes != P) { printf("Population\n"); exit(1); }
+    // // This should also sort the nodes on position
+    
+    // for (uint8_t i=1; i < P; i++) {
+    //     uint16_t large = Ring::pos(ring.ring[i]);
+    //     uint16_t small = Ring::pos(ring.ring[i-1]);
+    //     if (large < small) {
+    //         printf("Sorting: %d < %d\n", large, small);
+    //         exit(1);
+    //     }
+    // }
+    
+    // Test resize stability (should not modify nodes in the list)
+    string b4 = ring.to_string();
+    
     ring.populate(P);
-    Ring::hue(ring.ring[0], hue);
-    Ring::lum(ring.ring[0], lum);
-    Ring::pos(ring.ring[0], pos);
-    if (ring.nodes != P) { printf("Population\n"); exit(1); }
-    // This should also sort the nodes on position
+    ring.populate(P);
+    ring.populate(P);
+    ring.populate(P);
+    ring.populate(P);
+    
+    string af = ring.to_string();
+    if (b4 != af) {
+        printf("Stability\n");
+        cout << b4 << endl << af << endl;
+        exit(1);
+    }
+    
     ring.print();
     
-    printf("%d\n", pos);
-    for (uint8_t i=1; i < P; i++)
-        if (Ring::pos(ring.ring[i]) < Ring::pos(ring.ring[i-1])) {
-            printf("Sorting: %d < %d\n", ring.ring[i], ring.ring[i-1]);
-            exit(1);
-        }
-    
-    //Try "resizing". These will just segfault if things go wrong.
-    uint32_t before = ring.ring[5];
-    ring.populate(255);
-    
-    ring.pos(ring.ring[254], 200);
-    uint32_t after = ring.ring[5];
-    if (before != after) { printf("Resize stability\n"); exit(1); }
-    
+    printf("All tests passed!\n");
+    exit(0);
 }

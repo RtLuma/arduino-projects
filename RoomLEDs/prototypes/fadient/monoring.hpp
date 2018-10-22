@@ -7,29 +7,32 @@ extern uint8_t R, G, B;
 #define ZERO_SYMBOL " "
 #define GRADIENT_WIDTH 3
 
-struct node {
+struct monode {
     uint16_t pos;
-    int8_t lum;
-    node *next;
-    node() {
-        this->lum=0;
+    int8_t sat;
+    monode *next;
+    monode() {
+        this->sat=0;
         this->pos=0;
         this->next=this;
     }
     
-    node(int8_t lum, uint16_t pos, node *next) {
-        this->lum=lum;
+    monode(int8_t sat, uint16_t pos, monode *next) {
+        this->sat=sat;
         this->pos=pos;
         this->next=next;
     }
 };
 
-struct Ring {
+class MonoRing {
     
-    node *head; node *tail; uint8_t nodes;
+private:
+    monode *head; monode *tail; uint8_t nodes;
     
-    Ring() {
-        head = new node;
+public:
+    
+    MonoRing() {
+        head = new monode;
         tail = head;
         nodes = 1;
     }
@@ -37,38 +40,38 @@ struct Ring {
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(rand()%PIXELS, rand()); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
-    int8_t interpolate(node* A, node* B, uint16_t pos) {
+    int8_t interpolate(monode* A, monode* B, uint16_t pos) {
         uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
-        uint16_t lum = abs(A->lum) << 8;
+        uint16_t sat = abs(A->sat) << 8;
         uint16_t dFromA = pos - A->pos;
-        int16_t lum_step = int16_t(abs(B->lum<<8) - lum)/dist;
-        lum += lum_step * dFromA;
-        lum >>= 8;
-        return rand() & 1 ? -lum : lum;
+        int16_t sat_step = int16_t(abs(B->sat<<8) - sat)/dist;
+        sat += sat_step * dFromA;
+        sat >>= 8;
+        return rand() & 1 ? -sat : sat;
     }    
     
     void updateDiscrete(void) {
-      node *n = head;
+      monode *n = head;
       do {
-        int8_t newlum = n->lum + 1;
+        int8_t newsat = n->sat + 1;
         
-        if (n->lum<0 && newlum>-1) {
+        if (n->sat<0 && newsat>-1) {
           uint16_t del_pos = n->pos; n = n->next; remove(del_pos);
           bool reinject; do { reinject = !insert(rand()%PIXELS, 0); } while (reinject);
           continue;
         }        
-        n->lum = newlum;
+        n->sat = newsat;
         n = n->next;
       } while(n->next != head);
     }
         
     void printDiscrete() {
-		node *n = head;
+		monode *n = head;
 		uint16_t p=0;
 		for (; n->next != head;) {
 			for (; p < n->pos; p++) printf(ZERO_SYMBOL);
-			printNode(n->lum);
+			printNode(n->sat);
             p++;
             n=n->next;
 		}
@@ -76,24 +79,24 @@ struct Ring {
 	}
     
     void updateContinuous() {
-      node *pre = tail, *cur = head;
+      monode *pre = tail, *cur = head;
       do {
-        int8_t newlum = cur->lum + 1;
+        int8_t newsat = cur->sat + 1;
         
-        if (!(abs(newlum) - abs(interpolate(pre, cur->next, cur->pos)))) {
+        if (!(abs(newsat) - abs(interpolate(pre, cur->next, cur->pos)))) {
           uint16_t del_pos = cur->pos; cur = cur->next; remove(del_pos);
           bool reinject; do { del_pos = rand()%PIXELS; reinject = !inject(del_pos); } while (reinject);
           continue;
         }        
-        cur->lum = newlum;
+        cur->sat = newsat;
         pre = cur; cur = cur->next;
       } while(cur->next != head);
     }
     
     void printContinuous() {
-        node *n = head;
+        monode *n = head;
         head->pos += PIXELS;
-        node origin(interpolate(tail, head, PIXELS), 0, head);
+        monode origin(interpolate(tail, head, PIXELS), 0, head);
         head->pos -= PIXELS;
         
         uint16_t p=0;
@@ -112,40 +115,40 @@ struct Ring {
         p=printGradient(tail, n);
 	}
     
-    void printNode(int8_t lum) {
-        uint8_t disp = abs(lum);
+    void printNode(int8_t sat) {
+        uint8_t disp = abs(sat);
         if (disp < 128) disp <<= 1;
         else disp = 255;
-        printf("\033[48;2;%d;%d;%dm \033[0m", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
+        printf("\033[38;2;%d;%d;%dm█\033[0;m", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
     } //]]
     
-    uint8_t printGradient(node* A, node* B) {
-        uint16_t lum = abs(A->lum) << 8; uint16_t dist = B->pos - A->pos;
+    uint8_t printGradient(monode* A, monode* B) {
+        uint16_t sat = abs(A->sat) << 8; uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
-        int16_t lum_step = int16_t(abs(B->lum<<8) - lum)/dist;
+        int16_t sat_step = int16_t(abs(B->sat<<8) - sat)/dist;
         uint16_t p = 1;
-        // printNode(lum>>8);
-        printf("\033[48;2;255;255;255m \033[0m");
-        lum += lum_step;
-        for (; p < dist; p++) { printNode(lum>>8); lum += lum_step; }
+        // printNode(sat>>8);
+        printf("\033[38;2;255;255;255m█\033[0;m");
+        sat += sat_step;
+        for (; p < dist; p++) { printNode(sat>>8); sat += sat_step; }
         return dist;
     }
     
-    bool insert(uint16_t pos, int8_t lum) { // bool 'alive' instead of lum arg
-        nodes++; node *cur=head;
-        if (pos < head->pos) { head = new node(lum,pos,head); tail->next=head;       return true;  }
+    bool insert(uint16_t pos, int8_t sat) { // bool 'alive' instead of sat arg
+        nodes++; monode *cur=head;
+        if (pos < head->pos) { head = new monode(sat,pos,head); tail->next=head;       return true;  }
         do { if (cur->next->pos == pos) {                                   nodes--; return false; }
-             if (cur->next->pos >  pos) { cur->next = new node(lum, pos, cur->next); return true;  }
+             if (cur->next->pos >  pos) { cur->next = new monode(sat, pos, cur->next); return true;  }
              cur = cur->next; } while (cur->next != head);
-        cur->next = new node(lum, pos, cur->next); tail=cur->next;                   return true;
+        cur->next = new monode(sat, pos, cur->next); tail=cur->next;                   return true;
     }
     
     bool inject(uint16_t pos) {
         if (pos > PIXELS || pos == head->pos) return false;
-        node *cur = head;
+        monode *cur = head;
         nodes++; 
         if (pos < head->pos) {
-            head = new node(interpolate(cur, cur->next, pos),pos,head);
+            head = new monode(interpolate(cur, cur->next, pos),pos,head);
             tail->next=head;
             return true;
         }
@@ -153,23 +156,23 @@ struct Ring {
             if (cur->next->pos > pos ) {
                 if (cur->next->pos - pos < GRADIENT_WIDTH) { nodes--; return false; }
                 if (pos - cur->pos       < GRADIENT_WIDTH) { nodes--; return false; }
-                cur->next = new node(interpolate(cur, cur->next, pos),pos,cur->next);
+                cur->next = new monode(interpolate(cur, cur->next, pos),pos,cur->next);
                 return true;
             }
             if (cur->next->pos == pos) { nodes--; return false; }
             cur = cur->next;
         } while(cur->next != head);
-        cur->next = new node(interpolate(cur, cur->next, pos), pos, cur->next);
+        cur->next = new monode(interpolate(cur, cur->next, pos), pos, cur->next);
         tail=cur->next;
         return true;
     }
     
     bool remove(uint16_t pos) {  //delete @ position
         if (pos > PIXELS || pos < head->pos) return false;
-        node *cur = head;
+        monode *cur = head;
         if (pos == head->pos) {
             nodes--;
-            node* temp=head->next;
+            monode* temp=head->next;
             delete head; head=temp;
             tail->next=head;
             return true;
@@ -177,7 +180,7 @@ struct Ring {
         do {
             if (cur->next->pos >  pos) return false;
             if (cur->next->pos == pos) {
-                node *temp = cur->next->next; 
+                monode *temp = cur->next->next; 
                 delete cur->next;
                 cur->next = temp;
                 nodes--;
