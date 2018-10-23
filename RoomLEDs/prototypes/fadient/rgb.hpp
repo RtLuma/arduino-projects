@@ -31,27 +31,24 @@ struct RGBing {
         Gp->pos += PIXELS; node Go(Ring::interpolate(G.tail, Gp, PIXELS), 0, Gp); Gp->pos -= PIXELS; if (Gp->pos) Gp = &Go;
         Bp->pos += PIXELS; node Bo(Ring::interpolate(B.tail, Bp, PIXELS), 0, Bp); Bp->pos -= PIXELS; if (Bp->pos) Bp = &Bo;
         
-        int16_t r, g, b, dR, dG, dB;
+        uint16_t r, g, b,
+                Rd=1, Gd=1, Bd=1;
+        int16_t  Rs, Gs, Bs;
 
-        // r=abs(Rp->lum)<<7;
-        // g=abs(Gp->lum)<<7;
-        // b=abs(Bp->lum)<<7;
-        
-        
-        // dR = int16_t((abs(Rp->next->lum)<<7) - r) / (Rp->next->pos - Rp->pos);
-        // dG = int16_t((abs(Gp->next->lum)<<7) - g) / (Gp->next->pos - Gp->pos);
-        // dB = int16_t((abs(Bp->next->lum)<<7) - b) / (Bp->next->pos - Bp->pos);
-        
-        
         for (uint16_t p=0; p < PIXELS; p++) {
             
-            if (Rp->pos == p && Rp != R.tail) { Rp=Rp->next; r=abs(Rp->lum)<<7; dR = ((abs(Rp->next->lum)<<7) - r) / (Rp->next->pos - Rp->pos); }
-            if (Gp->pos == p && Gp != G.tail) { Gp=Gp->next; g=abs(Gp->lum)<<7; dG = ((abs(Gp->next->lum)<<7) - g) / (Gp->next->pos - Gp->pos); }
-            if (Bp->pos == p && Bp != B.tail) { Bp=Bp->next; b=abs(Bp->lum)<<7; dB = ((abs(Bp->next->lum)<<7) - b) / (Bp->next->pos - Bp->pos); }
+            if (!(--Rd)) {
+                Rp=Rp->next;
+                r=abs(Rp->lum)<<7;
+                Rd = Rp->next->pos - Rp->pos;
+                Rs = ((abs(Rp->next->lum)<<7) - r) / Rd;
+            }
+            if (Gp->pos == p && Gp != G.tail) { Gp=Gp->next; g=abs(Gp->lum)<<7; Gs = ((abs(Gp->next->lum)<<7) - g) / (Gp->next->pos - Gp->pos); }
+            if (Bp->pos == p && Bp != B.tail) { Bp=Bp->next; b=abs(Bp->lum)<<7; Bs = ((abs(Bp->next->lum)<<7) - b) / (Bp->next->pos - Bp->pos); }
             
-            r += dR;
-            g += dG;
-            b += dB;            
+            r += Rs;
+            g += Gs;
+            b += Bs;            
             
             //Print
             printf("\033[48;2;%d;%d;%dm \033[0m", getLum(r>>7), 0,0);

@@ -95,20 +95,30 @@ struct Ring {
         head->pos += PIXELS;
         node origin(interpolate(tail, head, PIXELS), 0, head);
         head->pos -= PIXELS;
+
+        node finish((origin.lum), PIXELS-1, &origin);
+        tail->next = &finish;
+        
         
         if (head->pos)n=&origin;
-        uint16_t lum;
+        uint16_t lum, dist=1;
         int16_t lum_step;
         
         for (uint16_t p = 0; p < PIXELS; p++) { 
-            if (n->pos == p) { 
+            if (!(--dist)) { 
                 n=n->next;
                 // lum=abs(n->lum)<<8;
-                lum_step = ((abs(n->next->lum)<<8) - lum) / (n->next->pos - n->pos);
+                dist=(n->next->pos - n->pos);
+                lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
+                printf("\033[48;2;255;255;255m \033[0m");
             }
-            printNode(lum>>8);
+            else printNode(lum>>8);
             lum += lum_step;
         }
+        
+        tail->next = head;
+        
+        
 	}
     
     void printNode(int8_t lum) {
