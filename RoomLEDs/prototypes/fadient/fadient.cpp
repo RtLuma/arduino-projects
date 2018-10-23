@@ -23,7 +23,8 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
-    SPARKLES = PIXELS/10;
+    // SPARKLES = PIXELS/10;
+    SPARKLES = 21;
     srand(time(NULL));
     R = rand(); G = rand(); B = rand();
     
@@ -42,13 +43,12 @@ int main() {
             
         case 2: //0b10
             display = rgbContinuous;
-            cleds.populate(SPARKLES);
-            cleds.scramble();
+            rgbing.populate(SPARKLES);
             break;
             
         case 3: //0b11
-            display = rgbDiscrete;
-            cleds.populate(SPARKLES);
+            display = rgbContinuous;
+            rgbing.populate(SPARKLES);
             break;
     
         default:
@@ -60,7 +60,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(20000);
+        usleep(200000);
         printf("\r");
     }
 }

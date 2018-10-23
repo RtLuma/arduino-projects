@@ -37,7 +37,7 @@ struct Ring {
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(rand()%PIXELS, rand()); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
-    int8_t interpolate(node* A, node* B, uint16_t pos) {
+    static int8_t interpolate(node* A, node* B, uint16_t pos) {
         uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
         uint16_t lum = abs(A->lum) << 8;
