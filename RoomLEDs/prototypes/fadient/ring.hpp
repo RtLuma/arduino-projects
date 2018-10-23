@@ -123,10 +123,7 @@ struct Ring {
         uint16_t lum = abs(A->lum) << 8; uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
         int16_t lum_step = int16_t(abs(B->lum<<8) - lum)/dist;
-        uint16_t p = 1;
-        // printNode(lum>>8);
-        printf("\033[48;2;255;255;255m \033[0m");
-        lum += lum_step;
+        uint16_t p = 0;
         for (; p < dist; p++) { printNode(lum>>8); lum += lum_step; }
         return dist;
     }
@@ -153,6 +150,7 @@ struct Ring {
             if (cur->next->pos > pos ) {
                 if (cur->next->pos - pos < GRADIENT_WIDTH) { nodes--; return false; }
                 if (pos - cur->pos       < GRADIENT_WIDTH) { nodes--; return false; }
+                pos = (cur->pos + cur->next->pos)>>1;
                 cur->next = new node(interpolate(cur, cur->next, pos),pos,cur->next);
                 return true;
             }

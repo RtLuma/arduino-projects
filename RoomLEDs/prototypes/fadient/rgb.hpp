@@ -17,7 +17,7 @@ struct RGBing {
         B.updateContinuous();
     }
     
-    static uint8_t getLum(uint16_t lum) {
+    static uint8_t getLum(int16_t lum) {
         uint8_t disp = abs(lum);
         if (disp < 128) disp <<= 1;
         else disp = 255;
