@@ -96,19 +96,20 @@ struct Ring {
         node origin(interpolate(tail, head, PIXELS), 0, head);
         head->pos -= PIXELS;
         
-        if (head->pos)n=&origin;
-        uint16_t lum;
-        int16_t lum_step;
+        uint16_t p=0;
         
-        for (uint16_t p = 0; p < PIXELS; p++) { 
-            if (n->pos == p) { 
-                n=n->next;
-                // lum=abs(n->lum)<<8;
-                lum_step = ((abs(n->next->lum)<<8) - lum) / (n->next->pos - n->pos);
-            }
-            printNode(lum>>8);
-            lum += lum_step;
+        n=&origin;
+        p=printGradient(n, head);
+        n=head;
+                
+        for (; n->next != head;) {
+            p += printGradient(n, n->next);
+            n=n->next;
         }
+
+        origin.pos=PIXELS;
+        n=&origin;
+        p=printGradient(tail, n);
 	}
     
     void printNode(int8_t lum) {
