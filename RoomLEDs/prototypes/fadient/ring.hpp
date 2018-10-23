@@ -96,7 +96,7 @@ struct Ring {
         node origin(interpolate(tail, head, PIXELS), 0, head);
         head->pos -= PIXELS;
 
-        node finish((origin.lum), PIXELS-1, &origin);
+        node finish(origin.lum, PIXELS-1, &origin);
         tail->next = &finish;
         
         
