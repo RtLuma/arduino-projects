@@ -116,7 +116,7 @@ struct Ring {
         uint8_t disp = abs(lum);
         if (disp < 128) disp <<= 1;
         else disp = 255;
-        printf("\033[48;2;%d;%d;%dm \033[0m", (uint16_t(R * disp) + 1) >> 8, (uint16_t(G * disp) + 1) >> 8, (uint16_t(B * disp) + 1) >> 8);
+        printf("\033[48;2;%d;%d;%dm \033[0m", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
     } //]]
     
     uint8_t printGradient(node* A, node* B) {

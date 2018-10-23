@@ -60,7 +60,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(200000);
+        usleep(100000);
         printf("\r");
     }
 }
