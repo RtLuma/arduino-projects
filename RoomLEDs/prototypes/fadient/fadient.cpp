@@ -61,7 +61,7 @@ int main() {
         display();
         printf("]");
         fflush(stdout);
-        usleep(10000);
-        printf("\n");
+        usleep(50000);
+        printf("\r");
     }
 }

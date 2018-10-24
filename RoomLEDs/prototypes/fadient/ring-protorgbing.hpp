@@ -94,22 +94,31 @@ struct Ring {
         node *n = head;
         head->pos += PIXELS;
         node origin(interpolate(tail, head, PIXELS), 0, head);
+        node finish(origin.lum, PIXELS-1, &origin);
         head->pos -= PIXELS;
-        
-        uint16_t p=0;
-        
-        n=&origin;
-        p=printGradient(n, head);
-        n=head;
-                
-        for (; n->next != head;) {
-            p += printGradient(n, n->next);
-            n=n->next;
-        }
 
-        origin.pos=PIXELS;
-        n=&origin;
-        p=printGradient(tail, n);
+        tail->next = &finish;
+        
+        
+        if (head->pos)n=&origin;
+        uint16_t lum, dist;
+        int16_t lum_step;
+        lum=abs(n->lum)<<8;
+        dist=(n->next->pos - n->pos);
+        lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
+        
+        for (uint16_t p = 0; p < PIXELS; p++) { 
+            if (!(--dist)) { 
+                n=n->next;
+                lum=abs(n->lum)<<8;
+                dist=(n->next->pos - n->pos);
+                if (!dist) { dist = 1; continue; }
+                lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
+            }
+            printNode(lum>>8);
+            lum += lum_step;
+        }
+        tail->next = head;
 	}
     
     void printNode(int8_t lum) {
