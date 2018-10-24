@@ -101,17 +101,21 @@ struct Ring {
         
         
         if (head->pos)n=&origin;
-        uint16_t lum, dist=1;
+        uint16_t lum, dist;
         int16_t lum_step;
+        lum=abs(n->lum)<<8;
+        dist=(n->next->pos - n->pos);
+        lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
         
         for (uint16_t p = 0; p < PIXELS; p++) { 
             if (!(--dist)) { 
                 n=n->next;
-                // lum=abs(n->lum)<<8;
+                lum=abs(n->lum)<<8;
                 dist=(n->next->pos - n->pos);
                 if (!dist) { dist = 1; continue; }
                 lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
                 printf("\033[48;2;255;255;255m \033[0m");
+                p++;
             }
             else printNode(lum>>8);
             lum += lum_step;

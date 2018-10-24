@@ -26,7 +26,8 @@ int main() {
     // SPARKLES = PIXELS/10;
     SPARKLES = 21;
     srand(time(NULL));
-    R = rand(); G = rand(); B = rand();
+    R = 255; G = 64; B = 32;
+    // R = rand(); G = rand(); B = rand();
     
     uint8_t mode = ((uint8_t)TRICHROMATIC << 1) + (uint8_t)DISCRETE;
     
@@ -61,6 +62,6 @@ int main() {
         printf("]");
         fflush(stdout);
         usleep(50000);
-        printf("\r");
+        printf("\n");
     }
 }
