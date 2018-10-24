@@ -114,16 +114,11 @@ struct Ring {
                 dist=(n->next->pos - n->pos);
                 if (!dist) { dist = 1; continue; }
                 lum_step = ((abs(n->next->lum)<<8) - lum) / dist;
-                printf("\033[48;2;255;255;255m \033[0m");
-                p++;
             }
-            else printNode(lum>>8);
+            printNode(lum>>8);
             lum += lum_step;
         }
-        
         tail->next = head;
-        
-        
 	}
     
     void printNode(int8_t lum) {
