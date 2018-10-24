@@ -62,6 +62,6 @@ int main() {
         printf("]");
         fflush(stdout);
         usleep(10000);
-        printf("\r");
+        printf("\n");
     }
 }
