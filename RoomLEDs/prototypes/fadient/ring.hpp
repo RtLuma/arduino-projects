@@ -5,7 +5,6 @@ extern uint16_t PIXELS;
 extern uint8_t R, G, B;
 
 #define ZERO_SYMBOL " "
-#define GRADIENT_WIDTH 3
 
 struct node {
     uint16_t pos;
@@ -161,8 +160,8 @@ struct Ring {
         }
         do {
             if (cur->next->pos > pos ) {
-                if (cur->next->pos - pos < GRADIENT_WIDTH) { nodes--; return false; }
-                if (pos - cur->pos       < GRADIENT_WIDTH) { nodes--; return false; }
+                // if (cur->next->pos - pos < GRADIENT_WIDTH) { nodes--; return false; }
+                // if (pos - cur->pos       < GRADIENT_WIDTH) { nodes--; return false; }
                 pos = (cur->pos + cur->next->pos)>>1;
                 cur->next = new node(interpolate(cur, cur->next, pos),pos,cur->next);
                 return true;
