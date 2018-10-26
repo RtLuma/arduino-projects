@@ -84,14 +84,13 @@ void setup() {
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
 
-  sparkles.populate(P);
-  //sparkles.populate(50);
-
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
 
   FFT.begin();  // Init Audio-Spectrum shield
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
+
+  if (mode == sparkle) sparkles.populate(P);
 
   ledsetup();
   //    showColor(0, 0, 0); //blank the display
@@ -100,8 +99,3 @@ void setup() {
 void loop() {
   mode();
 }
-
-
-
-
-

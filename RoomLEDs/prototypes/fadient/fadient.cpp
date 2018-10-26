@@ -60,6 +60,7 @@ int main() {
         display();
         fflush(stdout);
         usleep(25000);
+>>>>>>> b511d680a7ae3708a3fc1b8a8fda904f7543ed18
         printf("\n");
     }
 }
