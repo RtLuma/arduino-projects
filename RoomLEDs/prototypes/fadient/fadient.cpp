@@ -23,8 +23,8 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col-2;
-    // SPARKLES = PIXELS/10;
-    SPARKLES = 21;
+    SPARKLES = PIXELS/10;
+    // SPARKLES = 21;
     srand(time(NULL));
     R = 255; G = 64; B = 32;
     // R = rand(); G = rand(); B = rand();
@@ -62,6 +62,6 @@ int main() {
         printf("]");
         fflush(stdout);
         usleep(50000);
-        printf("\r");
+        printf("\n");
     }
 }
