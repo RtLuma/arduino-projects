@@ -11,11 +11,12 @@ struct winsize w;
 
 uint16_t SPARKLES;
 uint16_t PIXELS;
+uint8_t HEIGHT;
 uint8_t R, G, B;
 voidF display;
 
 #define DISCRETE false
-#define TRICHROMATIC true
+#define TRICHROMATIC false
 
 //https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
 
@@ -23,8 +24,8 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col;
-    // SPARKLES = PIXELS/10;
-    SPARKLES = 21;
+    SPARKLES = PIXELS/10;
+    // SPARKLES = 21;
     srand(time(NULL));
     R = 255; G = 64; B = 32;
     // R = rand(); G = rand(); B = rand();
@@ -56,11 +57,14 @@ int main() {
             break;
     }
     
+    // #define HEIGHT 5
+    HEIGHT = 1;
+    // HEIGHT = w.ws_row-1;
+    
     while (true) {
         display();
         fflush(stdout);
         usleep(25000);
->>>>>>> b511d680a7ae3708a3fc1b8a8fda904f7543ed18
-        printf("\n");
+        printf("\r");
     }
 }

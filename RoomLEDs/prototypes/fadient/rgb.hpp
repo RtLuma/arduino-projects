@@ -1,5 +1,6 @@
 #include "ring.hpp"
 
+extern uint8_t HEIGHT;
 
 struct RGBing {
     Ring R; Ring G; Ring B;
@@ -88,5 +89,10 @@ struct RGBing {
 
 void rgbContinuous(void) { 
     rgbing.update();
-    rgbing.display();
+    for (uint8_t i = 0; i < HEIGHT; i++) {
+        rgbing.display();
+        printf("\n");
+    }
+    printf("\033[%dA", HEIGHT);
+    
 }
