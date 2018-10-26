@@ -76,7 +76,12 @@ struct Ring {
 	}
     
     void updateContinuous() {
-      node *pre = tail, *cur = head;
+      node _tail(*tail); _tail.pos -= PIXELS;
+      node _head(*head); _head.pos += PIXELS;
+      node *pre = &_tail, *cur = head;
+      
+      tail->next=&_head;
+      
       do {
         int8_t newlum = cur->lum + 1;
         
@@ -87,7 +92,9 @@ struct Ring {
         }        
         cur->lum = newlum;
         pre = cur; cur = cur->next;
-      } while(cur->next != head);
+      } while(cur != tail);
+      
+      if (tail->next == &_head) tail->next=head;
     }
     
     void printContinuous() {
@@ -116,6 +123,9 @@ struct Ring {
         uint8_t disp = abs(lum);
         if (disp < 128) disp <<= 1;
         else disp = 255;
+        // printf("\033[38;2;%d;%d;%dm", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
+        // std::cout << val2block(disp);
+        // printf("\033[0m");
         printf("\033[48;2;%d;%d;%dm \033[0m", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
     } //]]
     
@@ -123,7 +133,8 @@ struct Ring {
         uint16_t lum = abs(A->lum) << 8; uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
         int16_t lum_step = int16_t(abs(B->lum<<8) - lum)/dist;
-        uint16_t p = 0;
+        uint16_t p = 1;
+        printNode(127);
         for (; p < dist; p++) { printNode(lum>>8); lum += lum_step; }
         return dist;
     }
@@ -132,7 +143,7 @@ struct Ring {
         nodes++; node *cur=head;
         if (pos < head->pos) { head = new node(lum,pos,head); tail->next=head;       return true;  }
         do { if (cur->next->pos == pos) {                                   nodes--; return false; }
-             if (cur->next->pos >  pos) { cur->next = new node(lum, pos, cur->next); return true;  }
+             if (cur->next->pos >  pos) { cur->next = new node(lum, (cur->pos + cur->next->pos)>>1, cur->next); return true;  }
              cur = cur->next; } while (cur->next != head);
         cur->next = new node(lum, pos, cur->next); tail=cur->next;                   return true;
     }
@@ -142,7 +153,9 @@ struct Ring {
         node *cur = head;
         nodes++; 
         if (pos < head->pos) {
-            head = new node(interpolate(cur, cur->next, pos),pos,head);
+            head->pos += PIXELS;
+            head = new node(interpolate(tail, head, pos+PIXELS),pos,head);
+            head->next->pos -= PIXELS;
             tail->next=head;
             return true;
         }
@@ -189,4 +202,4 @@ struct Ring {
 } mleds;
 
 void monoDiscrete(void) { mleds.updateDiscrete(); mleds.printDiscrete(); }
-void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous(); }
+void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous();}

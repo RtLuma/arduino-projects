@@ -58,14 +58,20 @@ struct RGBing {
         Bs=((abs(Bp->next->lum)<<8) - b)/Bd;
 
         for (uint16_t p = 0; p < PIXELS; p++) { 
-            if (!(--Rd)) { Rp=Rp->next;r=abs(Rp->lum)<<8;Rd=Rp->next->pos - Rp->pos;Rs=((abs(Rp->next->lum)<<8)-r)/Rd;}
+            bool Rb=!(--Rd);
+            if (Rb) { Rp=Rp->next;r=abs(Rp->lum)<<8;Rd=Rp->next->pos - Rp->pos;Rs=((abs(Rp->next->lum)<<8)-r)/Rd;}
             if (!(--Gd)) { Gp=Gp->next;g=abs(Gp->lum)<<8;Gd=Gp->next->pos - Gp->pos;Gs=((abs(Gp->next->lum)<<8)-g)/Gd;}
             if (!(--Bd)) { Bp=Bp->next;b=abs(Bp->lum)<<8;Bd=Bp->next->pos - Bp->pos;Bs=((abs(Bp->next->lum)<<8)-b)/Bd;}
             
             printf("\033[48;2;%d;%d;%dm \033[0m",
+                // Rb ? 255 : getLum(r>>8),
+                // Rb ? 255 : 0,
+                // Rb ? 255 : 0
+                
                 getLum(r>>8),
                 getLum(g>>8),
                 getLum(b>>8)
+                
             );
             
             r += Rs;
