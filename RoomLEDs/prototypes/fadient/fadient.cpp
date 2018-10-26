@@ -57,9 +57,7 @@ int main() {
     }
     
     while (true) {
-        // printf("[");
         display();
-        // printf("]");
         fflush(stdout);
         usleep(25000);
         printf("\n");

@@ -7,9 +7,6 @@ extern uint8_t R, G, B;
 #define ZERO_SYMBOL " "
 #define GRADIENT_WIDTH 3
 
-std::string val2block(uint8_t val) {if (val > 223) return "\u2588";  if (val > 191) return "\u2587";  if (val > 159) return "\u2586";  if (val > 127) return "\u2585";  if (val > 95)  return "\u2584";  if (val > 63)  return "\u2583";  if (val > 31)  return "\u2582";  return " ";} 
-
-
 struct node {
     uint16_t pos;
     int8_t lum;
@@ -79,11 +76,11 @@ struct Ring {
 	}
     
     void updateContinuous() {
-    //   node *pre = tail, *cur = head;
-
-      node _tail(*tail);
-      _tail.pos -= PIXELS;
+      node _tail(*tail); _tail.pos -= PIXELS;
+      node _head(*head); _head.pos += PIXELS;
       node *pre = &_tail, *cur = head;
+      
+      tail->next=&_head;
       
       do {
         int8_t newlum = cur->lum + 1;
@@ -95,7 +92,9 @@ struct Ring {
         }        
         cur->lum = newlum;
         pre = cur; cur = cur->next;
-      } while(cur->next != head);
+      } while(cur != tail);
+      
+      if (tail->next == &_head) tail->next=head;
     }
     
     void printContinuous() {
@@ -124,10 +123,10 @@ struct Ring {
         uint8_t disp = abs(lum);
         if (disp < 128) disp <<= 1;
         else disp = 255;
-        printf("\033[38;2;%d;%d;%dm", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
-        std::cout << val2block(disp);
-        printf("\033[0m");
-        // printf("\033[48;2;%d;%d;%dm \033[0m", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
+        // printf("\033[38;2;%d;%d;%dm", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
+        // std::cout << val2block(disp);
+        // printf("\033[0m");
+        printf("\033[48;2;%d;%d;%dm \033[0m", uint16_t(R * disp) >> 8, uint16_t(G * disp) >> 8, uint16_t(B * disp) >> 8);
     } //]]
     
     uint8_t printGradient(node* A, node* B) {
