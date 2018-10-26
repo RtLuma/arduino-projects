@@ -44,9 +44,15 @@ void receiveEvent(byte length) {
           break;
         }
       case 'p': {
-          if (value > MAX_SPARKLES) break;
-          if (value > P) sparkles.populate(value);
-          else           sparkles.terminate(value);
+          if (value > MAX_SPARKLES || value < 5) break;
+          if (value > P) {
+            if (mode == monoDiscrete || mode == monoContinuous) mleds.populate(P);
+            if (mode == rgbContinuous) rgbing.populate(P);
+          }
+          else {
+            if (mode == monoDiscrete || mode == monoContinuous) mleds.terminate(P);
+            if (mode == rgbContinuous) rgbing.terminate(P);
+          }
           P = value;
           EEPROM.write(e_per, P);
           break;
@@ -90,7 +96,8 @@ void setup() {
   FFT.begin();  // Init Audio-Spectrum shield
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
-  if (mode == sparkle) sparkles.populate(P);
+  if (mode == monoDiscrete || mode == monoContinuous) mleds.populate(P);
+  if (mode == rgbContinuous) rgbing.populate(P);
 
   ledsetup();
   //    showColor(0, 0, 0); //blank the display

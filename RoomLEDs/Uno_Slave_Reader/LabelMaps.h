@@ -18,7 +18,7 @@ enum EEPROM_ADDRESS {
    Best alternative is a 1:1 array correspondence.
 */
 const char modeLabels[] = {
-   'f'//ill color
+   'G'//radient (rainbow)
   ,'s'//parkle
   ,'g'//radient
   ,'v'//isualizer 
@@ -26,20 +26,22 @@ const char modeLabels[] = {
   ,'t'//heater chase
   ,'r'//ainbow gradient
   ,'R'//ainbow fill
+  ,'f'//ill color
 
   //Eye mode?
   //Paintball?
   //Traffic?
 };
 const modePointer modes[] = {
-  []() { showColor(R, G, B); delay(100);},
-  sparkle,
-  gradient,
-  []() { solidVisualizer(); visualizer(); },
-  []() { chromaVisualizer(); visualizer(); },
-  theaterChase,
-  rainbowGradient,
-  rainbowSolid,
+  rgbContinuous,                              //G
+  monoDiscrete,                               //s
+  monoContinuous,                             //g
+  []() { solidVisualizer(); visualizer(); },  //v
+  []() { chromaVisualizer(); visualizer(); }, //V
+  theaterChase,                               //t
+  rainbowGradient,                            //r
+  rainbowSolid,                               //R
+  []() { showColor(R, G, B); delay(100);},    //f
 };
 
 int8_t label2modeIndex(char label) {
@@ -97,4 +99,3 @@ int8_t label2modeIndex(char label) {
 //  ,'p'//eriod     -> EEPROM_CYCLE_REPS_ADDR
 //  ,'w'//idth      -> EEPROM_SPACING_ADDR
 //};
-
