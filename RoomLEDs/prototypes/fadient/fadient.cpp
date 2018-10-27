@@ -11,6 +11,7 @@ struct winsize w;
 
 uint16_t SPARKLES;
 uint16_t PIXELS;
+uint8_t HEIGHT;
 uint8_t R, G, B;
 voidF display;
 
@@ -23,8 +24,8 @@ int main() {
     srand(time(NULL));
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
     PIXELS = w.ws_col;
-    // SPARKLES = PIXELS/10;
-    SPARKLES = 21;
+    SPARKLES = PIXELS/10;
+    // SPARKLES = 21;
     srand(time(NULL));
     R = 255; G = 64; B = 32;
     // R = rand(); G = rand(); B = rand();
@@ -55,6 +56,10 @@ int main() {
         default:
             break;
     }
+    
+    // #define HEIGHT 5
+    HEIGHT = 1;
+    // HEIGHT = w.ws_row-1;
     
     while (true) {
         display();
