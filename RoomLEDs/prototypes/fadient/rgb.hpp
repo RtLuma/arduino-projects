@@ -18,11 +18,11 @@ struct RGBing {
         B.updateContinuous();
     }
     
-    static uint8_t getLum(int16_t lum) {
-        uint8_t disp = abs(lum);
-        if (disp < 128) disp <<= 1;
-        else disp = 255;
-        return disp;
+     static void printNode(uint16_t r, uint16_t g, uint16_t b) {
+        uint32_t _r = abs(r>>8); if (_r < 128) _r <<= 1; else _r = 255;
+        uint32_t _g = abs(g>>8); if (_g < 128) _g <<= 1; else _g = 255;
+        uint32_t _b = abs(b>>8); if (_b < 128) _b <<= 1; else _b = 255;
+        printf("\033[48;2;%d;%d;%dm \033[0m", _r,_g,_b);
     }
     
     void display(void) {
@@ -31,49 +31,46 @@ struct RGBing {
                 *Bp=B.head;
         
         uint16_t r,  g,  b,
+                 rB, gB, bB;
+                
+        int16_t  Rs, Gs, Bs,
                  Rd, Gd, Bd;
-        int16_t  Rs, Gs, Bs;
         
-        Rp->pos += PIXELS; node Ro(Ring::interpolate(R.tail, R.head, PIXELS), 0, R.head); node Rf(Ro.lum,PIXELS-1,&Ro); Rp->pos -= PIXELS;
-        Gp->pos += PIXELS; node Go(Ring::interpolate(G.tail, G.head, PIXELS), 0, G.head); node Gf(Go.lum,PIXELS-1,&Go); Gp->pos -= PIXELS;
-        Bp->pos += PIXELS; node Bo(Ring::interpolate(B.tail, B.head, PIXELS), 0, B.head); node Bf(Bo.lum,PIXELS-1,&Bo); Bp->pos -= PIXELS;
-        
-        if (Rp->pos) Rp = &Ro; 
-        if (Gp->pos) Gp = &Go; 
-        if (Bp->pos) Bp = &Bo;
-        
-        if (R.tail->pos != PIXELS-1) R.tail->next=&Rf;
-        if (G.tail->pos != PIXELS-1) G.tail->next=&Gf;
-        if (B.tail->pos != PIXELS-1) B.tail->next=&Bf;
-        
-        r=abs(Rp->lum)<<8;
-        g=abs(Gp->lum)<<8;
-        b=abs(Bp->lum)<<8;
-        
-        Rd=abs(Rp->next->pos - Rp->pos);
-        Gd=abs(Gp->next->pos - Gp->pos);
-        Bd=abs(Bp->next->pos - Bp->pos);
-        
-        Rs=((abs(Rp->next->lum)<<8) - r)/Rd;
-        Gs=((abs(Gp->next->lum)<<8) - g)/Gd;
-        Bs=((abs(Bp->next->lum)<<8) - b)/Bd;
+        #define ORIGIN(C, Cp, Co, Cf)\
+        Cp->pos += PIXELS;\
+        node Co(Ring::interpolate(C.tail, C.head, PIXELS), 0, C.head);\
+        node Cf(Co.lum,PIXELS-1,&Co);\
+        Cp->pos -= PIXELS;\
+        if (Cp->pos) Cp = &Co;\
+        if (C.tail->pos != PIXELS-1) C.tail->next=&Cf;\
+
+        ORIGIN(R, Rp, Ro, Rf)
+        ORIGIN(G, Gp, Go, Gf)
+        ORIGIN(B, Bp, Bo, Bf)
+
+        #define DERIVE(CP, CD, CS, c, cb)\
+        CD=CP->next->pos - CP->pos;\
+        c=abs(CP->lum)<<8;\
+        cb=abs(CP->next->lum)<<8;\
+        CS=(int16_t)cb - (int16_t)c;\
+        CS/=CD;\
+        CP=CP->next;\
+
+        DERIVE(Rp, Rd, Rs, r, rB)
+        DERIVE(Gp, Gd, Gs, g, gB)
+        DERIVE(Bp, Bd, Bs, b, bB)
 
         for (uint16_t p = 0; p < PIXELS; p++) { 
-            bool Rb=!(--Rd);
-            if (Rb) { Rp=Rp->next;r=abs(Rp->lum)<<8;Rd=Rp->next->pos - Rp->pos;Rs=((abs(Rp->next->lum)<<8)-r)/Rd;}
-            if (!(--Gd)) { Gp=Gp->next;g=abs(Gp->lum)<<8;Gd=Gp->next->pos - Gp->pos;Gs=((abs(Gp->next->lum)<<8)-g)/Gd;}
-            if (!(--Bd)) { Bp=Bp->next;b=abs(Bp->lum)<<8;Bd=Bp->next->pos - Bp->pos;Bs=((abs(Bp->next->lum)<<8)-b)/Bd;}
+
+            bool Rb = !(--Rd);
+            bool Gb = !(--Gd);
+            bool Bb = !(--Bd);
             
-            printf("\033[48;2;%d;%d;%dm \033[0m",
-                // Rb ? 255 : getLum(r>>8),
-                // Rb ? 255 : 0,
-                // Rb ? 255 : 0
-                
-                getLum(r>>8),
-                getLum(g>>8),
-                getLum(b>>8)
-                
-            );
+            if (Rb) { DERIVE(Rp, Rd, Rs, r, rB) }
+            if (Gb) { DERIVE(Gp, Gd, Gs, g, gB) }
+            if (Bb) { DERIVE(Bp, Bd, Bs, b, bB) }
+            
+            printNode(r, g, b);
             
             r += Rs;
             g += Gs;
@@ -83,8 +80,8 @@ struct RGBing {
         R.tail->next=R.head;
         G.tail->next=G.head;
         B.tail->next=B.head;
-        
     }
+
 } rgbing;
 
 void rgbContinuous(void) { 
