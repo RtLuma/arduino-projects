@@ -77,7 +77,7 @@ void receiveEvent(byte length) {
 
 void setup() {
   Serial.begin(9600);
-  randomSeed(analogRead(0));
+  
 
   uint8_t EEPROM_RAW[e_STORED_ARGM_NUM];
   for (uint8_t i = 0; i < e_STORED_ARGM_NUM; i++) EEPROM_RAW[i] = EEPROM.read(i);
@@ -89,6 +89,8 @@ void setup() {
   F = EEPROM_RAW[e_freq];
   P = EEPROM_RAW[e_per];
   W = EEPROM_RAW[e_width];
+
+  randomSeed(analogRead(0) * analogRead(1) * analogRead(2) + R + G + B + F + P + W);
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event

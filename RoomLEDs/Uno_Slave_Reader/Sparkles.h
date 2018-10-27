@@ -255,63 +255,71 @@ struct RGBing {
         return disp;
     }
     
+    static void printNode(uint16_t r, uint16_t g, uint16_t b) {
+        uint32_t _r = abs(r>>8); if (_r < 128) _r <<= 1; else _r = 255; _r = sq(_r);
+        uint32_t _g = abs(g>>8); if (_g < 128) _g <<= 1; else _g = 255; _g = sq(_g);
+        uint32_t _b = abs(b>>8); if (_b < 128) _b <<= 1; else _b = 255; _b = sq(_b);
+//        send2Pixels(_r,_g,_b);
+        send2Pixels(_r>>8,_g>>8,_b>>8);
+    }
+    
     void display(void) {
         node    *Rp=R.head,
                 *Gp=G.head,
                 *Bp=B.head;
         
-        uint16_t r,  g,  b;
+        uint16_t r,  g,  b,
+                 rB, gB, bB;
                 
         int16_t  Rs, Gs, Bs,
                  Rd, Gd, Bd;
         
-        Rp->pos += PIXELS;
-        Gp->pos += PIXELS;
-        Bp->pos += PIXELS;
+        #define ORIGIN(C, Cp, Co, Cf)\
+        Cp->pos += PIXELS;\
+        node Co(Ring::interpolate(C.tail, C.head, PIXELS), 0, C.head);\
+        node Cf(Co.lum,PIXELS-1,&Co);\
+        Cp->pos -= PIXELS;\
+        if (Cp->pos) Cp = &Co;\
+        if (C.tail->pos != PIXELS-1) C.tail->next=&Cf;\
 
-        node Ro(Ring::interpolate(R.tail, R.head, PIXELS), 0, R.head);
-        node Go(Ring::interpolate(G.tail, G.head, PIXELS), 0, G.head);
-        node Bo(Ring::interpolate(B.tail, B.head, PIXELS), 0, B.head);
+        
 
-        node Rf(Ro.lum,PIXELS-1,&Ro);
-        node Gf(Go.lum,PIXELS-1,&Go);
-        node Bf(Bo.lum,PIXELS-1,&Bo);
+        ORIGIN(R, Rp, Ro, Rf)
+        ORIGIN(G, Gp, Go, Gf)
+        ORIGIN(B, Bp, Bo, Bf)
 
-        Rp->pos -= PIXELS;
-        Gp->pos -= PIXELS;
-        Bp->pos -= PIXELS;
+
+        #define DERIVE(CP, CD, CS, c, cb)\
+        CD=CP->next->pos - CP->pos;\
+        c=abs(CP->lum)<<8;\
+        cb=abs(CP->next->lum)<<8;\
+        CS=(int16_t)cb - (int16_t)c;\
+        CS/=CD;\
+        CP=CP->next;\
         
-        if (Rp->pos) Rp = &Ro; 
-        if (Gp->pos) Gp = &Go; 
-        if (Bp->pos) Bp = &Bo;
-        
-        if (R.tail->pos != PIXELS-1) R.tail->next=&Rf;
-        if (G.tail->pos != PIXELS-1) G.tail->next=&Gf;
-        if (B.tail->pos != PIXELS-1) B.tail->next=&Bf;
-        
-        r=abs(Rp->lum)<<8;
-        g=abs(Gp->lum)<<8;
-        b=abs(Bp->lum)<<8;
-        
-        Rd=abs((int16_t)Rp->next->pos - (int16_t)Rp->pos);
-        Gd=abs((int16_t)Gp->next->pos - (int16_t)Gp->pos);
-        Bd=abs((int16_t)Bp->next->pos - (int16_t)Bp->pos);
-        
-        Rs=((abs(Rp->next->lum)<<8) - r)/Rd;
-        Gs=((abs(Gp->next->lum)<<8) - g)/Gd;
-        Bs=((abs(Bp->next->lum)<<8) - b)/Bd;
+
+
+        DERIVE(Rp, Rd, Rs, r, rB)
+        DERIVE(Gp, Gd, Gs, g, gB)
+        DERIVE(Bp, Bd, Bs, b, bB)
 
         for (uint16_t p = 0; p < PIXELS; p++) { 
+
+            bool Rb = !(--Rd);
+            bool Gb = !(--Gd);
+            bool Bb = !(--Bd);
             
-            if (!(--Rd)) { Rp=Rp->next;r=abs(Rp->lum)<<8;Rd=(int16_t)Rp->next->pos - (int16_t)Rp->pos;Rs=((abs(Rp->next->lum)<<8)-r)/Rd;}
-            if (!(--Gd)) { Gp=Gp->next;g=abs(Gp->lum)<<8;Gd=(int16_t)Gp->next->pos - (int16_t)Gp->pos;Gs=((abs(Gp->next->lum)<<8)-g)/Gd;}
-            if (!(--Bd)) { Bp=Bp->next;b=abs(Bp->lum)<<8;Bd=(int16_t)Bp->next->pos - (int16_t)Bp->pos;Bs=((abs(Bp->next->lum)<<8)-b)/Bd;}
+            if (Rb) { DERIVE(Rp, Rd, Rs, r, rB) }
+            if (Gb) { DERIVE(Gp, Gd, Gs, g, gB) }
+            if (Bb) { DERIVE(Bp, Bd, Bs, b, bB) }
             
-            send2Pixels(
-                getLum(r>>8),
-                getLum(g>>8),
-                getLum(b>>8)
-            );
+//            send2Pixels(
+//                getLum(r>>8),
+//                getLum(g>>8),
+//                getLum(b>>8)
+//            );
+            printNode(r, g, b);
+//            printNode(Rb ? 255:r, Gb ? 255:g, Bb ? 255:b);
             
             r += Rs;
             g += Gs;
@@ -331,4 +339,4 @@ RGBing rgbing;
 
 void monoDiscrete  (void) { mleds.updateDiscrete();   mleds.printDiscrete();   delayMicroseconds(MAX_SPARKLES - P); }
 void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous();  }
-void rgbContinuous (void) { rgbing.update();          rgbing.display();         }
+void rgbContinuous (void) { rgbing.update();          rgbing.display();        delayMicroseconds(MAX_SPARKLES - P); }
