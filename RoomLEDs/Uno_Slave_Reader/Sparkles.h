@@ -26,12 +26,13 @@ struct Ring {
         tail = head;
         nodes = 1;
     }
-        
+    
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(PIXELS), random(255)); }
+//    void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(PIXELS), random(255)); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
     static int8_t interpolate(node* A, node* B, uint16_t pos) {
-        uint16_t dist = (int16_t)B->pos - (int16_t)A->pos;
+        int16_t dist = (int16_t)B->pos - (int16_t)A->pos;
         if (!dist) return 0;
         uint16_t lum = abs(A->lum) << 8;
         uint16_t dFromA = pos - A->pos;
@@ -52,7 +53,7 @@ struct Ring {
         uint32_t disp = abs(lum);
         if (disp < 128) disp <<= 1;
         else disp = 255;
-        disp *= disp;
+        disp = sq(disp);
         send2Pixels(
             (uint32_t(disp) * R) >> 16,
             (uint32_t(disp) * G) >> 16,
@@ -76,8 +77,11 @@ struct Ring {
         int8_t newlum = n->lum + 1;
         
         if (n->lum<0 && newlum>-1) {
-          uint16_t del_pos = n->pos; n = n->next; remove(del_pos);
-          bool reinject; do { reinject = !insert(random(PIXELS), 0); } while (reinject);
+          uint16_t del_pos = n->pos;
+          n = n->next;
+          remove(del_pos);
+          bool reinject;
+          do { reinject = !insert(random(PIXELS), 0); } while (reinject);
           continue;
         }        
         n->lum = newlum;
@@ -99,17 +103,17 @@ struct Ring {
     
     void updateContinuous() {
       node _tail(*tail); _tail.pos -= PIXELS;
-    //   node _head(*head); _head.pos += PIXELS;
+//      node _head(*head); _head.pos += PIXELS;
       node *pre = &_tail, *cur = head;
       
-    //   tail->next=&_head;
+//       tail->next=&_head;
       
       do {
         int8_t newlum = cur->lum + 1;
         
         if (!(abs(newlum) - abs(interpolate(pre, cur->next, cur->pos)))) {
           uint16_t del_pos = cur->pos; cur = cur->next; remove(del_pos);
-          bool reinject; do { del_pos = random(PIXELS); reinject = !inject(del_pos); } while (reinject);
+          bool reinject; do { reinject = !inject(random(PIXELS)); } while (reinject);
           continue;
         }        
         cur->lum = newlum;
@@ -127,11 +131,11 @@ struct Ring {
         
         uint16_t p=0;
         
-        n=&origin;
-        p=printGradient(n, head);
-        n=head;
+        if (head->pos) n=&origin;
+//        p=printGradient(n, head);
+//        n=head;
                 
-        for (; n->next != head;) {
+        for (; n != tail;) {
             p += printGradient(n, n->next);
             n=n->next;
         }
@@ -256,13 +260,26 @@ struct RGBing {
                 *Gp=G.head,
                 *Bp=B.head;
         
-        uint16_t r,  g,  b,
+        uint16_t r,  g,  b;
+                
+        int16_t  Rs, Gs, Bs,
                  Rd, Gd, Bd;
-        int16_t  Rs, Gs, Bs;
         
-        Rp->pos += PIXELS; node Ro(Ring::interpolate(R.tail, R.head, PIXELS), 0, R.head); node Rf(Ro.lum,PIXELS-1,&Ro); Rp->pos -= PIXELS;
-        Gp->pos += PIXELS; node Go(Ring::interpolate(G.tail, G.head, PIXELS), 0, G.head); node Gf(Go.lum,PIXELS-1,&Go); Gp->pos -= PIXELS;
-        Bp->pos += PIXELS; node Bo(Ring::interpolate(B.tail, B.head, PIXELS), 0, B.head); node Bf(Bo.lum,PIXELS-1,&Bo); Bp->pos -= PIXELS;
+        Rp->pos += PIXELS;
+        Gp->pos += PIXELS;
+        Bp->pos += PIXELS;
+
+        node Ro(Ring::interpolate(R.tail, R.head, PIXELS), 0, R.head);
+        node Go(Ring::interpolate(G.tail, G.head, PIXELS), 0, G.head);
+        node Bo(Ring::interpolate(B.tail, B.head, PIXELS), 0, B.head);
+
+        node Rf(Ro.lum,PIXELS-1,&Ro);
+        node Gf(Go.lum,PIXELS-1,&Go);
+        node Bf(Bo.lum,PIXELS-1,&Bo);
+
+        Rp->pos -= PIXELS;
+        Gp->pos -= PIXELS;
+        Bp->pos -= PIXELS;
         
         if (Rp->pos) Rp = &Ro; 
         if (Gp->pos) Gp = &Go; 
@@ -276,9 +293,9 @@ struct RGBing {
         g=abs(Gp->lum)<<8;
         b=abs(Bp->lum)<<8;
         
-        Rd=abs(Rp->next->pos - Rp->pos);
-        Gd=abs(Gp->next->pos - Gp->pos);
-        Bd=abs(Bp->next->pos - Bp->pos);
+        Rd=abs((int16_t)Rp->next->pos - (int16_t)Rp->pos);
+        Gd=abs((int16_t)Gp->next->pos - (int16_t)Gp->pos);
+        Bd=abs((int16_t)Bp->next->pos - (int16_t)Bp->pos);
         
         Rs=((abs(Rp->next->lum)<<8) - r)/Rd;
         Gs=((abs(Gp->next->lum)<<8) - g)/Gd;
@@ -313,5 +330,5 @@ Ring mleds;
 RGBing rgbing;
 
 void monoDiscrete  (void) { mleds.updateDiscrete();   mleds.printDiscrete();   delayMicroseconds(MAX_SPARKLES - P); }
-void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous(); delayMicroseconds(MAX_SPARKLES - P); }
-void rgbContinuous (void) { rgbing.update();          rgbing.display();        delayMicroseconds(MAX_SPARKLES - P); }
+void monoContinuous(void) { mleds.updateContinuous(); mleds.printContinuous();  }
+void rgbContinuous (void) { rgbing.update();          rgbing.display();         }
