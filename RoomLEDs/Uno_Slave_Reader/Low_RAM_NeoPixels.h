@@ -1,5 +1,6 @@
 #define PIXELS 298  // Number of pixels in the string
 #define PIXELS2 298
+#define ALLPIXELS PIXELS + IRIS
 #define SCLERA PIXELS
 #define IRIS 194
 #define PUPIL 104
@@ -230,9 +231,3 @@ void rainbowGradient(void) {
     sendPixel2(rainbow(h), rainbow(h - 85), rainbow(h - 170));
   }
 }
-
-
-
-
-
-
