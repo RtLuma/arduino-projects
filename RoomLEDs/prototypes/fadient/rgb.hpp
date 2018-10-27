@@ -62,13 +62,9 @@ struct RGBing {
 
         for (uint16_t p = 0; p < PIXELS; p++) { 
 
-            bool Rb = !(--Rd);
-            bool Gb = !(--Gd);
-            bool Bb = !(--Bd);
-            
-            if (Rb) { DERIVE(Rp, Rd, Rs, r, rB) }
-            if (Gb) { DERIVE(Gp, Gd, Gs, g, gB) }
-            if (Bb) { DERIVE(Bp, Bd, Bs, b, bB) }
+            if (!(--Rd)) { DERIVE(Rp, Rd, Rs, r, rB) }
+            if (!(--Gd)) { DERIVE(Gp, Gd, Gs, g, gB) }
+            if (!(--Bd)) { DERIVE(Bp, Bd, Bs, b, bB) }
             
             printNode(r, g, b);
             
