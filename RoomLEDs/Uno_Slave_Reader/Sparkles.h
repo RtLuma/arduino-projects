@@ -21,11 +21,7 @@ struct Ring {
     
     node *head; node *tail; uint8_t nodes;
     
-    Ring() {
-        head = new node;
-        tail = head;
-        nodes = 1;
-    }
+    Ring() { head = new node; tail = head; nodes = 1; }
     
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(PIXELS), random(255)); }
 //    void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(PIXELS), random(255)); }
