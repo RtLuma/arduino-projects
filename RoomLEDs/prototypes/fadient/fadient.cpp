@@ -15,7 +15,7 @@ uint8_t R, G, B;
 voidF display;
 
 #define DISCRETE false
-#define TRICHROMATIC true
+#define TRICHROMATIC false
 
 //https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html
 
@@ -60,7 +60,6 @@ int main() {
         display();
         fflush(stdout);
         usleep(25000);
->>>>>>> b511d680a7ae3708a3fc1b8a8fda904f7543ed18
         printf("\n");
     }
 }

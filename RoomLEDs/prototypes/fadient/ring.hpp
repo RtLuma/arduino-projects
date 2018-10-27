@@ -76,10 +76,10 @@ struct Ring {
     
     void updateContinuous() {
       node _tail(*tail); _tail.pos -= PIXELS;
-      node _head(*head); _head.pos += PIXELS;
+    //   node _head(*head); _head.pos += PIXELS;
       node *pre = &_tail, *cur = head;
       
-      tail->next=&_head;
+    //   tail->next=&_head;
       
       do {
         int8_t newlum = cur->lum + 1;
@@ -93,7 +93,7 @@ struct Ring {
         pre = cur; cur = cur->next;
       } while(cur != tail);
       
-      if (tail->next == &_head) tail->next=head;
+    //   if (tail->next == &_head) tail->next=head;
     }
     
     void printContinuous() {
@@ -132,8 +132,8 @@ struct Ring {
         uint16_t lum = abs(A->lum) << 8; uint16_t dist = B->pos - A->pos;
         if (!dist) return 0;
         int16_t lum_step = int16_t(abs(B->lum<<8) - lum)/dist;
-        uint16_t p = 1;
-        printNode(127);
+        uint16_t p = 0;
+        // printNode(127);
         for (; p < dist; p++) { printNode(lum>>8); lum += lum_step; }
         return dist;
     }
