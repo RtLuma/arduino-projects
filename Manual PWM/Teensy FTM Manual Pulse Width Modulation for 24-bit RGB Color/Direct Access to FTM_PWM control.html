@@ -1,0 +1,1581 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0069)https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en" id="vbulletin_html"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+	<!-- BEGIN TEMPLATE: headinclude -->
+
+<meta id="e_vb_meta_bburl" name="vb_meta_bburl" content="https://forum.pjrc.com">
+<!--<base href="https://forum.pjrc.com/">--><base href="."><!--[if IE]></base><![endif]-->
+<meta name="generator" content="vBulletin 4.2.2">
+<meta http-equiv="X-UA-Compatible" content="IE=9">
+
+	<link rel="Shortcut Icon" href="https://forum.pjrc.com/favicon.ico" type="image/x-icon">
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+<!--
+	if (typeof YAHOO === 'undefined') // Load ALL YUI Local
+	{
+		document.write('<script type="text/javascript" src="clientscript/yui/yuiloader-dom-event/yuiloader-dom-event.js?v=422"><\/script>');
+		document.write('<script type="text/javascript" src="clientscript/yui/connection/connection-min.js?v=422"><\/script>');
+		var yuipath = 'clientscript/yui';
+		var yuicombopath = '';
+		var remoteyui = false;
+	}
+	else	// Load Rest of YUI remotely (where possible)
+	{
+		var yuipath = 'clientscript/yui';
+		var yuicombopath = '';
+		var remoteyui = true;
+		if (!yuicombopath)
+		{
+			document.write('<script type="text/javascript" src="clientscript/yui/connection/connection-min.js?v=422"><\/script>');
+		}
+	}
+	var SESSIONURL = "s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&";
+	var SECURITYTOKEN = "guest";
+	var IMGDIR_MISC = "images/misc";
+	var IMGDIR_BUTTON = "images/buttons";
+	var vb_disable_ajax = parseInt("0", 10);
+	var SIMPLEVERSION = "422";
+	var BBURL = "https://forum.pjrc.com";
+	var LOGGEDIN = 0 > 0 ? true : false;
+	var THIS_SCRIPT = "showthread";
+	var RELPATH = "threads/31596-Direct-Access-to-FTM-PWM-control";
+	var PATHS = {
+		forum : "",
+		cms   : "",
+		blog  : ""
+	};
+	var AJAXBASEURL = "https://forum.pjrc.com/";
+// -->
+</script><script type="text/javascript" src="./Direct Access to FTM_PWM control_files/yuiloader-dom-event.js"></script><script type="text/javascript" src="./Direct Access to FTM_PWM control_files/connection-min.js"></script>
+<script type="text/javascript" src="./Direct Access to FTM_PWM control_files/vbulletin-core.js"></script>
+
+
+
+	<link rel="alternate" type="application/rss+xml" title="PJRC (Teensy) Forum RSS Feed" href="https://forum.pjrc.com/external.php?type=RSS2">
+	
+		<link rel="alternate" type="application/rss+xml" title="PJRC (Teensy) Forum - Technical Support &amp; Questions - RSS Feed" href="https://forum.pjrc.com/external.php?type=RSS2&amp;forumids=3">
+	
+
+
+
+	<link rel="stylesheet" type="text/css" href="./Direct Access to FTM_PWM control_files/css.php">
+
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="css.php?styleid=1&amp;langid=1&amp;d=1478870520&amp;td=ltr&amp;sheet=popupmenu-ie.css,vbulletin-ie.css,vbulletin-chrome-ie.css,vbulletin-formcontrols-ie.css,editor-ie.css" />
+	<![endif]-->
+
+
+<!-- END TEMPLATE: headinclude -->
+	<meta name="keywords" content="ftm0_mode, setup, access, direct, aligned, port_pcr_sre, port_pcr_mux4, //write, ftm0_c4sc, port_pcr_dse, enable, ftm0_mod, ftm_mode_ftmen, ftm0_cntin, ftm0_c4v, ftm_mode_wpdis, //edge, ftm0_outmask, outputs, //allow, combine, ftm0_combine, ftm0_pwmload, 0x2f, ftm0_cnt, ftm_sync_swsync, ftm0_sync, ftm0_outinit, needed, prescaler, portd_pcr4, clock, //system, ftm_csc_elsa, ftm0_sc, ftm_sc_clks1, //not, ftm_sc_ps7, ftm_csc_msb, void, interrupt, routine, quick, project, control, ftm/pwm, teensy, port, updates, frequently">
+	<meta name="description" content="Hello, 
+ 
+I&#39;ve just got a Teensy 3.2 and am trying to port a project from a Due where I do PWM that changes from an interrupt routine. I&#39;d like this to be as quick as possible as it updates frequently so I&#39;d like to access the registers direct. 
+ 
+So far I&#39;m trying to get pin 6 to do PWM but I can&#39;t get it to work. The pin just goes high after a reset. I&#39;m probably missing something obvious... 
+ 
+void setup() { 
+  // put your setup code here, to run once: 
+ 
+  SIM_SCGC6 |= SIM_SCGC6_FTM0;">
+
+	<title> Direct Access to FTM/PWM control</title>
+	<link rel="canonical" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+		<link rel="stylesheet" type="text/css" href="./Direct Access to FTM_PWM control_files/css(1).php">
+	
+	<!--[if lt IE 8]><link rel="stylesheet" type="text/css" href="css.php?styleid=1&amp;langid=1&amp;d=1478870520&amp;td=ltr&amp;sheet=toolsmenu-ie.css,postlist-ie.css,showthread-ie.css,postbit-ie.css,poll-ie.css" /><![endif]-->
+<!-- BEGIN TEMPLATE: headinclude_bottom -->
+<link rel="stylesheet" type="text/css" href="./Direct Access to FTM_PWM control_files/css(2).php">
+
+<!-- END TEMPLATE: headinclude_bottom -->
+</head>
+
+<body>
+
+<!-- BEGIN TEMPLATE: header -->
+<div class="above_body"> <!-- closing tag is in template navbar -->
+<div id="header" class="floatcontainer doc_header">
+	<div><a name="top" href="https://forum.pjrc.com/forum.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="logo-image"><img src="./Direct Access to FTM_PWM control_files/vbulletin4_logo.png" alt="PJRC (Teensy) Forum - Powered by vBulletin" title="PJRC (Teensy) Forum - Powered by vBulletin"></a></div>
+	<div id="toplinks" class="toplinks">
+		
+			<ul class="nouser">
+			
+				<li><a href="https://forum.pjrc.com/register.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" rel="nofollow">Register</a></li>
+			
+				<li><a rel="help" href="https://forum.pjrc.com/faq.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Help</a></li>
+				<li>
+			<script type="text/javascript" src="./Direct Access to FTM_PWM control_files/vbulletin_md5.js"></script>
+			<form id="navbar_loginform" action="https://forum.pjrc.com/login.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=login" method="post" onsubmit="md5hash(vb_login_password, vb_login_md5password, vb_login_md5password_utf, 0)">
+				<fieldset id="logindetails" class="logindetails">
+					<div>
+						<div>
+					<input type="text" class="textbox default-value" name="vb_login_username" id="navbar_username" size="10" accesskey="u" tabindex="101" value="User Name">
+					<input type="password" class="textbox" tabindex="102" name="vb_login_password" id="navbar_password" size="10" style="display: none;">
+					<input type="text" class="textbox default-value" tabindex="102" name="vb_login_password_hint" id="navbar_password_hint" size="10" value="Password" style="display: inline;">
+					<input type="submit" class="loginbutton" tabindex="104" value="Log in" title="Enter your username and password in the boxes provided to login, or click the &#39;register&#39; button to create a profile for yourself." accesskey="s">
+						</div>
+					</div>
+				</fieldset>
+				<div id="remember" class="remember">
+					<label for="cb_cookieuser_navbar"><input type="checkbox" name="cookieuser" value="1" id="cb_cookieuser_navbar" class="cb_cookieuser_navbar" accesskey="c" tabindex="103"> Remember Me?</label>
+				</div>
+
+				<input type="hidden" name="s" value="3cb2d1b0df1d0ffe2c24fecbe3e9ded1">
+				<input type="hidden" name="securitytoken" value="guest">
+				<input type="hidden" name="do" value="login">
+				<input type="hidden" name="vb_login_md5password">
+				<input type="hidden" name="vb_login_md5password_utf">
+			</form>
+			<script type="text/javascript">
+			YAHOO.util.Dom.setStyle('navbar_password_hint', "display", "inline");
+			YAHOO.util.Dom.setStyle('navbar_password', "display", "none");
+			vB_XHTML_Ready.subscribe(function()
+			{
+			//
+				YAHOO.util.Event.on('navbar_username', "focus", navbar_username_focus);
+				YAHOO.util.Event.on('navbar_username', "blur", navbar_username_blur);
+				YAHOO.util.Event.on('navbar_password_hint', "focus", navbar_password_hint);
+				YAHOO.util.Event.on('navbar_password', "blur", navbar_password);
+			});
+			
+			function navbar_username_focus(e)
+			{
+			//
+				var textbox = YAHOO.util.Event.getTarget(e);
+				if (textbox.value == 'User Name')
+				{
+				//
+					textbox.value='';
+					textbox.style.color='#000000';
+				}
+			}
+
+			function navbar_username_blur(e)
+			{
+			//
+				var textbox = YAHOO.util.Event.getTarget(e);
+				if (textbox.value == '')
+				{
+				//
+					textbox.value='User Name';
+					textbox.style.color='#777777';
+				}
+			}
+			
+			function navbar_password_hint(e)
+			{
+			//
+				var textbox = YAHOO.util.Event.getTarget(e);
+				
+				YAHOO.util.Dom.setStyle('navbar_password_hint', "display", "none");
+				YAHOO.util.Dom.setStyle('navbar_password', "display", "inline");
+				YAHOO.util.Dom.get('navbar_password').focus();
+			}
+
+			function navbar_password(e)
+			{
+			//
+				var textbox = YAHOO.util.Event.getTarget(e);
+				
+				if (textbox.value == '')
+				{
+					YAHOO.util.Dom.setStyle('navbar_password_hint', "display", "inline");
+					YAHOO.util.Dom.setStyle('navbar_password', "display", "none");
+				}
+			}
+			</script>
+				</li>
+				
+			</ul>
+		
+	</div>
+	<div class="ad_global_header" style="display: none !important;">
+		<!-- BEGIN TEMPLATE: ad_global_header1 -->
+
+<!-- END TEMPLATE: ad_global_header1 -->
+		<!-- BEGIN TEMPLATE: ad_global_header2 -->
+
+<!-- END TEMPLATE: ad_global_header2 -->
+	</div>
+	<hr>
+</div>
+<!-- END TEMPLATE: header -->
+<!-- BEGIN TEMPLATE: navbar -->
+<div id="navbar" class="navbar">
+	<ul id="navtabs" class="navtabs floatcontainer">
+		
+		<!-- BEGIN TEMPLATE: navbar_tabs -->
+
+	
+		<li id="vbtab_whatsnew">
+			<a class="navtab" href="https://forum.pjrc.com/activity.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">What's New?</a>
+		</li>
+		
+		
+
+	
+		<li class="selected" id="vbtab_forum">
+			<a class="navtab" href="https://forum.pjrc.com/forum.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Forum</a>
+		</li>
+		
+		
+			<ul class="floatcontainer">
+				
+					
+						
+							<li id="vbflink_newposts"><a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=getnew&amp;contenttype=vBForum_Post">New Posts</a></li>
+						
+					
+				
+					
+						
+							<li id="vbflink_faq"><a href="https://forum.pjrc.com/faq.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">FAQ</a></li>
+						
+					
+				
+					
+						
+							<li id="vbflink_calendar"><a href="https://forum.pjrc.com/calendar.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Calendar</a></li>
+						
+					
+				
+					
+						<li class="popupmenu" id="vbmenu_community">
+							<a href="javascript://" class="popupctrl" id="yui-gen1">Community</a>
+							<ul class="popupbody" id="yui-gen0">
+								
+									<li id="vbclink_members"><a href="https://forum.pjrc.com/memberlist.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Member List</a></li>
+								
+							</ul>
+						</li>
+					
+				
+					
+						<li class="popupmenu" id="vbmenu_actions">
+							<a href="javascript://" class="popupctrl" id="yui-gen3">Forum Actions</a>
+							<ul class="popupbody" id="yui-gen2">
+								
+									<li id="vbalink_mfr"><a href="https://forum.pjrc.com/forumdisplay.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=markread&amp;markreadhash=guest">Mark Forums Read</a></li>
+								
+							</ul>
+						</li>
+					
+				
+					
+						<li class="popupmenu" id="vbmenu_qlinks">
+							<a href="javascript://" class="popupctrl" id="yui-gen5">Quick Links</a>
+							<ul class="popupbody" id="yui-gen4">
+								
+									<li id="vbqlink_posts"><a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=getdaily&amp;contenttype=vBForum_Post">Today's Posts</a></li>
+								
+									<li id="vbqlink_leaders"><a href="https://forum.pjrc.com/showgroups.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">View Site Leaders</a></li>
+								
+							</ul>
+						</li>
+					
+				
+			</ul>
+		
+
+<!-- END TEMPLATE: navbar_tabs -->
+		
+	</ul>
+	
+		<div id="globalsearch" class="globalsearch">
+			<form action="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=process" method="post" id="navbar_search" class="navbar_search">
+				
+				<input type="hidden" name="securitytoken" value="guest">
+				<input type="hidden" name="do" value="process">
+				<span class="textboxcontainer"><span><input type="text" value="" name="query" class="textbox" tabindex="99"></span></span>
+				<span class="buttoncontainer"><span><input type="image" class="searchbutton" src="./Direct Access to FTM_PWM control_files/search.png" name="submit" onclick="document.getElementById(&#39;navbar_search&#39;).submit;" tabindex="100"></span></span>
+			</form>
+			<ul class="navbar_advanced_search">
+				<li><a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" accesskey="4">Advanced Search</a></li>
+				
+			</ul>
+		</div>
+	
+</div>
+</div><!-- closing div for above_body -->
+
+<div class="body_wrapper">
+<div id="breadcrumb" class="breadcrumb">
+	<ul class="floatcontainer">
+		<li class="navbithome"><a href="https://forum.pjrc.com/index.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" accesskey="1"><img src="./Direct Access to FTM_PWM control_files/navbit-home.png" alt="Home" title="Home"></a></li>
+		<!-- BEGIN TEMPLATE: navbar_link -->
+
+	<li class="navbit"><a href="https://forum.pjrc.com/forum.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Forum</a></li>
+
+<!-- END TEMPLATE: navbar_link --><!-- BEGIN TEMPLATE: navbar_link -->
+
+	<li class="navbit"><a href="https://forum.pjrc.com/forums/1-Main-Category?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Main Category</a></li>
+
+<!-- END TEMPLATE: navbar_link --><!-- BEGIN TEMPLATE: navbar_link -->
+
+	<li class="navbit"><a href="https://forum.pjrc.com/forums/3-Technical-Support-amp-Questions?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Technical Support &amp; Questions</a></li>
+
+<!-- END TEMPLATE: navbar_link -->
+		<!-- BEGIN TEMPLATE: navbar_link -->
+
+	<li class="navbit lastnavbit"><span> Direct Access to FTM/PWM control</span></li>
+
+<!-- END TEMPLATE: navbar_link -->
+	</ul>
+	<hr>
+</div>
+
+<!-- BEGIN TEMPLATE: ad_navbar_below -->
+
+<!-- END TEMPLATE: ad_navbar_below -->
+<!-- BEGIN TEMPLATE: ad_global_below_navbar -->
+<div style="padding-top:15px; padding-bottom:15px; padding-left:30px; font-size: 1.25em">
+<b>Forum Rule</b>: Always post <span style="color:#C00000">complete source code</span> &amp; details to reproduce any issue!
+</div>
+<!-- END TEMPLATE: ad_global_below_navbar -->
+
+
+	<form action="https://forum.pjrc.com/profile.php?do=dismissnotice" method="post" id="notices" class="notices">
+		<input type="hidden" name="do" value="dismissnotice">
+		<input type="hidden" name="s" value="s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;">
+		<input type="hidden" name="securitytoken" value="guest">
+		<input type="hidden" id="dismiss_notice_hidden" name="dismiss_noticeid" value="">
+		<input type="hidden" name="url" value="">
+		<ol>
+			<!-- BEGIN TEMPLATE: navbar_noticebit -->
+<li class="restore" id="navbar_notice_1">
+	
+	If this is your first visit, be sure to
+		check out the <a href="https://forum.pjrc.com/faq.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" target="_blank"><b>FAQ</b></a> by clicking the
+		link above. You may have to <a href="https://forum.pjrc.com/register.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" target="_blank"><b>register</b></a>
+		before you can post: click the register link above to proceed. To start viewing messages,
+		select the forum that you want to visit from the selection below.
+</li>
+<!-- END TEMPLATE: navbar_noticebit -->
+		</ol>
+	</form>
+
+
+<!-- END TEMPLATE: navbar -->
+
+
+
+	<div id="above_postlist" class="above_postlist">
+		
+		<div id="pagination_top" class="pagination_top">
+		
+			<div id="postpagestats_above" class="postpagestats">
+				Results 1 to 5 of 5
+			</div>
+		</div>
+	</div>
+	<div id="pagetitle" class="pagetitle">
+		<h1>
+			Thread: <span class="threadtitle"><a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="Reload this Page">Direct Access to FTM/PWM control</a></span>
+		</h1>
+		
+	</div>
+	<div id="thread_controls" class="thread_controls toolsmenu">
+		<div>
+		<ul id="postlist_popups" class="postlist_popups popupgroup">
+			
+			
+			<li class="popupmenu" id="threadtools">
+				<h6><a class="popupctrl" href="javascript://" id="yui-gen7">Thread Tools</a></h6>
+				<ul class="popupbody" id="yui-gen6">
+					<li><a href="https://forum.pjrc.com/printthread.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;t=31596&amp;pp=25&amp;page=1" accesskey="3" rel="nofollow">Show Printable Version</a></li>
+					
+						<li><a href="https://forum.pjrc.com/sendmessage.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=sendtofriend&amp;t=31596" rel="nofollow">Email this Page…</a></li>
+					
+					<li>
+						
+							<a href="https://forum.pjrc.com/subscription.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=addsubscription&amp;t=31596" rel="nofollow">Subscribe to this Thread…</a>
+						
+					</li>
+					
+				</ul>
+			</li>
+
+			
+
+			
+				<li class="popupmenu searchthread menusearch" id="searchthread">
+					<h6><a class="popupctrl" href="javascript://" id="yui-gen9">Search Thread</a></h6>
+					<form action="https://forum.pjrc.com/search.php" method="post">
+						<ul class="popupbody" id="yui-gen8">
+							<li>
+								<input type="text" name="query" class="searchbox" value="Search..." tabindex="13">
+								<input type="submit" class="button" value="Search" tabindex="14">
+							</li>
+							<li class="formsubmit" id="popupsearch">
+								<div class="submitoptions">&nbsp;</div>
+								<div class="advancedsearchlink"><a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;search_type=1&amp;searchthreadid=31596&amp;contenttype=vBForum_Post">Advanced Search</a></div>
+							</li>
+						</ul>
+						<input type="hidden" name="s" value="3cb2d1b0df1d0ffe2c24fecbe3e9ded1">
+						<input type="hidden" name="securitytoken" value="guest">
+						<input type="hidden" name="do" value="process">
+						<input type="hidden" name="searchthreadid" value="31596">
+						<input type="hidden" name="search_type" value="1">
+						<input type="hidden" name="contenttype" value="vBForum_Post">
+					</form>
+				</li>
+			
+
+			
+
+			
+				<li class="popupmenu" id="displaymodes">
+					<h6><a class="popupctrl" href="javascript://" id="yui-gen11">Display</a></h6>
+					<ul class="popupbody" id="yui-gen10">
+						<li><label>Linear Mode</label></li>
+						<li><a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;mode=hybrid"> Switch to Hybrid Mode</a></li>
+						<li><a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88366&amp;mode=threaded#post88366"> Switch to Threaded Mode</a></li>
+					</ul>
+				</li>
+			
+
+			
+			</ul>
+		</div>
+	</div>
+
+<div id="postlist" class="postlist restrain">
+	
+
+	
+		<ol id="posts" class="posts" start="1">
+			<!-- BEGIN TEMPLATE: postbit_wrapper -->
+<!-- BEGIN TEMPLATE: postbit_legacy -->
+
+<li class="postbitlegacy postbitim postcontainer old" id="post_88366">
+<!-- see bottom of postbit.css for .userinfo .popupmenu styles -->
+
+	<div class="posthead">
+			<span class="postdate old">
+				
+					<span class="date">11-15-2015,&nbsp;<span class="time">06:10 PM</span></span>
+				
+			</span>
+			<span class="nodecontrols">
+				
+					<a name="post88366" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88366&amp;viewfull=1#post88366" class="postcounter">#1</a><a id="postcount88366" name="1"></a>
+				
+				
+				
+			</span>
+	</div>
+	<div class="postdetails">
+		<div class="userinfo">
+			<div class="username_container">
+			
+				<!-- BEGIN TEMPLATE: memberaction_dropdown -->
+<div class="popupmenu memberaction" id="yui-gen12">
+	<a class="username offline popupctrl" href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="dominicbeesley is offline" id="yui-gen14"><strong>dominicbeesley</strong></a>
+	<ul class="popupbody memberaction_body" id="yui-gen13">
+		<li class="left">
+			<a href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="siteicon_profile">
+				View Profile
+			</a>
+		</li>
+		
+		<li class="right">
+			<a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=finduser&amp;userid=41602&amp;contenttype=vBForum_Post&amp;showposts=1" class="siteicon_forum" rel="nofollow">
+				View Forum Posts
+			</a>
+		</li>
+		
+		
+		<li class="left">
+			<a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newpm&amp;u=41602" class="siteicon_message" rel="nofollow">
+				Private Message
+			</a>
+		</li>
+		
+		
+		
+		
+		
+		
+		
+
+		
+
+		
+		
+	</ul>
+</div>
+<!-- END TEMPLATE: memberaction_dropdown -->
+				<!-- BEGIN TEMPLATE: postbit_onlinestatus -->
+<img class="inlineimg onlinestatus" src="./Direct Access to FTM_PWM control_files/user-offline.png" alt="dominicbeesley is offline" border="0" title="dominicbeesley is offline">
+
+<!-- END TEMPLATE: postbit_onlinestatus -->
+			
+			</div>
+			<span class="usertitle">
+				Junior Member
+			</span>
+			
+			
+			
+			 
+			
+				<hr>
+				<dl class="userinfo_extra">
+					<dt>Join Date</dt> <dd>Nov 2015</dd>
+					
+					
+					<dt>Posts</dt> <dd>4</dd>	
+					
+				</dl>
+				
+				
+				<div class="imlinks">
+					    
+				</div>
+			
+		</div>
+		<div class="postbody">
+			<div class="postrow">
+				
+				
+				<h2 class="title icon">
+					Direct Access to FTM/PWM control
+				</h2>
+				
+
+
+						
+							
+							
+						
+						
+				<div class="content">
+					<div id="post_message_88366">
+						<blockquote class="postcontent restore ">
+							Hello,<br>
+<br>
+I've just got a Teensy 3.2 and am trying to port a project from a Due where I do PWM that changes from an interrupt routine. I'd like this to be as quick as possible as it updates frequently so I'd like to access the registers direct.<br>
+<br>
+So far I'm trying to get pin 6 to do PWM but I can't get it to work. The pin just goes high after a reset. I'm probably missing something obvious...<br>
+<br>
+<!-- BEGIN TEMPLATE: bbcode_code -->
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code" style="height:372px;">void setup() {
+  // put your setup code here, to run once:
+
+  SIM_SCGC6 |= SIM_SCGC6_FTM0;
+
+  PORTD_PCR4 = PORT_PCR_MUX(4) | PORT_PCR_DSE | PORT_PCR_SRE;
+
+  //WRITE ENABLE
+  FTM0_MODE |= FTM_MODE_WPDIS;
+  FTM0_MODE |= FTM_MODE_FTMEN;
+
+  FTM0_MOD = 300;
+  FTM0_CNTIN = 0;
+  FTM0_C4V = 100;
+  //Edge aligned PWM neg
+  FTM0_C4SC = FTM_CSC_MSB | FTM_CSC_ELSA;  
+  //System clock, prescaler 128
+  FTM0_SC = FTM_SC_CLKS(1) | FTM_SC_PS(7);
+  //NOT SURE IF NEEDED?
+  FTM0_OUTINIT = 0;
+
+  //allow all outputs
+  FTM0_OUTMASK = 0;
+
+  // no combine
+  FTM0_COMBINE = 0;
+  
+  FTM0_SYNC |= FTM_SYNC_SWSYNC;
+  FTM0_CNT = 0;
+  FTM0_PWMLOAD = 0x2F;
+
+}</pre>
+</div>
+<!-- END TEMPLATE: bbcode_code -->
+						</blockquote>
+					</div>
+
+					
+				</div>
+			</div>
+			
+			<div class="cleardiv"></div>
+		</div>
+	</div>
+		<div class="postfoot">
+			<!-- <div class="postfoot_container"> -->
+			<div class="textcontrols floatcontainer">
+				<span class="postcontrols">
+					<img style="display:none" id="progress_88366" src="./Direct Access to FTM_PWM control_files/progress.gif" alt="">
+					
+					
+					
+						<a id="qrwq_88366" class="newreply" href="https://forum.pjrc.com/newreply.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newreply&amp;p=88366" rel="nofollow" title="Reply With Quote"><img id="quoteimg_88366" src="./Direct Access to FTM_PWM control_files/clear.gif" alt="Reply With Quote" title="Reply With Quote">  Reply With Quote</a> 
+					
+					
+					
+				</span>
+				<span class="postlinking">
+					
+						
+					
+
+					
+					
+					
+					
+
+					
+					
+
+					
+					
+					
+					
+					
+				</span>
+			<!-- </div> -->
+			</div>
+		</div>
+	<hr>
+</li>
+
+<!-- END TEMPLATE: postbit_legacy -->
+<!-- END TEMPLATE: postbit_wrapper --><!-- BEGIN TEMPLATE: postbit_wrapper -->
+<!-- BEGIN TEMPLATE: postbit_legacy -->
+
+<li class="postbitlegacy postbitim postcontainer old" id="post_88380">
+<!-- see bottom of postbit.css for .userinfo .popupmenu styles -->
+
+	<div class="posthead">
+			<span class="postdate old">
+				
+					<span class="date">11-15-2015,&nbsp;<span class="time">09:33 PM</span></span>
+				
+			</span>
+			<span class="nodecontrols">
+				
+					<a name="post88380" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88380&amp;viewfull=1#post88380" class="postcounter">#2</a><a id="postcount88380" name="2"></a>
+				
+				
+				
+			</span>
+	</div>
+	<div class="postdetails">
+		<div class="userinfo">
+			<div class="username_container">
+			
+				<!-- BEGIN TEMPLATE: memberaction_dropdown -->
+<div class="popupmenu memberaction" id="yui-gen15">
+	<a class="username offline popupctrl" href="https://forum.pjrc.com/members/35644-Ben?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="Ben is offline" id="yui-gen17"><strong>Ben</strong></a>
+	<ul class="popupbody memberaction_body" id="yui-gen16">
+		<li class="left">
+			<a href="https://forum.pjrc.com/members/35644-Ben?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="siteicon_profile">
+				View Profile
+			</a>
+		</li>
+		
+		<li class="right">
+			<a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=finduser&amp;userid=35644&amp;contenttype=vBForum_Post&amp;showposts=1" class="siteicon_forum" rel="nofollow">
+				View Forum Posts
+			</a>
+		</li>
+		
+		
+		<li class="left">
+			<a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newpm&amp;u=35644" class="siteicon_message" rel="nofollow">
+				Private Message
+			</a>
+		</li>
+		
+		
+		
+		
+		
+		
+		
+
+		
+
+		
+		
+	</ul>
+</div>
+<!-- END TEMPLATE: memberaction_dropdown -->
+				<!-- BEGIN TEMPLATE: postbit_onlinestatus -->
+<img class="inlineimg onlinestatus" src="./Direct Access to FTM_PWM control_files/user-offline.png" alt="Ben is offline" border="0" title="Ben is offline">
+
+<!-- END TEMPLATE: postbit_onlinestatus -->
+			
+			</div>
+			<span class="usertitle">
+				Senior Member
+			</span>
+			
+			
+			
+			
+			<a class="postuseravatar" href="https://forum.pjrc.com/members/35644-Ben?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="Ben is offline">
+				<img src="./Direct Access to FTM_PWM control_files/image.jpg" alt="Ben&#39;s Avatar" title="Ben&#39;s Avatar">
+			</a>
+			 
+			
+				<hr>
+				<dl class="userinfo_extra">
+					<dt>Join Date</dt> <dd>Jul 2013</dd>
+					<dt>Location</dt> <dd>Germany</dd>
+					
+					<dt>Posts</dt> <dd>401</dd>	
+					
+				</dl>
+				
+				
+				<div class="imlinks">
+					    
+				</div>
+			
+		</div>
+		<div class="postbody">
+			<div class="postrow">
+				
+				
+
+
+						
+						
+				<div class="content">
+					<div id="post_message_88380">
+						<blockquote class="postcontent restore ">
+							Have you tried the "normal" approach using an ISR with Teensyduino's analogWrite(6, something); ? Don't optimize if you don't have to. Test if you have to. Teensyduino comes with pretty smart and fast built in functions, maybe they suffice for your speed needs.<br>
+Ben
+						</blockquote>
+					</div>
+
+					
+				</div>
+			</div>
+			
+			<div class="cleardiv"></div>
+		</div>
+	</div>
+		<div class="postfoot">
+			<!-- <div class="postfoot_container"> -->
+			<div class="textcontrols floatcontainer">
+				<span class="postcontrols">
+					<img style="display:none" id="progress_88380" src="./Direct Access to FTM_PWM control_files/progress.gif" alt="">
+					
+					
+					
+						<a id="qrwq_88380" class="newreply" href="https://forum.pjrc.com/newreply.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newreply&amp;p=88380" rel="nofollow" title="Reply With Quote"><img id="quoteimg_88380" src="./Direct Access to FTM_PWM control_files/clear.gif" alt="Reply With Quote" title="Reply With Quote">  Reply With Quote</a> 
+					
+					
+					
+				</span>
+				<span class="postlinking">
+					
+						
+					
+
+					
+					
+					
+					
+
+					
+					
+
+					
+					
+					
+					
+					
+				</span>
+			<!-- </div> -->
+			</div>
+		</div>
+	<hr>
+</li>
+
+<!-- END TEMPLATE: postbit_legacy -->
+<!-- END TEMPLATE: postbit_wrapper --><!-- BEGIN TEMPLATE: postbit_wrapper -->
+<!-- BEGIN TEMPLATE: postbit_legacy -->
+
+<li class="postbitlegacy postbitim postcontainer old" id="post_88382">
+<!-- see bottom of postbit.css for .userinfo .popupmenu styles -->
+
+	<div class="posthead">
+			<span class="postdate old">
+				
+					<span class="date">11-15-2015,&nbsp;<span class="time">10:13 PM</span></span>
+				
+			</span>
+			<span class="nodecontrols">
+				
+					<a name="post88382" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88382&amp;viewfull=1#post88382" class="postcounter">#3</a><a id="postcount88382" name="3"></a>
+				
+				
+				
+			</span>
+	</div>
+	<div class="postdetails">
+		<div class="userinfo">
+			<div class="username_container">
+			
+				<!-- BEGIN TEMPLATE: memberaction_dropdown -->
+<div class="popupmenu memberaction" id="yui-gen18">
+	<a class="username offline popupctrl" href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="dominicbeesley is offline" id="yui-gen20"><strong>dominicbeesley</strong></a>
+	<ul class="popupbody memberaction_body" id="yui-gen19">
+		<li class="left">
+			<a href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="siteicon_profile">
+				View Profile
+			</a>
+		</li>
+		
+		<li class="right">
+			<a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=finduser&amp;userid=41602&amp;contenttype=vBForum_Post&amp;showposts=1" class="siteicon_forum" rel="nofollow">
+				View Forum Posts
+			</a>
+		</li>
+		
+		
+		<li class="left">
+			<a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newpm&amp;u=41602" class="siteicon_message" rel="nofollow">
+				Private Message
+			</a>
+		</li>
+		
+		
+		
+		
+		
+		
+		
+
+		
+
+		
+		
+	</ul>
+</div>
+<!-- END TEMPLATE: memberaction_dropdown -->
+				<!-- BEGIN TEMPLATE: postbit_onlinestatus -->
+<img class="inlineimg onlinestatus" src="./Direct Access to FTM_PWM control_files/user-offline.png" alt="dominicbeesley is offline" border="0" title="dominicbeesley is offline">
+
+<!-- END TEMPLATE: postbit_onlinestatus -->
+			
+			</div>
+			<span class="usertitle">
+				Junior Member
+			</span>
+			
+			
+			
+			 
+			
+				<hr>
+				<dl class="userinfo_extra">
+					<dt>Join Date</dt> <dd>Nov 2015</dd>
+					
+					
+					<dt>Posts</dt> <dd>4</dd>	
+					
+				</dl>
+				
+				
+				<div class="imlinks">
+					    
+				</div>
+			
+		</div>
+		<div class="postbody">
+			<div class="postrow">
+				
+				
+
+
+						
+						
+				<div class="content">
+					<div id="post_message_88382">
+						<blockquote class="postcontent restore ">
+							<!-- BEGIN TEMPLATE: bbcode_quote -->
+<div class="bbcode_container">
+	<div class="bbcode_quote">
+		<div class="quote_container">
+			<div class="bbcode_quote_container"></div>
+			
+				<div class="bbcode_postedby">
+					<img src="./Direct Access to FTM_PWM control_files/quote_icon.png" alt="Quote" title="Quote"> Originally Posted by <strong>Ben</strong>
+					<a href="https://forum.pjrc.com/showthread.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88380#post88380" rel="nofollow"><img class="inlineimg" src="./Direct Access to FTM_PWM control_files/viewpost-right.png" alt="View Post" title="View Post"></a>
+				</div>
+				<div class="message">Have you tried the "normal" approach using an ISR with Teensyduino's analogWrite(6, something); ? Don't optimize if you don't have to. Test if you have to. Teensyduino comes with pretty smart and fast built in functions, maybe they suffice for your speed needs.<br>
+Ben</div>
+			
+		</div>
+	</div>
+</div>
+<!-- END TEMPLATE: bbcode_quote -->Yes I tried a quick test program, and no it's not fast enough even at 120Mhz.<br>
+<br>
+I want to understand how to program the chip at a low level as this will be very difficult to get going at the speed I need, lots of DSP and lots of bit banging to drive a load of RGB panels.<br>
+<br>
+D
+						</blockquote>
+					</div>
+
+					
+				</div>
+			</div>
+			
+			<div class="cleardiv"></div>
+		</div>
+	</div>
+		<div class="postfoot">
+			<!-- <div class="postfoot_container"> -->
+			<div class="textcontrols floatcontainer">
+				<span class="postcontrols">
+					<img style="display:none" id="progress_88382" src="./Direct Access to FTM_PWM control_files/progress.gif" alt="">
+					
+					
+					
+						<a id="qrwq_88382" class="newreply" href="https://forum.pjrc.com/newreply.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newreply&amp;p=88382" rel="nofollow" title="Reply With Quote"><img id="quoteimg_88382" src="./Direct Access to FTM_PWM control_files/clear.gif" alt="Reply With Quote" title="Reply With Quote">  Reply With Quote</a> 
+					
+					
+					
+				</span>
+				<span class="postlinking">
+					
+						
+					
+
+					
+					
+					
+					
+
+					
+					
+
+					
+					
+					
+					
+					
+				</span>
+			<!-- </div> -->
+			</div>
+		</div>
+	<hr>
+</li>
+
+<!-- END TEMPLATE: postbit_legacy -->
+<!-- END TEMPLATE: postbit_wrapper --><!-- BEGIN TEMPLATE: postbit_wrapper -->
+<!-- BEGIN TEMPLATE: postbit_legacy -->
+
+<li class="postbitlegacy postbitim postcontainer old" id="post_88417">
+<!-- see bottom of postbit.css for .userinfo .popupmenu styles -->
+
+	<div class="posthead">
+			<span class="postdate old">
+				
+					<span class="date">11-16-2015,&nbsp;<span class="time">10:03 AM</span></span>
+				
+			</span>
+			<span class="nodecontrols">
+				
+					<a name="post88417" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88417&amp;viewfull=1#post88417" class="postcounter">#4</a><a id="postcount88417" name="4"></a>
+				
+				
+				
+			</span>
+	</div>
+	<div class="postdetails">
+		<div class="userinfo">
+			<div class="username_container">
+			
+				<!-- BEGIN TEMPLATE: memberaction_dropdown -->
+<div class="popupmenu memberaction" id="yui-gen21">
+	<a class="username offline popupctrl" href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="dominicbeesley is offline" id="yui-gen23"><strong>dominicbeesley</strong></a>
+	<ul class="popupbody memberaction_body" id="yui-gen22">
+		<li class="left">
+			<a href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="siteicon_profile">
+				View Profile
+			</a>
+		</li>
+		
+		<li class="right">
+			<a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=finduser&amp;userid=41602&amp;contenttype=vBForum_Post&amp;showposts=1" class="siteicon_forum" rel="nofollow">
+				View Forum Posts
+			</a>
+		</li>
+		
+		
+		<li class="left">
+			<a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newpm&amp;u=41602" class="siteicon_message" rel="nofollow">
+				Private Message
+			</a>
+		</li>
+		
+		
+		
+		
+		
+		
+		
+
+		
+
+		
+		
+	</ul>
+</div>
+<!-- END TEMPLATE: memberaction_dropdown -->
+				<!-- BEGIN TEMPLATE: postbit_onlinestatus -->
+<img class="inlineimg onlinestatus" src="./Direct Access to FTM_PWM control_files/user-offline.png" alt="dominicbeesley is offline" border="0" title="dominicbeesley is offline">
+
+<!-- END TEMPLATE: postbit_onlinestatus -->
+			
+			</div>
+			<span class="usertitle">
+				Junior Member
+			</span>
+			
+			
+			
+			 
+			
+				<hr>
+				<dl class="userinfo_extra">
+					<dt>Join Date</dt> <dd>Nov 2015</dd>
+					
+					
+					<dt>Posts</dt> <dd>4</dd>	
+					
+				</dl>
+				
+				
+				<div class="imlinks">
+					    
+				</div>
+			
+		</div>
+		<div class="postbody">
+			<div class="postrow">
+				
+				
+
+
+						
+						
+				<div class="content">
+					<div id="post_message_88417">
+						<blockquote class="postcontent restore ">
+							Thanks Ben, <br>
+<br>
+Yes I have tried and it is too slow. Just the call overhead is a bit more than I'd like. I have to reconfigure the PWM on the fly and leave as much main thread time available as possible.<br>
+<br>
+I suspect it is something simple (but not so easy to find in the datasheet) that I have forgotten to do.<br>
+<br>
+Dom
+						</blockquote>
+					</div>
+
+					
+				</div>
+			</div>
+			
+			<div class="cleardiv"></div>
+		</div>
+	</div>
+		<div class="postfoot">
+			<!-- <div class="postfoot_container"> -->
+			<div class="textcontrols floatcontainer">
+				<span class="postcontrols">
+					<img style="display:none" id="progress_88417" src="./Direct Access to FTM_PWM control_files/progress.gif" alt="">
+					
+					
+					
+						<a id="qrwq_88417" class="newreply" href="https://forum.pjrc.com/newreply.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newreply&amp;p=88417" rel="nofollow" title="Reply With Quote"><img id="quoteimg_88417" src="./Direct Access to FTM_PWM control_files/clear.gif" alt="Reply With Quote" title="Reply With Quote">  Reply With Quote</a> 
+					
+					
+					
+				</span>
+				<span class="postlinking">
+					
+						
+					
+
+					
+					
+					
+					
+
+					
+					
+
+					
+					
+					
+					
+					
+				</span>
+			<!-- </div> -->
+			</div>
+		</div>
+	<hr>
+</li>
+
+<!-- END TEMPLATE: postbit_legacy -->
+<!-- END TEMPLATE: postbit_wrapper --><!-- BEGIN TEMPLATE: postbit_wrapper -->
+<!-- BEGIN TEMPLATE: postbit_legacy -->
+
+<li class="postbitlegacy postbitim postcontainer old" id="post_88481">
+<!-- see bottom of postbit.css for .userinfo .popupmenu styles -->
+
+	<div class="posthead">
+			<span class="postdate old">
+				
+					<span class="date">11-17-2015,&nbsp;<span class="time">09:46 AM</span></span>
+				
+			</span>
+			<span class="nodecontrols">
+				
+					<a name="post88481" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;p=88481&amp;viewfull=1#post88481" class="postcounter">#5</a><a id="postcount88481" name="5"></a>
+				
+				
+				
+			</span>
+	</div>
+	<div class="postdetails">
+		<div class="userinfo">
+			<div class="username_container">
+			
+				<!-- BEGIN TEMPLATE: memberaction_dropdown -->
+<div class="popupmenu memberaction" id="yui-gen24">
+	<a class="username offline popupctrl" href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" title="dominicbeesley is offline" id="yui-gen26"><strong>dominicbeesley</strong></a>
+	<ul class="popupbody memberaction_body" id="yui-gen25">
+		<li class="left">
+			<a href="https://forum.pjrc.com/members/41602-dominicbeesley?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="siteicon_profile">
+				View Profile
+			</a>
+		</li>
+		
+		<li class="right">
+			<a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=finduser&amp;userid=41602&amp;contenttype=vBForum_Post&amp;showposts=1" class="siteicon_forum" rel="nofollow">
+				View Forum Posts
+			</a>
+		</li>
+		
+		
+		<li class="left">
+			<a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newpm&amp;u=41602" class="siteicon_message" rel="nofollow">
+				Private Message
+			</a>
+		</li>
+		
+		
+		
+		
+		
+		
+		
+
+		
+
+		
+		
+	</ul>
+</div>
+<!-- END TEMPLATE: memberaction_dropdown -->
+				<!-- BEGIN TEMPLATE: postbit_onlinestatus -->
+<img class="inlineimg onlinestatus" src="./Direct Access to FTM_PWM control_files/user-offline.png" alt="dominicbeesley is offline" border="0" title="dominicbeesley is offline">
+
+<!-- END TEMPLATE: postbit_onlinestatus -->
+			
+			</div>
+			<span class="usertitle">
+				Junior Member
+			</span>
+			
+			
+			
+			 
+			
+				<hr>
+				<dl class="userinfo_extra">
+					<dt>Join Date</dt> <dd>Nov 2015</dd>
+					
+					
+					<dt>Posts</dt> <dd>4</dd>	
+					
+				</dl>
+				
+				
+				<div class="imlinks">
+					    
+				</div>
+			
+		</div>
+		<div class="postbody">
+			<div class="postrow">
+				
+				
+
+
+						
+						
+							
+						
+				<div class="content">
+					<div id="post_message_88481">
+						<blockquote class="postcontent restore ">
+							For anyone else who is stuck I finally got it working. The thing to NOT do is set the FTMEN bit in the _SC register!<br>
+<br>
+<br>
+<!-- BEGIN TEMPLATE: bbcode_code -->
+<div class="bbcode_container">
+	<div class="bbcode_description">Code:</div>
+	<pre class="bbcode_code" style="height:264px;">  //WRITE ENABLE
+  FTM0_MODE |= FTM_MODE_WPDIS; // | FTM_MODE_FTMEN;
+  //Disable everything before setting mod
+  FTM0_SC = 0;
+  //Timer modulus
+  FTM0_MOD = ticks_main;
+  //System clock, prescaler 0, enable modulus overflow interrupt
+  FTM0_SC = FTM_SC_CLKS(1) | FTM_SC_PS(0) | FTM_SC_TOIE;
+  //Set pin 6 as timer output with high current and slew rate
+  PORTD_PCR4 = PORT_PCR_MUX(4) | PORT_PCR_DSE | PORT_PCR_SRE;
+  //reset counter
+  FTM0_CNT = 0;
+  //reset counter start
+  FTM0_CNTIN = 0;
+  //set channel options for PWM inverted
+  FTM0_C4SC = FTM_CSC_MSB | FTM_CSC_ELSB;
+  //initial pwm value
+  FTM0_C4V = 3;
+   // Enable FTM0 interrupt inside NVIC
+  NVIC_ENABLE_IRQ(IRQ_FTM0);</pre>
+</div>
+<!-- END TEMPLATE: bbcode_code -->
+						</blockquote>
+					</div>
+
+					
+				</div>
+			</div>
+			
+			<div class="cleardiv"></div>
+		</div>
+	</div>
+		<div class="postfoot">
+			<!-- <div class="postfoot_container"> -->
+			<div class="textcontrols floatcontainer">
+				<span class="postcontrols">
+					<img style="display:none" id="progress_88481" src="./Direct Access to FTM_PWM control_files/progress.gif" alt="">
+					
+					
+					
+						<a id="qrwq_88481" class="newreply" href="https://forum.pjrc.com/newreply.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=newreply&amp;p=88481" rel="nofollow" title="Reply With Quote"><img id="quoteimg_88481" src="./Direct Access to FTM_PWM control_files/clear.gif" alt="Reply With Quote" title="Reply With Quote">  Reply With Quote</a> 
+					
+					
+					
+				</span>
+				<span class="postlinking">
+					
+						
+					
+
+					
+					
+					
+					
+
+					
+					
+
+					
+					
+					
+					
+					
+				</span>
+			<!-- </div> -->
+			</div>
+		</div>
+	<hr>
+</li>
+
+<!-- END TEMPLATE: postbit_legacy -->
+<!-- END TEMPLATE: postbit_wrapper -->
+		</ol>
+		<div class="separator"></div>
+		<div class="postlistfoot">
+			
+		</div>
+
+	
+
+</div>
+
+<div id="below_postlist" class="noinlinemod below_postlist">
+	
+	<div id="pagination_bottom" class="pagination_bottom">
+	
+		<!-- BEGIN TEMPLATE: forumjump -->
+<div class="clear"></div>
+<div class="navpopupmenu popupmenu nohovermenu" id="showthread_navpopup">
+	
+		<span class="shade">Quick Navigation</span>
+		<a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1" class="popupctrl" id="yui-gen28"><span class="ctrlcontainer">Technical Support &amp; Questions</span></a>
+		<a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control#top" class="textcontrol" onclick="document.location.hash=&#39;top&#39;;return false;">Top</a>
+	
+	<ul class="navpopupbody popupbody" id="yui-gen27">
+		
+		<li class="optionlabel">Site Areas</li>
+		<li><a href="https://forum.pjrc.com/usercp.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Settings</a></li>
+		<li><a href="https://forum.pjrc.com/private.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Private Messages</a></li>
+		<li><a href="https://forum.pjrc.com/subscription.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Subscriptions</a></li>
+		<li><a href="https://forum.pjrc.com/online.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Who's Online</a></li>
+		<li><a href="https://forum.pjrc.com/search.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Search Forums</a></li>
+		<li><a href="https://forum.pjrc.com/forum.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Forums Home</a></li>
+		
+			<li class="optionlabel">Forums</li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/1-Main-Category?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Main Category</a>
+					<ol class="d1">
+						
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/6-Announcements?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Announcements</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/5-General-Discussion?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">General Discussion</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/2-Project-Guidance?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Project Guidance</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/8-Audio-Projects?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Audio Projects</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/3-Technical-Support-amp-Questions?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Technical Support &amp; Questions</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/9-Blog-Project-Submission?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Blog Project Submission</a></li>
+			
+		
+			
+				<li><a href="https://forum.pjrc.com/forums/4-Suggestions-amp-Bug-Reports?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Suggestions &amp; Bug Reports</a></li>
+			
+		
+			
+					</ol>
+				</li>
+			
+		
+		
+	</ul>
+</div>
+<div class="clear"></div>
+<!-- END TEMPLATE: forumjump -->
+	</div>
+</div>
+
+
+
+
+
+
+
+
+	<!-- next / previous links -->
+	<div class="navlinks">
+		
+			<strong>«</strong>
+			<a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;goto=nextoldest" rel="nofollow">Previous Thread</a>
+			|
+			<a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;goto=nextnewest" rel="nofollow">Next Thread</a>
+			<strong>»</strong>
+		
+	</div>
+	<!-- / next / previous links -->
+
+<div id="thread_info" class="thread_info block">
+	
+	
+	
+	
+	
+	
+	<div class="options_block_container">
+		
+		<div class="options_block">
+			<h4 class="collapse blockhead options_correct">
+				<a class="collapse" id="collapse_posting_rules" href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control#top"><img src="./Direct Access to FTM_PWM control_files/collapse_40b.png" alt=""></a>
+				Posting Permissions
+			</h4>
+			<div id="posting_rules" class="thread_info_block blockbody formcontrols floatcontainer options_correct">
+				<!-- BEGIN TEMPLATE: forumrules -->
+
+<div id="forumrules" class="info_subblock">
+
+	<ul class="youcandoblock">
+		<li>You <strong>may not</strong> post new threads</li>
+		<li>You <strong>may not</strong> post replies</li>
+		<li>You <strong>may not</strong> post attachments</li>
+		<li>You <strong>may not</strong> edit your posts</li>
+		<li>&nbsp;</li>
+	</ul>
+	<div class="bbcodeblock">
+		<ul>
+			<li><a href="https://forum.pjrc.com/misc.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=bbcode" target="_blank">BB code</a> is <strong>On</strong></li>
+			<li><a href="https://forum.pjrc.com/misc.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=showsmilies" target="_blank">Smilies</a> are <strong>On</strong></li>
+			<li><a href="https://forum.pjrc.com/misc.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=bbcode#imgcode" target="_blank">[IMG]</a> code is <strong>On</strong></li>
+			<li><a href="https://forum.pjrc.com/misc.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=bbcode#videocode" target="_blank">[VIDEO]</a> code is <strong>On</strong></li>
+			<li>HTML code is <strong>Off</strong></li>
+		</ul>
+	</div>
+	<p class="rules_link"><a href="https://forum.pjrc.com/misc.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1&amp;do=showrules" target="_blank">Forum Rules</a></p>
+
+</div>
+
+<!-- END TEMPLATE: forumrules -->
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+<!-- BEGIN TEMPLATE: footer -->
+
+<div style="clear: left">
+  <!-- BEGIN TEMPLATE: ad_footer_start -->
+
+<!-- END TEMPLATE: ad_footer_start -->
+  <!-- BEGIN TEMPLATE: ad_global_above_footer -->
+
+<!-- END TEMPLATE: ad_global_above_footer -->
+</div>
+
+<div id="footer" class="floatcontainer footer">
+
+	<form action="https://forum.pjrc.com/forum.php" method="get" id="footer_select" class="footer_select">
+
+		
+			<select name="styleid" onchange="switch_id(this, &#39;style&#39;)">
+				<optgroup label="Quick Style Chooser"><option class="hidden"></option></optgroup>
+				
+					
+					<optgroup label=" Standard Styles">
+									
+					<!-- BEGIN TEMPLATE: option -->
+
+	<option value="1" class="" selected="selected">-- Default Style</option>
+
+<!-- END TEMPLATE: option -->
+					
+					</optgroup>
+										
+				
+				
+					
+					<optgroup label=" Mobile Styles">
+					
+					<!-- BEGIN TEMPLATE: option -->
+
+	<option value="2" class="">-- Default Mobile Style</option>
+
+<!-- END TEMPLATE: option -->
+					
+					</optgroup>
+										
+				
+			</select>	
+		
+		
+		
+	</form>
+
+	<ul id="footer_links" class="footer_links">
+		
+		<li><a href="http://www.pjrc.com/">PJRC Electronic Projects</a></li>
+		
+		
+		<li><a href="https://forum.pjrc.com/archive/index.php?s=3cb2d1b0df1d0ffe2c24fecbe3e9ded1">Archive</a></li>
+		
+		
+		
+		<li><a href="https://forum.pjrc.com/threads/31596-Direct-Access-to-FTM-PWM-control#top" onclick="document.location.hash=&#39;top&#39;; return false;">Top</a></li>
+	</ul>
+	
+	
+	
+	
+	<script type="text/javascript">
+	<!--
+		// Main vBulletin Javascript Initialization
+		vBulletin_init();
+	//-->
+	</script>
+        
+</div>
+</div> <!-- closing div for body_wrapper -->
+
+<div class="below_body">
+<div id="footer_time" class="shade footer_time">All times are GMT. The time now is <span class="time">05:52 PM</span>.</div>
+
+<div id="footer_copyright" class="shade footer_copyright">
+	<!-- Do not remove this copyright notice -->
+	Powered by <a href="https://www.vbulletin.com/" id="vbulletinlink">vBulletin®</a> Version 4.2.2 <br>Copyright © 2018 vBulletin Solutions, Inc. All rights reserved. 
+	<!-- Do not remove this copyright notice -->	
+</div>
+<div id="footer_morecopyright" class="shade footer_morecopyright">
+	<!-- Do not remove cronimage or your scheduled tasks will cease to function -->
+	
+	<!-- Do not remove cronimage or your scheduled tasks will cease to function -->
+	
+	
+</div>
+<!-- BEGIN TEMPLATE: ad_footer_end -->
+
+<!-- END TEMPLATE: ad_footer_end --> 
+
+</div>
+<!-- END TEMPLATE: footer -->
+
+
+<!-- END TEMPLATE: SHOWTHREAD --><style>#header + #content > #left > #rlblock_left,
+.ad_global_header
+{display:none !important;}</style></body></html>
