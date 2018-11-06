@@ -13,15 +13,20 @@ void YAW_AXIS_ZERO(void)
                               
 void setup(void) 
 { 
+    Serial.begin(9600);
     pinMode(3, INPUT); 
     pinMode(7, OUTPUT); 
     pinMode(9, OUTPUT); 
     attachInterrupt(digitalPinToInterrupt(3), YAW_AXIS_ZERO, RISING);
     digitalWrite(9, HIGH);
     digitalWrite(7, LOW);
-    while(!ZERO){};
+    while(!ZERO);
 } 
                                
 void loop(void) { 
-  
+  int t = millis();
+  while(ZERO);
+  t = millis() - t;
+  Serial.println(t, DEC);
+  ((void (*)())NULL)();
 } 
