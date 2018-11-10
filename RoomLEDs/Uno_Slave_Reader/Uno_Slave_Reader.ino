@@ -45,13 +45,14 @@ void receiveEvent(byte length) {
         }
       case 'p': {
           if (value > MAX_SPARKLES || value < 5) break;
+          uint16_t sP=(P<<1)/3, iP=sP>>1; //split into approx third proportions
           if (value > P) {
-            if (mode == monoDiscrete || mode == monoContinuous) mleds.populate(P);
-            if (mode == rgbContinuous) rgbing.populate(P);
+            if (mode == monoDiscrete || mode == monoContinuous) { sring.populate(sP); iring.populate(iP); }
+            if (mode == rgbContinuous) { srgbing.populate((P*2)/3); irgbing.populate(P/3); }
           }
           else {
-            if (mode == monoDiscrete || mode == monoContinuous) mleds.terminate(P);
-            if (mode == rgbContinuous) rgbing.terminate(P);
+            if (mode == monoDiscrete || mode == monoContinuous) { sring.terminate(sP); iring.terminate(iP); }
+            if (mode == rgbContinuous) { srgbing.terminate((P*2)/3); irgbing.terminate(P/3); }
           }
           P = value;
           EEPROM.write(e_per, P);
@@ -98,8 +99,8 @@ void setup() {
   FFT.begin();  // Init Audio-Spectrum shield
   mode = modes[EEPROM.read(e_mode)]; // Load display mode
 
-  if (mode == monoDiscrete || mode == monoContinuous) mleds.populate(P);
-  if (mode == rgbContinuous) rgbing.populate(P);
+  if (mode == monoDiscrete || mode == monoContinuous) { sring.populate((P*2)/3); iring.populate(P/3); }
+  if (mode == rgbContinuous) { srgbing.populate((P*2)/3); irgbing.populate(P/3); }
 
   ledsetup();
   //    showColor(0, 0, 0); //blank the display
