@@ -259,13 +259,19 @@ struct RGBing {
     }
     
     void printNode(uint16_t r, uint16_t g, uint16_t b) {
-        uint32_t _r = abs(r>>8); if (_r < 128) _r <<= 1; else _r = 255; _r *= sq(_r);
-        uint32_t _g = abs(g>>8); if (_g < 128) _g <<= 1; else _g = 255; _g *= sq(_g);
-        uint32_t _b = abs(b>>8); if (_b < 128) _b <<= 1; else _b = 255; _b *= sq(_b);
-//        send2Pixels(_r,_g,_b);
-//        send2Pixels(_r>>8,_g>>8,_b>>8);
-        R.pixelSend(_r>>16,_g>>16,_b>>16);
-//        send2Pixels(_r,_g,_b);
+//        uint32_t _r = abs(r>>8); if (_r < 128) _r <<= 1; else _r = 255; _r *= sq(_r);
+//        uint32_t _g = abs(g>>8); if (_g < 128) _g <<= 1; else _g = 255; _g *= sq(_g);
+//        uint32_t _b = abs(b>>8); if (_b < 128) _b <<= 1; else _b = 255; _b *= sq(_b);
+////        send2Pixels(_r,_g,_b);
+////        send2Pixels(_r>>8,_g>>8,_b>>8);
+//        R.pixelSend(_r>>16,_g>>16,_b>>16);
+////        send2Pixels(_r,_g,_b);
+
+        uint32_t _r = abs(r>>8); if (_r < 128) _r <<= 1; else _r = 255; _r = sq(_r);
+        uint32_t _g = abs(g>>8); if (_g < 128) _g <<= 1; else _g = 255; _g = sq(_g);
+        uint32_t _b = abs(b>>8); if (_b < 128) _b <<= 1; else _b = 255; _b = sq(_b);
+        R.pixelSend(_r>>8,_g>>8,_b>>8);
+//        R.pixelSend(_r>>16,_g>>16,_b>>16);
     }
     
     void display(void) {
