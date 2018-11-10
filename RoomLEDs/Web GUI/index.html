@@ -10,10 +10,15 @@
             border-radius: 6px;
             transition: 0.25s;
             box-shadow: var(--shadow);
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
         }
         
         .slider {
-            -webkit-appearance: slider-vertical
+            -webkit-appearance: slider-vertical;
+            -moz-appearance: slider-vertical;
+            padding: 0 4em;
         }   
         
         fieldset {
@@ -34,6 +39,10 @@
         body {
             display: flex;
             flex-direction: column;
+            position: absolute;
+            top:0;
+            left:0;
+            overflow-y: hidden;
         }
         
         div {
@@ -104,6 +113,8 @@
                 }
 
                 cv.resize();
+                
+                hsv.ondragstart = function(e) { e.preventDefault(); };
 
                 hsv.onmousedown = function(e) {
                     cv.resize();
@@ -114,6 +125,18 @@
                     this.onmousemove = null;
                     this.style.setProperty("--shadow", "");
                 }
+                
+                hsv.ontouchstart = function(e) {
+                    cv.resize();
+                    this.ontouchmove = getMousePixel;
+                    getMousePixel(e);
+                    console.log("dicks")
+                }
+                hsv.ontouchend = function(e) {
+                    this.ontouchmove = null;
+                    this.style.setProperty("--shadow", "");
+                }
+                
                 hsv.ondblclick = function(e) {
                     if (!this.onmousemove) {
                         cv.resize();
@@ -125,11 +148,15 @@
                     }
                 }
                 
-                for (e of document.getElementsByClassName("slider")) {
-                    e.onmousewheel = function(e) { 
+                for (s of document.getElementsByClassName("slider")) {
+                    s.onmousewheel = function(e) { 
                         this.value -= e.deltaY/10
                         this.oninput();
                     };
+                    s.addEventListener('DOMMouseScroll', function(e) {
+                        this.value -= e.detail;
+                        this.oninput();
+                    }, false);
                 }
                 
                 const buttons = document.getElementById("buttons");
@@ -162,15 +189,15 @@
     <div>
         <fieldset>
             <legend>Width</legend>
-            <input class="slider" type="range" value="0" min="2" max="50" name="w" oninput="sendPacket({[this.name]:this.value})">
+            <input orient="vertical" class="slider" type="range" value="0" min="2" max="50" name="w" oninput="sendPacket({[this.name]:this.value})">
         </fieldset>
         <fieldset>
             <legend>Speed</legend>
-            <input class="slider" type="range" value="0" min="5" max="128" name="f" oninput="sendPacket({[this.name]:this.value})">
+            <input orient="vertical" class="slider" type="range" value="0" min="5" max="128" name="f" oninput="sendPacket({[this.name]:this.value})">
         </fieldset>
         <fieldset>
             <legend>Population</legend>
-            <input class="slider" type="range" value="20" min="20" max="180" name="p" oninput="sendPacket({[this.name]:this.value})">
+            <input orient="vertical" class="slider" type="range" value="20" min="20" max="180" name="p" oninput="sendPacket({[this.name]:this.value})">
         </fieldset>
     </div>
 </body>
