@@ -25,10 +25,14 @@ struct Ring {
     fPixelSender pixelSend = sendPixel;
     
     Ring(void) { head = new node; tail = head; nodes = 1; }
-    Ring(bool _iris) { Ring(); LENGTH=IRIS; pixelSend = sendPixel2; }
+    
+    Ring(bool _iris) { 
+        LENGTH=IRIS;
+        pixelSend = sendPixel2;
+        head = new node; tail = head; nodes = 1;    
+    }
     
     void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(LENGTH), random(255)); }
-//    void populate (uint8_t desiredNodes) { while (nodes < desiredNodes) insert(random(LENGTH), random(255)); }
     void terminate(uint8_t desiredNodes) { while (nodes > desiredNodes) remove(head->pos); }
     
     static int8_t interpolate(node* A, node* B, uint16_t pos) {
