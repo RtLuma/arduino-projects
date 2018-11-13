@@ -36,6 +36,7 @@ void setup(void)
     digitalWrite(3, HIGH);
     digitalWrite(4, LOW);
 //    while(!ZERO);
+
 } 
 
 uint32_t t = 0;
@@ -71,4 +72,5 @@ Serial.print(left);
 Serial.print("\t");
 Serial.println(right);
 delay(100);
+
 } 
