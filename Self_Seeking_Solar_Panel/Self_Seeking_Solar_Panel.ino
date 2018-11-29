@@ -53,6 +53,11 @@ void YAW_AXIS_ZERO(void) {
   ZERO = !ZERO;
 }
 
+//  while (!digitalRead(YAW_INTERUPT_PIN)) Serial.println(digitalRead(YAW_INTERUPT_PIN));
+
+//  attachInterrupt(digitalPinToInterrupt(YAW_INTERUPT_PIN), YAW_AXIS_ZERO, RISING);
+//  while (!ZERO);
+
 void setup(void) {
   Serial.begin(9600);
   digitalWrite(3, LOW); //cuz physics is gay lmao
@@ -77,22 +82,42 @@ void setup(void) {
   for (auto p : OUTPUTS) pinMode(p, OUTPUT);
 
   yawTurn(false);
+  pitchTurn(true);
 
-  //  while (!digitalRead(YAW_INTERUPT_PIN)) Serial.println(digitalRead(YAW_INTERUPT_PIN));
+  Serial.print("calibrating");
 
-  //  attachInterrupt(digitalPinToInterrupt(YAW_INTERUPT_PIN), YAW_AXIS_ZERO, RISING);
-  //  while (!ZERO);
+  uint32_t max_t = 0, max_l = 0;
+  
+  while (!digitalRead(YAW_INTERUPT_PIN)) {
+    Serial.print(".");
+    uint16_t BL = analogRead(PHOTO_BL) + 60,
+             TL = analogRead(PHOTO_TL) + 40,
+             TR = analogRead(PHOTO_TR) + 25,
+             BR = analogRead(PHOTO_BR);
 
-  while (!ZERO) ZERO = digitalRead(YAW_INTERUPT_PIN);
-  digitalWrite(13, LOW);
+    uint16_t up    = (TR + TL) >> 1;
+    uint16_t down  = (BL + BR) >> 1;
+    uint16_t right = (BR + TR) >> 1;
+    uint16_t left  = (BL + TL) >> 1;
+
+    uint16_t avg = (up + down + left + right) >> 2;
+    if (avg > max_l)  { max_l = avg; max_t = millis(); }
+  }
+
   yawTurn(true);
-  delay(4000);
-  digitalWrite(13, HIGH);
+  delay(millis() - max_t);
 
-  do ZERO = digitalRead(YAW_INTERUPT_PIN); while (!ZERO);
   digitalWrite(13, LOW);
-  yawTurn(false);
-  delay(1000);
+
+  yawStop();
+  pitchStop();
+
+  //  digitalWrite(13, HIGH);
+
+  //  do ZERO = digitalRead(YAW_INTERUPT_PIN); while (!ZERO);
+  //  digitalWrite(13, LOW);
+  //  yawTurn(false);
+  //  delay(1000);
 
   //
 
@@ -125,11 +150,11 @@ void loop(void) {
   //  Serial.print(",");
   //  Serial.println(analogRead(PHOTO_BR));
 
-  if (abs(dLR) < 5) yawStop();
-  else yawTurn(dLR < 1);
+    if (abs(dLR) < 5) yawStop();
+    else yawTurn(dLR < 1);
 
-  if (abs(dUD) < 5) pitchStop();
-  else pitchTurn(dUD < 1);
+  if (abs(dUD) < 3) pitchStop();
+  else pitchTurn(dUD > 1);
 
   //    if ( dUD < -1) {
   //      digitalWrite(PITCH_MOTOR_ENABLE, HIGH);
