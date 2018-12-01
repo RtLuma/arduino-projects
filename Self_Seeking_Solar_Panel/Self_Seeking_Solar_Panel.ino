@@ -47,7 +47,7 @@ void pitchStop(void) {
 }
 
 void YAW_ISR(void) {
-  digitalWrite(13, HIGH); //Make it obvious we're unwinding.
+    digitalWrite(13, HIGH); //Make it obvious we're unwinding.
   UNCOIL = true;
   //  CW = !CW; yawTurn(CW); //Stop, drop, and yaw the other way.
   //  while (digitalRead(YAW_INTERUPT_PIN));  //Wait for switch to drop to LOW
@@ -61,8 +61,18 @@ void setup(void) {
   digitalWrite(3, LOW); //cuz physics is gay lmao
   pinMode(13, OUTPUT);
 
-  pinMode(YAW_INTERUPT_PIN,  INPUT);
-  attachInterrupt(digitalPinToInterrupt(YAW_INTERUPT_PIN), YAW_ISR, RISING);
+  attachInterrupt(digitalPinToInterrupt(YAW_INTERUPT_PIN), YAW_ISR, FALLING);
+
+  pinMode(YAW_INTERUPT_PIN, INPUT_PULLUP);
+
+  int INPUTS[] = {
+    PHOTO_BR,
+    PHOTO_TR,
+    PHOTO_TL,
+    PHOTO_BL
+  };
+
+  for (auto p : INPUTS) pinMode(p, INPUT);
 
   int OUTPUTS[] = {
     YAW_MOTOR_ENABLE,
@@ -70,11 +80,7 @@ void setup(void) {
     YAW_MOTOR_PIN_2,
     PITCH_MOTOR_ENABLE,
     PITCH_MOTOR_PIN_1,
-    PITCH_MOTOR_PIN_2,
-    PHOTO_BR,
-    PHOTO_TR,
-    PHOTO_TL,
-    PHOTO_BL
+    PITCH_MOTOR_PIN_2
   };
 
   for (auto p : OUTPUTS) pinMode(p, OUTPUT);
@@ -82,7 +88,7 @@ void setup(void) {
   yawStop();
   pitchStop();
 
-  //  yawTurn(false);
+    yawTurn(true);
   //  pitchTurn(true);
 
 }
@@ -103,33 +109,36 @@ void loop(void) {
   int32_t dLR = right - left,
           dUD = down  - up;
 
-    Serial.print(analogRead(PHOTO_BL)+60);
-    Serial.print(",");
-    Serial.print(analogRead(PHOTO_TL)+40);
-    Serial.print(",");
-    Serial.print(analogRead(PHOTO_TR)+25);
-    Serial.print(",");
-    Serial.println(analogRead(PHOTO_BR));
+  Serial.print(analogRead(PHOTO_BL) + 60);
+  Serial.print(",");
+  Serial.print(analogRead(PHOTO_TL) + 40);
+  Serial.print(",");
+  Serial.print(analogRead(PHOTO_TR) + 25);
+  Serial.print(",");
+  Serial.println(analogRead(PHOTO_BR));
 
-  if (abs(dLR) < 5) yawStop();
-  else yawTurn(dLR < 1);
+//  if (abs(dLR) < 5) yawStop();
+//  else yawTurn(dLR < 1);
+//
+//  if (abs(dUD) < 3) pitchStop();
+//  else pitchTurn(dUD > 1);
 
-  if (abs(dUD) < 3) pitchStop();
-  else pitchTurn(dUD > 1);
+//  if (!pitclk) pitchStop();
+//  else pitclk += CW ? -1 : 1;
+//  if (pitclk > 65535) pitchStop();
 
-  if (!pitclk) pitchStop();
-  else pitclk += CW ? -1 : 1;
-  if (pitclk > 65535) pitchStop();
-
-  if (UNCOIL) {
-    CW = !CW; yawTurn(CW); //Stop, drop, and yaw the other way.
-    UNCOIL = false;
+  if (digitalRead(13)) {
     noInterrupts();
+    CW = !CW;
+    yawTurn(CW); //Stop, drop, and yaw the other way.
+    UNCOIL = false;
     delay(1000);
     interrupts();
     while (!UNCOIL); //Wait for switch to return HIGH
-    
-    CW = !CW; yawStop(); //Wires should be uncoiled.
+
+    CW = !CW;
+//    yawStop(); //Wires should be uncoiled.
+    yawTurn(CW);
     digitalWrite(13, LOW); //Make it obvious we're done unwinding.
     UNCOIL = false;
   }
