@@ -56,8 +56,14 @@ void YAW_ISR(void) {
   //  digitalWrite(13, LOW); //Make it obvious we're done unwinding.
 }
 
+#define HISTORY 20
+
+uint16_t history[HISTORY] = {0};
+uint32_t sum = 0;
+
 void setup(void) {
   Serial.begin(9600);
+  interrupts();
   digitalWrite(3, LOW); //cuz physics is gay lmao
   pinMode(13, OUTPUT);
   pinMode(YAW_INTERUPT_PIN, INPUT_PULLUP);
@@ -100,18 +106,54 @@ uint16_t PHOTO[4][3] = {
   {0, 1000, 0}
 };
 
-uint16_t U, D, L, R;
+int16_t U = 0, D = 0, L = 0, R = 0;
 
 void loop() {
 
-  //  for (uint8_t i = 0; i < 4; i++) {
-  //    uint16_t val = analogRead(PHOTO_PINS[i]);
-  //    i f (val < PHOTO[i][1]) PHOTO[i][1] = val;
-  //    if (val > PHOTO[i][2]) PHOTO[i][2] = val;
-  //    PHOTO[i][0] = map(val, PHOTO[i][1], PHOTO[i][2], 0, 255);
-  //    //    Serial.print(val);
-  //    //    Serial.print(",");
-  //  }
+  for (uint8_t i = 0; i < 4; i++) {
+    uint16_t val = analogRead(PHOTO_PINS[i]);
+    if (val < PHOTO[i][1]) PHOTO[i][1] = val;
+    if (val > PHOTO[i][2]) PHOTO[i][2] = val;
+    PHOTO[i][0] = map(val, PHOTO[i][1], PHOTO[i][2], 0, 255);
+  }
+
+  int16_t u = (PHOTO[2][0] + PHOTO[3][0]) >> 1,
+          d = (PHOTO[0][0] + PHOTO[1][0]) >> 1,
+          r = (PHOTO[1][0] + PHOTO[3][0]) >> 1,
+          l = (PHOTO[0][0] + PHOTO[2][0]) >> 1;
+
+  uint32_t avg = u + d + l + r;
+  avg >>= 2;
+
+  sum -= history[0];
+  for (uint8_t j = 1; j < HISTORY; j++) history[j - 1] = history[j];
+  history[HISTORY - 1] = avg;
+  sum += avg;
+
+
+  uint32_t stdsum = 0;
+  for (int i = 0; i < HISTORY; i++) stdsum += sq(avg - history[i]);
+
+  float stdev = sqrt(stdsum / float(HISTORY));
+
+  Serial.println(stdev);
+
+  //  Serial.print(u);
+  //  Serial.print(",");
+  //  Serial.print(d);
+  //  Serial.print(",");
+  //  Serial.print(l);
+  //  Serial.print(",");
+  //  Serial.println(r);
+
+  pitchTurn(u - d > 0);
+  yawTurn(r - l > 0);
+
+  U = u;
+  D = d;
+  L = l;
+  R = r;
+
 
   if (UNCOIL) {
     pitchStop();
@@ -127,54 +169,8 @@ void loop() {
     digitalWrite(13, LOW); //Make it obvious we're done unwinding.
     UNCOIL = false;
     yawTurn(CW);
-    delay(100);
+    delay(300);
   }
 
-  delay(200);
-
-    uint16_t BL = analogRead(PHOTO_BL),
-           TL = analogRead(PHOTO_TL),
-           TR = analogRead(PHOTO_TR),
-           BR = analogRead(PHOTO_BR);
-
-  uint16_t u = (TR + TL) >> 1,
-           d = (BL + BR) >> 1,
-           r = (BR + TR) >> 1,
-           l = (BL + TL) >> 1;
-
-  bool bU = U - u > 0,
-       bD = D - d > 0,
-       bL = L - l > 0,
-       bR = R - r > 0;
-
-  if (bU && bD) pitchStop();
-  else pitchTurn(bU);
-
-  if (bL && bR) yawStop();
-  else yawTurn(bR);
-
-  U = u;
-  D = d;
-  L = l;
-  R = r;
-
-
-  //  if (!pitclk) pitchStop();
-  //  else pitclk += CW ? -1 : 1;
-  //  if (pitclk > 65535) pitchStop();
-
-
-
-  //  Serial.println(digitalRead(YAW_INTERUPT_PIN));
-
-  //  if (millis() > 4000) {
-  //    Serial.print(up);
-  //    Serial.print(",");
-  //    Serial.print(down);
-  //    Serial.print(",");
-  //    Serial.print(left);
-  //    Serial.print(",");
-  //    Serial.println(right);
-  //  }
-
+  delay(100);
 }
