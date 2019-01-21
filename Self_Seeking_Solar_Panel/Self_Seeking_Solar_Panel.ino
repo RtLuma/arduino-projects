@@ -56,7 +56,7 @@ void YAW_ISR(void) {
   //  digitalWrite(13, LOW); //Make it obvious we're done unwinding.
 }
 
-#define HISTORY 20
+#define HISTORY 50
 
 uint16_t history[HISTORY] = {0};
 uint32_t sum = 0;
@@ -137,6 +137,12 @@ void loop() {
   float stdev = sqrt(stdsum / float(HISTORY));
 
   Serial.println(stdev);
+
+  if (stdev < 20) {
+    yawStop();
+    pitchStop();
+    delay(1000);
+  }
 
   //  Serial.print(u);
   //  Serial.print(",");
