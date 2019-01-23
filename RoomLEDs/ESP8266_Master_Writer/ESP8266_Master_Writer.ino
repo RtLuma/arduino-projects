@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <ArduinoOTA.h>
 #include "Credentials.h"
+#include "HTML.h"
 
 #define SLAVE_ADDR 8
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
@@ -26,36 +27,50 @@ void setup() {
   Serial.begin(9600);
 
   server.on("/", []() {
-//    if (!server.authenticate(www_username, www_password))
-//      return server.requestAuthentication();
+    //    if (!server.authenticate(www_username, www_password))
+    //      return server.requestAuthentication();
     String message = "";
     bool succesfulQuery = true;
 
     if (server.args()) {
-      const byte length = server.args()<<1;
+      const byte length = server.args() << 1;
       char payload[length];
 
       for (uint8_t i = 0; i < server.args(); i++) {
         uint8_t i2 = i << 1;
-        payload[i2 + 1] =
-          (payload[i2] = server.argName(i)[0]) == 'm' ?
-          server.arg(i)[0] : server.arg(i).toInt();
+        payload[i2 + 1] = (payload[i2] = server.argName(i)[0]) == 'm' ? server.arg(i)[0] : server.arg(i).toInt();
       }
-      
+
       Wire.beginTransmission(SLAVE_ADDR);
       for (byte i = 0; i < length; i++)  Wire.write(payload[i]);
       succesfulQuery = !Wire.endTransmission();
 
-      for (uint8_t i = 0; i < length; i+=2) {
+      for (uint8_t i = 0; i < length; i += 2) {
         char jews[] = {payload[i], '\0'};
-        message += String(jews) + ": " + String((uint8_t)payload[i+1]) + "; ";
+        message += String(jews) + ": " + String((uint8_t)payload[i + 1]) + "; ";
       }
-    }
-    else message = "No args";
 
-    //if (succesfulQuery) server.send(200, "text/plain", "");
-    if (succesfulQuery) server.send(200, "text/plain", message + "\n");
-    else server.send(500, "text/plain", "I2C error?");
+      if (succesfulQuery) server.send(200, "text/plain", message + "\n");
+      else server.send(500, "text/plain", "I2C error?");
+    }
+    else {
+      //      #define PAYLENGTH 14
+      //      char payload[PAYLENGTH];
+      //      uint8_t i = 0;
+      //
+      //      Wire.requestFrom(SLAVE_ADDR, PAYLENGTH, true);
+      ////      while (Wire.available()) payload[i++] = Wire.read();
+      //      while (Wire.available()) {
+      //        message += Wire.read();
+      //        message += ",";
+      //      }
+      ////      Wire.flush();
+      //
+      //
+      ////      message = "No args";
+      server.send(200, "text/html", HTML);
+    }
+
   });
 
   server.onNotFound([]() {
@@ -88,5 +103,5 @@ void setup() {
 
 void loop() {
   server.handleClient();
-  ArduinoOTA.handle();
+//  ArduinoOTA.handle();
 }

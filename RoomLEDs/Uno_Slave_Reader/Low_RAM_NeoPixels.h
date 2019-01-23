@@ -182,12 +182,12 @@ void theaterChase() {
     for (++i; i < W; i++) sendPixel2(0, 0, 0);
   }
 
-  for (p = 0; p < PUPIL; p += W) {
-    uint8_t i = 0;
-    for (i; i < l; i++) sendPixel2(0, 0, 0);
-    sendPixel2(R, G, B);
-    for (++i; i < W; i++) sendPixel2(0, 0, 0);
-  }
+//  for (p = 0; p < PUPIL; p += W) {
+//    uint8_t i = 0;
+//    for (i; i < l; i++) sendPixel2(0, 0, 0);
+//    sendPixel2(R, G, B);
+//    for (++i; i < W; i++) sendPixel2(0, 0, 0);
+//  }
 }
 
 uint8_t rainbow(uint8_t hue) {

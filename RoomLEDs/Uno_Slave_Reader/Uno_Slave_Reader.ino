@@ -11,7 +11,24 @@ uint16_t OFFSET = 0;
 
 #include "LabelMaps.h"
 
-
+void requestEvent() {
+  cli();
+  
+  char payload[] = {
+//    'm', EEPROM.read(e_mode),
+    65,0,
+    'r', R,
+    'g', G,
+    'b', B,
+    'f', F,
+    'p', P,
+    'w', W
+  };
+  
+  Wire.write(payload, ARRAY_SIZE(payload));
+  Wire.flush();
+  sei();
+}
 
 void receiveEvent(byte length) {
   cli();
@@ -67,8 +84,8 @@ void receiveEvent(byte length) {
     }
   }
 
-  Serial.println();
-  Serial.flush();
+//  Serial.println();
+//  Serial.flush();
 
   if (needSoftReset) ((void (*)())NULL)();
   //  else if (!EEPROM.read(e_mode)) mode();
@@ -95,6 +112,7 @@ void setup() {
 
   Wire.begin(8);                // join i2c bus with address #8
   Wire.onReceive(receiveEvent); // register event
+  Wire.onRequest(requestEvent); // register event
 
   FFT.begin();  // Init Audio-Spectrum shield
   mode = modes[EEPROM.read(e_mode)]; // Load display mode

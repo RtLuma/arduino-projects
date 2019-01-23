@@ -78,7 +78,7 @@ struct Ring {
     void updateDiscrete(void) {
       node *n = head;
       do {
-        int8_t newlum = n->lum + 1;
+        int8_t newlum = n->lum + ((F>>6) + 1);
         
         if (n->lum<0 && newlum>-1) {
           uint16_t del_pos = n->pos;
@@ -113,7 +113,7 @@ struct Ring {
 //       tail->next=&_head;
       
       do {
-        int8_t newlum = cur->lum + 1;
+        int8_t newlum = cur->lum + ((F>>6) + 1);
         
         if (!(abs(newlum) - abs(interpolate(pre, cur->next, cur->pos)))) {
           uint16_t del_pos = cur->pos; cur = cur->next; remove(del_pos);
