@@ -14,13 +14,13 @@
             -khtml-user-select: none;
             -webkit-user-select: none;
         }
-        
+
         .slider {
             -webkit-appearance: slider-vertical;
             -moz-appearance: slider-vertical;
             padding: 0 4em;
-        }   
-        
+        }
+
         fieldset {
             display: inline;
             border-radius: 6px;
@@ -35,19 +35,19 @@
         legend {
             text-align: center;
         }
-        
+
         body {
             display: flex;
             flex-direction: column;
             position: absolute;
-            top:0;
-            left:0;
+            top: 0;
+            left: 0;
             overflow-y: hidden;
         }
-        
+
         div {
             width: 100%;
-            display:flex;
+            display: flex;
             align-items: center;
             align-content: space-around;
             justify-content: center;
@@ -58,17 +58,17 @@
     <script type="text/javascript">
         const API_URL = "http://192.168.0.69?";
         let cansend = true;
-        
+
         const LED_MODES = {
-             "f":"Fill (solid)"
-            ,"s":"Sparkle"
-            ,"g":"Gradient"
-            ,"G":"Grainbient"
-            ,"v":"Visualizer (solid)"
-            ,"V":"Visualizer (rainbow)"
-            ,"t":"Theater Chase"
-            ,"r":"Gradient (rainbow)"
-            ,"R":"RGB Solid Fill Cycle"
+            "f": "Fill (solid)",
+            "s": "Sparkle",
+            "g": "Gradient",
+            "G": "Grainbient",
+            "v": "Visualizer (solid)",
+            "V": "Visualizer (rainbow)",
+            "t": "Theater Chase",
+            "r": "Gradient (rainbow)",
+            "R": "RGB Solid Fill Cycle"
         }
 
         async function sendPacket(data) {
@@ -86,8 +86,8 @@
         }
         const cv = document.createElement("CANVAS");
         const ctx = cv.getContext('2d');
-        
-        var getMousePixel = function(e) {
+
+        var getMousePixel = function (e) {
             let rgb = ctx.getImageData(e.offsetX, e.offsetY, 1, 1).data;
             let packet = {
                 r: rgb[0],
@@ -105,7 +105,7 @@
                 cv.height = hsv.height;
                 ctx.drawImage(hsv, 0, 0, hsv.width, hsv.height);
 
-                cv.resize = function() {
+                cv.resize = function () {
                     cv.width = hsv.width;
                     cv.height = hsv.height;
                     ctx.clearRect(0, 0, cv.width, cv.height)
@@ -113,31 +113,33 @@
                 }
 
                 cv.resize();
-                
-                hsv.ondragstart = function(e) { e.preventDefault(); };
 
-                hsv.onmousedown = function(e) {
+                hsv.ondragstart = function (e) {
+                    e.preventDefault();
+                };
+
+                hsv.onmousedown = function (e) {
                     cv.resize();
                     this.onmousemove = getMousePixel;
                     getMousePixel(e);
                 }
-                hsv.onmouseup = function(e) {
+                hsv.onmouseup = function (e) {
                     this.onmousemove = null;
                     this.style.setProperty("--shadow", "");
                 }
-                
-                hsv.ontouchstart = function(e) {
+
+                hsv.ontouchstart = function (e) {
                     cv.resize();
                     this.ontouchmove = getMousePixel;
                     getMousePixel(e);
                     console.log("dicks")
                 }
-                hsv.ontouchend = function(e) {
+                hsv.ontouchend = function (e) {
                     this.ontouchmove = null;
                     this.style.setProperty("--shadow", "");
                 }
-                
-                hsv.ondblclick = function(e) {
+
+                hsv.ondblclick = function (e) {
                     if (!this.onmousemove) {
                         cv.resize();
                         this.onmousemove = getMousePixel;
@@ -147,31 +149,35 @@
                         this.style.setProperty("--shadow", "");
                     }
                 }
-                
+
                 for (s of document.getElementsByClassName("slider")) {
-                    s.onmousewheel = function(e) { 
-                        this.value -= e.deltaY/10
+                    s.onmousewheel = function (e) {
+                        this.value -= e.deltaY / 10
                         this.oninput();
                     };
-                    s.addEventListener('DOMMouseScroll', function(e) {
+                    s.addEventListener('DOMMouseScroll', function (e) {
                         this.value -= e.detail;
                         this.oninput();
                     }, false);
                 }
-                
-                const buttons = document.getElementById("buttons");
-                for (m in LED_MODES) {
-                    console.log(m);
-                    // <input type="button" value="Fill" name="f" oninput="sendPacket({[this.name]:this.name})">
-                    let but = document.createElement("input");
-                    but.type = "button";
-                    but.value = LED_MODES[m];
-                    but.name = m;
-                    but.onclick = function(e) { sendPacket({"m":this.name}) };
-                    // but.oninput = "sendPacket({[this.value]:this.name})";
-                    buttons.appendChild(but);
-                }
             };
+
+            const buttons = document.getElementById("buttons");
+            for (m in LED_MODES) {
+                console.log(m);
+                // <input type="button" value="Fill" name="f" oninput="sendPacket({[this.name]:this.name})">
+                let but = document.createElement("input");
+                but.type = "button";
+                but.value = LED_MODES[m];
+                but.name = m;
+                but.onclick = function (e) {
+                    sendPacket({
+                        "m": this.name
+                    })
+                };
+                // but.oninput = "sendPacket({[this.value]:this.name})";
+                buttons.appendChild(but);
+            }
         });
     </script>
 </head>
@@ -203,4 +209,3 @@
 </body>
 
 </html>
-
