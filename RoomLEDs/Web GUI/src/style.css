@@ -1,0 +1,52 @@
+#colorpicker {
+    --shadow: "";
+    width: 97vw;
+    height: 512px;
+    image-rendering: pixelated;
+    border-radius: 6px;
+    transition: 0.25s;
+    box-shadow: var(--shadow);
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+}
+
+.slider {
+    -webkit-appearance: slider-vertical;
+    -moz-appearance: slider-vertical;
+    padding: 0 4em;
+}
+
+fieldset {
+    display: inline;
+    border-radius: 6px;
+    padding: 1em;
+}
+
+input[type=button] {
+    margin: 0 0.5em;
+    height: 5em;
+}
+
+legend {
+    text-align: center;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow-y: hidden;
+}
+
+div {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    align-content: space-around;
+    justify-content: center;
+    justify-items: center;
+    align-self: center;
+}
