@@ -4,7 +4,7 @@ cd src
 
 CSS=`npx uglifycss style.css`
 
-JS=`npx -q uglifyjs rgb.js --ecma 8 --rename --toplevel -c -m`
+JS=`npx -q uglifyjs script.js --ecma 8 --rename -c -m`
 
 HTML=`sed -e "s#__JAVASCRIPT__#$JS#" -e "s@__CSS__@$CSS@" -e "s#__JAVASCRIPT__#\&#" template.html`
 
