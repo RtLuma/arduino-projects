@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <style type="text/css">
+    __CSS__
+    </style>
+    <script type="text/javascript">
+    __JAVASCRIPT__
+    </script>
+</head>
+    <body>
+        <fieldset>
+            <legend>RGB</legend>
+            <img draggable="false" id="colorpicker" src="hsv.png"></img>
+        </fieldset>
+        <div>
+            <fieldset style="display: inline-block; width: fit-content;" id="buttons">
+                <legend>Modes</legend>
+            </fieldset>
+        </div>
+        <div>
+            <fieldset>
+                <legend>Width</legend>
+                <input orient="vertical" class="slider" type="range" value="0" min="2" max="50" name="w" oninput="sendPacket({[this.name]:this.value})">
+            </fieldset>
+            <fieldset>
+                <legend>Speed</legend>
+                <input orient="vertical" class="slider" type="range" value="0" min="5" max="128" name="f" oninput="sendPacket({[this.name]:this.value})">
+            </fieldset>
+            <fieldset>
+                <legend>Population</legend>
+                <input orient="vertical" class="slider" type="range" value="20" min="20" max="180" name="p" oninput="sendPacket({[this.name]:this.value})">
+            </fieldset>
+        </div>
+    </body>
+</html>
