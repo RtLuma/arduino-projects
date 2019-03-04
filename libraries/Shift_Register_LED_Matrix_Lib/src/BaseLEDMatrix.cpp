@@ -32,6 +32,7 @@ BaseLEDMatrix::BaseLEDMatrix(
 	bool rowControlBitOn,
 	unsigned int interFrameOffTimeMicros,
 	int slavePin,
+	DeviceBitEndian bitEndian,
 	unsigned long maxSPISpeed
 ) :		TimerAction(UPDATE_INTERVAL),
 		_rows(rows),
@@ -39,6 +40,7 @@ BaseLEDMatrix::BaseLEDMatrix(
 		_columnBitWidth(columnBitWidth),
 		_pwmCycleScanCount(pwmCycleScanCount),
 		_interFrameOffTimeMicros(interFrameOffTimeMicros),
+		_bitEndian(bitEndian),
 		_columnControlBitOn(columnControlBitOn),
 		_rowControlBitOn(rowControlBitOn),
 		_curScreenBitFrames(NULL),
@@ -220,7 +222,54 @@ void BaseLEDMatrix::stopScanning(void) {
 
 unsigned int BaseLEDMatrix::nextRowScanTimerInterval(void) const {
 	// Calculates the microseconds for each scan	
-	return  5*this->baseIntervalMultiplier( _scanPass );
+	return  100*this->baseIntervalMultiplier( _scanPass );
+}
+
+#pragma mark ESP32 Handlers
+#elif defined ( ESP32 )
+hw_timer_t * timer = NULL;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+
+void IRAM_ATTR onTimer() {
+	portENTER_CRITICAL_ISR(&timerMux);
+	timerStop(timer);
+	if (gSingleton->doInterFrameTransmitOff()) {
+		gSingleton->shiftOutAllOff();
+	} else {
+		gSingleton->shiftOutCurrentRow();
+				
+		// update scan row. Done outside of interrupt stoppage since execution time can
+		// be inconsistent, which would lead to vary brightness in rows.
+		gSingleton->incrementScanRow();
+	}
+	timerAlarmWrite(timer, gSingleton->nextRowScanTimerInterval(), true);
+	timerRestart(timer);
+	portEXIT_CRITICAL_ISR(&timerMux);
+}
+
+void BaseLEDMatrix::startScanning(void) {
+	this->setup();
+	
+	_interFrameOffTimeInterval = _interFrameOffTimeMicros;
+	
+	noInterrupts();
+	
+	// this sets the timer to count every 1 micro seconds. use timer 3 for best compatibility
+	timer = timerBegin(3, 80, true);
+	timerAttachInterrupt(timer, &onTimer, true);
+	timerAlarmWrite(timer, this->nextRowScanTimerInterval(), true);
+	timerAlarmEnable(timer);
+	
+	interrupts();
+}
+
+void BaseLEDMatrix::stopScanning(void) {
+	timerEnd(timer);
+}
+
+unsigned int BaseLEDMatrix::nextRowScanTimerInterval(void) const {
+	// this sets the interrupt to fire a multiple every 25 timer counts, or 25 microseconds
+	return  25*this->baseIntervalMultiplier( _scanPass );
 }
 
 #pragma mark ESP8266 Handlers

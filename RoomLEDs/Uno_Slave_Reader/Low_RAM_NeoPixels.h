@@ -156,12 +156,23 @@ void show() {
   _delay_us( (RES / 1000UL) + 1);
 }
 
-void showColor( unsigned char r , unsigned char g , unsigned char b ) {
+void fillColor( unsigned char r , unsigned char g , unsigned char b ) {
   for ( uint16_t p = 0; p < PIXELS; p++ ) {
     sendPixel( r , g , b ); sendPixel2( r , g , b );
   }  show();
 }
 
+void fillIris( unsigned char r , unsigned char g , unsigned char b ) {
+  for ( uint16_t p = 0; p < PIXELS; p++ ) {
+    sendPixel2( r , g , b );
+  }  show();
+}
+
+void fillSclera( unsigned char r , unsigned char g , unsigned char b ) {
+  for ( uint16_t p = 0; p < PIXELS; p++ ) {
+    sendPixel( r , g , b );
+  }  show();
+}
 
 void theaterChase() {
   OFFSET += F;

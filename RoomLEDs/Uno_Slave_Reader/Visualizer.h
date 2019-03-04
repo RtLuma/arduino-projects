@@ -96,3 +96,48 @@ void visualizer(void) {
 
 }
 
+void visualizerSclera(void) {
+  uint8_t *pixelA, *pixelB;
+  //////// start computing and broadcasting each pixel on the fly
+  uint16_t r, g, b;
+  int16_t r_step, g_step, b_step;
+ 
+  pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[0][1]; pixelB = sclera[1][0]; sendVisualizerPixels(SECTION_SCLERA)
+
+  pixelA = sclera[1][0]; pixelB = sclera[1][1]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[1][1]; pixelB = sclera[1][2]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[1][2]; pixelB = sclera[1][3]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[1][3]; pixelB = sclera[1][4]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[1][4]; pixelB = sclera[1][5]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[1][5]; pixelB = sclera[1][6]; sendVisualizerPixels((SECTION_SCLERA + 1))
+  //pixelA = sclera[1][5]; pixelB = sclera[1][6]; visualizerDebug((SECTION_SCLERA + 1), sendPixel)
+
+  pixelA = sclera[0][6]; pixelB = sclera[0][5]; sendVisualizerPixels((SECTION_SCLERA - 1))
+  pixelA = sclera[0][5]; pixelB = sclera[0][4]; sendVisualizerPixels(SECTION_SCLERA)
+  pixelA = sclera[0][4]; pixelB = sclera[0][3]; sendVisualizerPixels(SECTION_SCLERA)
+
+}
+
+void visualizerIris(void) {
+  uint8_t *pixelA, *pixelB;
+  uint16_t r, g, b;
+  int16_t r_step, g_step, b_step;
+  
+  pixelA = sclera[0][3]; pixelB = sclera[0][2]; sendVisualizerPixels2((SECTION_IRIS - 1))
+  pixelA = sclera[0][2]; pixelB = sclera[0][1]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[0][1]; pixelB = sclera[0][0]; sendVisualizerPixels2(SECTION_IRIS)
+
+  pixelA = sclera[1][0]; pixelB = sclera[1][1]; sendVisualizerPixels2((SECTION_IRIS + 1))
+  pixelA = sclera[1][1]; pixelB = sclera[1][2]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[1][2]; pixelB = sclera[1][3]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[1][3]; pixelB = sclera[1][4]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[1][4]; pixelB = sclera[1][5]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[1][5]; pixelB = sclera[1][6]; sendVisualizerPixels2((SECTION_IRIS + 1))
+
+  pixelA = sclera[0][6]; pixelB = sclera[0][5]; sendVisualizerPixels2(SECTION_IRIS)
+  pixelA = sclera[0][5]; pixelB = sclera[0][4]; sendVisualizerPixels2((SECTION_IRIS + 0))
+  pixelA = sclera[0][4]; pixelB = sclera[0][3]; sendVisualizerPixels2((SECTION_IRIS + 1))
+  
+}

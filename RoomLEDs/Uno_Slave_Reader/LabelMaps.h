@@ -21,6 +21,10 @@ const char modeLabels[] = {
    'G'//radient (rainbow)
   ,'s'//parkle
   ,'g'//radient
+  ,'o'//utside visualizer, solid 
+  ,'O'//utside visualizer, rainbow
+  ,'0'//inside visualizer, solid
+  ,'@'//inside visualizer, rainbow
   ,'v'//isualizer 
   ,'V'//isualizer (rainbow)
   ,'t'//heater chase
@@ -32,16 +36,25 @@ const char modeLabels[] = {
   //Paintball?
   //Traffic?
 };
+
 const modePointer modes[] = {
   rgbContinuous,                              //G
   monoDiscrete,                               //s
   monoContinuous,                             //g
+  []() { fillIris(R,G,B);
+  solidVisualizer(); visualizerSclera(); },   //o
+  []() { fillIris(R,G,B);
+  chromaVisualizer(); visualizerSclera(); },  //O
+  []() { fillSclera(R,G,B);
+  solidVisualizer(); visualizerIris(); },     //0
+  []() { fillSclera(R,G,B);
+  chromaVisualizer(); visualizerIris(); },    //@
   []() { solidVisualizer(); visualizer(); },  //v
   []() { chromaVisualizer(); visualizer(); }, //V
   theaterChase,                               //t
   rainbowGradient,                            //r
   rainbowSolid,                               //R
-  []() { showColor(R, G, B); delay(100);},    //f
+  []() { fillColor(R, G, B); delay(100);},    //f
 };
 
 int8_t label2modeIndex(char label) {
