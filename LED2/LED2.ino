@@ -34,10 +34,7 @@ void setup() {
 void loop() {
 
   for (uint8_t C = 0; C < 2; C++) {
-    for (int i = 0; i < samples; i++)  {
-      vReal[i] = adc.analogRead(0);
-      vImag[i] = 0;
-    }
+    for (int i = 0; i < samples; i++)  { vReal[i] = adc.analogRead(C); vImag[i] = 0; }
     FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
     FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
     FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
