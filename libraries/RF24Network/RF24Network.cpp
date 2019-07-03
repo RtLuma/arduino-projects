@@ -160,7 +160,9 @@ uint8_t RF24Network::update(void)
   }
   #endif
   
-  while ( radio.isValid() && radio.available(&pipe_num) ){
+  uint32_t timeout = millis();
+  
+  while ( radio.isValid() && radio.available(&pipe_num) && millis() - timeout < 1000){
 
     #if defined (ENABLE_DYNAMIC_PAYLOADS) && !defined (XMEGA_D3)
       if( (frame_size = radio.getDynamicPayloadSize() ) < sizeof(RF24NetworkHeader)){
@@ -193,7 +195,7 @@ uint8_t RF24Network::update(void)
 		continue;
 	  }
 	  
-	  uint8_t returnVal = header->type;
+      returnVal = header->type;
 
 	  // Is this for us?
       if ( header->to_node == node_address   ){
@@ -202,7 +204,7 @@ uint8_t RF24Network::update(void)
 			   continue;
 			}
 		    if(header->type == NETWORK_ADDR_RESPONSE ){	
-			    uint16_t requester = 04444;
+			    uint16_t requester = NETWORK_DEFAULT_ADDRESS;
 				if(requester != node_address){
 					header->to_node = requester;
 					write(header->to_node,USER_TX_TO_PHYSICAL_ADDRESS);
@@ -242,7 +244,7 @@ uint8_t RF24Network::update(void)
 			
 
 				if(header->type == NETWORK_POLL  ){
-                    if( !(networkFlags & FLAG_NO_POLL) && node_address != 04444 ){
+                    if( !(networkFlags & FLAG_NO_POLL) && node_address != NETWORK_DEFAULT_ADDRESS ){
 					  header->to_node = header->from_node;
 					  header->from_node = node_address;			
 					  delay(parent_pipe);
@@ -254,6 +256,11 @@ uint8_t RF24Network::update(void)
 				
 				if(multicastRelay){					
 					IF_SERIAL_DEBUG_ROUTING( printf_P(PSTR("%u MAC: FWD multicast frame from 0%o to level %u\n"),millis(),header->from_node,multicast_level+1); );
+					if ((node_address >> 3) != 0) {
+					  // for all but the first level of nodes, those not directly connected to the master, we add the total delay per level
+					  delayMicroseconds(600*4);
+					}
+					delayMicroseconds((node_address % 4)*600);
 					write(levelToAddress(multicast_level)<<3,4);
 				}
 				if( val == 2 ){ //External data received			
@@ -604,14 +611,10 @@ uint16_t RF24Network::parent() const
 }
 
 /******************************************************************/
-/*uint8_t RF24Network::peekData(){
-		
-		return frame_queue[0];
-}*/
 
 uint16_t RF24Network::peek(RF24NetworkHeader& header)
 {
-  if ( available() )
+  if (available())
   {
   #if defined (RF24_LINUX)
     RF24NetworkFrame frame = frame_queue.front();
@@ -630,12 +633,36 @@ uint16_t RF24Network::peek(RF24NetworkHeader& header)
 
 /******************************************************************/
 
+void RF24Network::peek(RF24NetworkHeader& header, void* message, uint16_t maxlen)
+{
+#if defined (RF24_LINUX)
+  if (available()) 
+  { // TODO: Untested
+    RF24NetworkFrame frame = frame_queue.front();
+    memcpy(&header, &(frame.header), sizeof(RF24NetworkHeader));
+    memcpy(message, frame.message_buffer, maxlen);
+  }
+#else
+  if(available()) 
+  {
+    memcpy(&header, frame_queue, 8); //Copy the header
+    if(maxlen > 0) 
+    {
+      memcpy(message, frame_queue + 10, maxlen); //Copy the message
+    }
+  }
+#endif
+}
+
+/******************************************************************/
+
 uint16_t RF24Network::read(RF24NetworkHeader& header,void* message, uint16_t maxlen)
 {
   uint16_t bufsize = 0;
 
  #if defined (RF24_LINUX)
-   if ( available() ) {
+   if (available())
+   {
     RF24NetworkFrame frame = frame_queue.front();
 
     // How much buffer size should we actually copy?
@@ -651,7 +678,7 @@ uint16_t RF24Network::read(RF24NetworkHeader& header,void* message, uint16_t max
     frame_queue.pop();
   }
 #else  
-  if ( available() )
+  if (available())
   {
     
 	memcpy(&header,frame_queue,8);
@@ -1149,6 +1176,10 @@ void RF24Network::setup_address(void)
   parent_pipe = i;
 
   IF_SERIAL_DEBUG_MINIMAL( printf_P(PSTR("setup_address node=0%o mask=0%o parent=0%o pipe=0%o\n\r"),node_address,node_mask,parent_node,parent_pipe););
+//  IF_SERIAL_DEBUG_MINIMAL(Serial.print(F("setup_address node=")));
+//  IF_SERIAL_DEBUG_MINIMAL(Serial.print(node_address,OCT));
+//  IF_SERIAL_DEBUG_MINIMAL(Serial.print(F(" parent=")));
+//  IF_SERIAL_DEBUG_MINIMAL(Serial.println(parent_node,OCT));
 
 }
 
