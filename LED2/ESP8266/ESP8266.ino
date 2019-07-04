@@ -34,21 +34,35 @@ void setup() {
 void loop() {
 
   for (uint8_t C = 0; C < 2; C++) {
-    for (int i = 0; i < samples; i++)  { vReal[i] = adc.analogRead(C); vImag[i] = 0; }
+    for (int i = 0; i < samples; i++)  { 
+//      vReal[i] = C ? adc.analogRead(0) : analogRead(0);
+      vReal[i] = adc.analogRead(C);
+      vImag[i] = 0;
+     }
     FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
     FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
     FFT.ComplexToMagnitude(vReal, vImag, samples); /* Compute magnitudes */
 
+    double ratios[samples>>1];
+    double hardmax = 0.0;
+
     for (uint16_t i = 0; i < (samples >> 1); i++) {
       double magn = vReal[i];
+      
       if (magn > maxs[C][i]) maxs[C][i] = magn;
-      maxs[C][i] *= 0.995;
-
-      vals[C][i] *= 0.9;
+      maxs[C][i] *= 0.9975;
 
       magn /= (maxs[C][i]);
-      magn = pow(magn, 6);
+      magn = pow(magn, 5);
 
+      if (magn > hardmax) hardmax = magn;
+      ratios[i] = magn; 
+    }
+
+    for (uint16_t i = 0; i < (samples >> 1); i++) {
+      double magn = ratios[i]*hardmax;
+      
+      vals[C][i] *= 0.95;
 
       if (magn > vals[C][i]) vals[C][i] = (vals[C][i] + magn) / 2.0;
       //        if (magn > vals[i]) vals[i] = (vals[i] + 3.0 * magn) / 4.0;
@@ -67,7 +81,7 @@ void loop() {
   }
 
   for (i = (samples >> 1) - 1; i > 0; i--, pixel++) {
-    uint8_t hue = ((uint16_t(i) << 8) / (samples >> 1));
+    uint8_t hue = ((uint16_t(i-1) << 8) / (samples >> 1));
     leds.setPixelColor(pixel, leds.Color(
                          rainbow(hue + 170) * vals[1][i],
                          rainbow(hue + 85)  * vals[1][i],
