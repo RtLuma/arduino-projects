@@ -4,11 +4,8 @@
 void setup()
 {
   Wire.begin();
-  Wire.setClock(400000); //Increase I2C clock speed to 400kHz
-
- 
-  Serial.begin(9600);
-  while (!Serial);             // Leonardo: wait for serial monitor
+  Wire.setClock(400000); //Increase I2C clock speed to 400kHzu
+  Serial.begin(115200);
   Serial.println("\nI2C Scanner");
 }
  
