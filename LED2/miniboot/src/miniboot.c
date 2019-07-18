@@ -146,8 +146,9 @@ int main() {
   // if (isReflashNecessary(i2c_application_timestamp) &&
       // isCrcOk(source_i2c_address_for_program)) {
   LED_ON();
-    // eraseApplication();
-    // writeFlashFromI2C(source_i2c_address_for_program, application_start);
+    eraseApplication();
+  LED_OFF();
+    writeFlashFromI2C(source_i2c_address_for_program, application_start);
     
   // } else {
   //   uint16_t address_in_external_eeprom = getWordFromSource(
