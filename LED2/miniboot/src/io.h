@@ -6,8 +6,8 @@
 #define OUTPORT(name) CONCAT(DDR, name)
 #define LED_PORT(name) CONCAT(PORT, name)
 
-#define LED_ON() LED_PORT(LED_PORT_NAME) &= ~(1 << (LED_PIN))
-#define LED_OFF() LED_PORT(LED_PORT_NAME) |= (1 << (LED_PIN))
+#define LED_OFF() LED_PORT(LED_PORT_NAME) &= ~(1 << (LED_PIN))
+#define LED_ON() LED_PORT(LED_PORT_NAME) |= (1 << (LED_PIN))
 #define LED_TOGGLE() LED_PORT(LED_PORT_NAME) ^= (1 << (LED_PIN))
 
 #define LED_INIT()                                                             \

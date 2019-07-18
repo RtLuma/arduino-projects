@@ -4,6 +4,7 @@
 
 #include "crc32.h"
 #include "bootloader.h"
+#include "eeprom.h"
 #include "flash.h"
 #include "i2c_communication.h"
 #include "init.h"
@@ -118,30 +119,43 @@ static inline void leaveBootloader(uint16_t &application_start) {
 }
 
 static inline bool isReflashNecessary(uint32_t &i2c_application_timestamp) {
+  uint32_t current_application_timestamp =
+      readLatestApplicationTimestampFromInternalEeprom();
 
-// TODO: Don't reflash everytime
+  i2c_application_timestamp =
+      static_cast<uint32_t>(getWordFromSource(
+          source_i2c_address_for_program, timestamp_application_byte_offset))
+      << 16;
+  i2c_application_timestamp |= static_cast<uint32_t>(getWordFromSource(
+      source_i2c_address_for_program, timestamp_application_byte_offset + 2));
 
-  return true;
+  if (eeprom_not_programmed == current_application_timestamp)
+    return true;
+  if (i2c_application_timestamp != current_application_timestamp)
+    return true;
+  return false;
 }
 
 int main() {
 
   init();
 
-  uint32_t i2c_application_timestamp;
+  // uint32_t i2c_application_timestamp;
   uint16_t application_start = 0;
 
-  if (isReflashNecessary(i2c_application_timestamp) &&
-      isCrcOk(source_i2c_address_for_program)) {
-    eraseApplication();
-    writeFlashFromI2C(source_i2c_address_for_program, application_start);
-  } else {
-    uint16_t address_in_external_eeprom = getWordFromSource(
-        source_i2c_address_for_program, application_start_address_byte_offset);
+  // if (isReflashNecessary(i2c_application_timestamp) &&
+      // isCrcOk(source_i2c_address_for_program)) {
+  LED_ON();
+    // eraseApplication();
+    // writeFlashFromI2C(source_i2c_address_for_program, application_start);
+    
+  // } else {
+  //   uint16_t address_in_external_eeprom = getWordFromSource(
+  //       source_i2c_address_for_program, application_start_address_byte_offset);
 
-    application_start = address_in_external_eeprom >> 8;
-    application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8;
-  }
+  //   application_start = address_in_external_eeprom >> 8;
+  //   application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8;
+  // }
   leaveBootloader(application_start);
 
   return 0;

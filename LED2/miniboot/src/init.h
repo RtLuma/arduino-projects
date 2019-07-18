@@ -15,7 +15,7 @@ static inline void disableWatchdog() {
 }
 
 static inline void init() {
-  //disableWatchdog();
+  disableWatchdog();
   i2c_init();
   initIO();
 }

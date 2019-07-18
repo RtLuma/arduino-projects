@@ -1,7 +1,5 @@
 Archive member included to satisfy reference by file (symbol)
 
-/usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
-                              miniboot.o (__udivmodhi4)
 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
                               /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o (exit)
 
@@ -9,24 +7,11 @@ Discarded input sections
 
  .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
+ .text          0x0000000000000000        0x0 miniboot.o
  .data          0x0000000000000000        0x0 miniboot.o
  .bss           0x0000000000000000        0x0 miniboot.o
  .data          0x0000000000000000        0x0 I2C-master-lib/i2c_master.o
  .bss           0x0000000000000000        0x0 I2C-master-lib/i2c_master.o
- .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc.mul
-                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc   0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc.prologue
-                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc.builtins
-                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc.fmul
-                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
- .text.libgcc.fixed
-                0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
  .text          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
  .data          0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
  .bss           0x0000000000000000        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
@@ -169,7 +154,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x0000000000007800      0x682
+.text           0x0000000000007800      0x2c4
  *(.vectors)
  .vectors       0x0000000000007800       0x68 /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
                 0x0000000000007800                __vectors
@@ -250,30 +235,26 @@ END GROUP
                 0x0000000000007878                __vector_16
                 0x0000000000007878                __vector_18
                 0x0000000000007878                __vector_20
- .text          0x000000000000787a      0x28a miniboot.o
- .text          0x0000000000007b04      0x220 I2C-master-lib/i2c_master.o
-                0x0000000000007b04                _Z8i2c_initv
-                0x0000000000007b0c                _Z9i2c_starth
-                0x0000000000007b50                _Z9i2c_writeh
-                0x0000000000007b72                _Z12i2c_read_ackv
-                0x0000000000007b86                _Z13i2c_read_nackv
-                0x0000000000007b9a                _Z12i2c_transmithPhj
-                0x0000000000007bea                _Z11i2c_receivehPhj
-                0x0000000000007c50                _Z12i2c_writeReghhPhj
-                0x0000000000007ca6                _Z11i2c_readReghhPhj
-                0x0000000000007d1c                _Z8i2c_stopv
-                0x0000000000007d24                . = ALIGN (0x2)
+ .text          0x000000000000787a      0x220 I2C-master-lib/i2c_master.o
+                0x000000000000787a                _Z8i2c_initv
+                0x0000000000007882                _Z9i2c_starth
+                0x00000000000078c6                _Z9i2c_writeh
+                0x00000000000078e8                _Z12i2c_read_ackv
+                0x00000000000078fc                _Z13i2c_read_nackv
+                0x0000000000007910                _Z12i2c_transmithPhj
+                0x0000000000007960                _Z11i2c_receivehPhj
+                0x00000000000079c6                _Z12i2c_writeReghhPhj
+                0x0000000000007a1c                _Z11i2c_readReghhPhj
+                0x0000000000007a92                _Z8i2c_stopv
+                0x0000000000007a9a                . = ALIGN (0x2)
  *(.text.*)
- .text.startup  0x0000000000007d24      0x132 miniboot.o
-                0x0000000000007d24                main
- .text.libgcc.div
-                0x0000000000007e56       0x28 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
-                0x0000000000007e56                __udivmodhi4
-                0x0000000000007e7e                . = ALIGN (0x2)
+ .text.startup  0x0000000000007a9a       0x26 miniboot.o
+                0x0000000000007a9a                main
+                0x0000000000007ac0                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000000000007e7e        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
-                0x0000000000007e7e                exit
-                0x0000000000007e7e                _exit
+ .fini9         0x0000000000007ac0        0x0 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
+                0x0000000000007ac0                exit
+                0x0000000000007ac0                _exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -292,11 +273,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000000000007e7e        0x4 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
+ .fini0         0x0000000000007ac0        0x4 /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_exit.o)
  *(.fini0)
-                0x0000000000007e82                _etext = .
+                0x0000000000007ac4                _etext = .
 
-.data           0x0000000000800100        0x0 load address 0x0000000000007e82
+.data           0x0000000000800100        0x0 load address 0x0000000000007ac4
                 [!provide]                        PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -313,8 +294,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                        PROVIDE (__bss_end, .)
-                0x0000000000007e82                __data_load_start = LOADADDR (.data)
-                0x0000000000007e82                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000000000007ac4                __data_load_start = LOADADDR (.data)
+                0x0000000000007ac4                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x0000000000800100        0x0
                 [!provide]                        PROVIDE (__noinit_start, .)
@@ -342,15 +323,15 @@ END GROUP
 .user_signatures
  *(.user_signatures*)
 
-.stab           0x0000000000000000     0x177c
+.stab           0x0000000000000000     0x10bc
  *(.stab)
- .stab          0x0000000000000000      0xcfc miniboot.o
- .stab          0x0000000000000cfc      0xa80 I2C-master-lib/i2c_master.o
+ .stab          0x0000000000000000      0x63c miniboot.o
+ .stab          0x000000000000063c      0xa80 I2C-master-lib/i2c_master.o
                                         0xa8c (size before relaxing)
 
-.stabstr        0x0000000000000000     0x1382
+.stabstr        0x0000000000000000     0x11b8
  *(.stabstr)
- .stabstr       0x0000000000000000     0x1382 miniboot.o
+ .stabstr       0x0000000000000000     0x11b8 miniboot.o
 
 .stab.excl
  *(.stab.excl)
@@ -450,25 +431,19 @@ Symbol                                            File
 _Z11i2c_readReghhPhj                              I2C-master-lib/i2c_master.o
 _Z11i2c_receivehPhj                               I2C-master-lib/i2c_master.o
 _Z12i2c_read_ackv                                 I2C-master-lib/i2c_master.o
-                                                  miniboot.o
 _Z12i2c_transmithPhj                              I2C-master-lib/i2c_master.o
 _Z12i2c_writeReghhPhj                             I2C-master-lib/i2c_master.o
 _Z13i2c_read_nackv                                I2C-master-lib/i2c_master.o
 _Z8i2c_initv                                      I2C-master-lib/i2c_master.o
                                                   miniboot.o
 _Z8i2c_stopv                                      I2C-master-lib/i2c_master.o
-                                                  miniboot.o
 _Z9i2c_starth                                     I2C-master-lib/i2c_master.o
-                                                  miniboot.o
 _Z9i2c_writeh                                     I2C-master-lib/i2c_master.o
-                                                  miniboot.o
 __FUSE_REGION_LENGTH__                            /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __bad_interrupt                                   /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __heap_end                                        /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __init                                            /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __stack                                           /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
-__udivmodhi4                                      /usr/lib/gcc/avr/5.4.0/avr5/libgcc.a(_udivmodhi4.o)
-                                                  miniboot.o
 __vector_1                                        /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __vector_10                                       /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
 __vector_11                                       /usr/lib/gcc/avr/5.4.0/../../../avr/lib/avr5/crtatmega328p.o
