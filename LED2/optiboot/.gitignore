@@ -1,0 +1,5 @@
+*.swp
+*~
+baudcheck.tmp.sh
+optiboot_atmega328.hex
+*.lst

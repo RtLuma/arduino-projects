@@ -12,23 +12,22 @@
    2:miniboot.c    **** //  Fuses :     Ext: 0xFF, Hi: 0xD8, Lo: 0xE2
    3:miniboot.c    **** //
    4:miniboot.c    **** 
-   5:miniboot.c    **** #include "Drivers/CRC/crc32.h"
+   5:miniboot.c    **** #include "crc32.h"
    6:miniboot.c    **** #include "bootloader.h"
-   7:miniboot.c    **** #include "eeprom.h"
-   8:miniboot.c    **** #include "flash.h"
-   9:miniboot.c    **** #include "i2c_communication.h"
-  10:miniboot.c    **** #include "init.h"
-  11:miniboot.c    **** 
-  12:miniboot.c    **** static inline uint16_t getDataStartAddressInSource(const uint8_t i2c_address) {
-  13:miniboot.c    ****   return application_byte_offset;
-  14:miniboot.c    **** }
-  15:miniboot.c    **** 
-  16:miniboot.c    **** static inline uint16_t getDataLength(const uint8_t i2c_address) {
-  17:miniboot.c    ****   return getWordFromSource(i2c_address, application_length_byte_offset);
-  18:miniboot.c    **** }
-  19:miniboot.c    **** 
-  20:miniboot.c    **** static inline void writeToFlash(const uint16_t address, uint8_t *data,
-  21:miniboot.c    ****                                 uint16_t &application_start) {
+   7:miniboot.c    **** #include "flash.h"
+   8:miniboot.c    **** #include "i2c_communication.h"
+   9:miniboot.c    **** #include "init.h"
+  10:miniboot.c    **** 
+  11:miniboot.c    **** static inline uint16_t getDataStartAddressInSource(const uint8_t i2c_address) {
+  12:miniboot.c    ****   return application_byte_offset;
+  13:miniboot.c    **** }
+  14:miniboot.c    **** 
+  15:miniboot.c    **** static inline uint16_t getDataLength(const uint8_t i2c_address) {
+  16:miniboot.c    ****   return getWordFromSource(i2c_address, application_length_byte_offset);
+  17:miniboot.c    **** }
+  18:miniboot.c    **** 
+  19:miniboot.c    **** static inline void writeToFlash(const uint16_t address, uint8_t *data,
+  20:miniboot.c    ****                                 uint16_t &application_start) {
  121               	.LM0:
  122               	.LFBB1:
  123 0000 CF93      		push r28
@@ -39,8 +38,8 @@
  128               	.L__stack_usage = 2
  129 0004 DB01      		movw r26,r22
  130 0006 FA01      		movw r30,r20
-  22:miniboot.c    **** 
-  23:miniboot.c    ****   if (0 == address && 0 == application_start) {
+  21:miniboot.c    **** 
+  22:miniboot.c    ****   if (0 == address && 0 == application_start) {
  132               	.LM1:
  133 0008 0097      		sbiw r24,0
  134 000a 01F4      		brne .L2
@@ -49,7 +48,7 @@
  138 000e 3181      		ldd r19,Z+1
  139 0010 232B      		or r18,r19
  140 0012 01F4      		brne .L2
-  24:miniboot.c    ****     application_start = static_cast<uint16_t>(data[RESET_VECTOR_ARGUMENT_ADDRESS]) << 8;
+  23:miniboot.c    ****     application_start = static_cast<uint16_t>(data[RESET_VECTOR_ARGUMENT_ADDRESS]) << 8;
  142               	.LM3:
  143 0014 1296      		adiw r26,2
  144 0016 2C91      		ld r18,X
@@ -59,8 +58,8 @@
  148 001e 2227      		clr r18
  149 0020 3183      		std Z+1,r19
  150 0022 2083      		st Z,r18
-  25:miniboot.c    ****     application_start |=
-  26:miniboot.c    ****         static_cast<uint8_t>(data[RESET_VECTOR_ARGUMENT_ADDRESS + 1]);
+  24:miniboot.c    ****     application_start |=
+  25:miniboot.c    ****         static_cast<uint8_t>(data[RESET_VECTOR_ARGUMENT_ADDRESS + 1]);
  152               	.LM4:
  153 0024 1396      		adiw r26,3
  154 0026 4C91      		ld r20,X
@@ -68,35 +67,35 @@
  156 002a 242B      		or r18,r20
  157 002c 3183      		std Z+1,r19
  158 002e 2083      		st Z,r18
-  27:miniboot.c    **** 
-  28:miniboot.c    ****     data[RESET_VECTOR] = static_cast<uint8_t>(jmp_instruction);
+  26:miniboot.c    **** 
+  27:miniboot.c    ****     data[RESET_VECTOR] = static_cast<uint8_t>(jmp_instruction);
  160               	.LM5:
  161 0030 2CE0      		ldi r18,lo8(12)
  162 0032 2C93      		st X,r18
-  29:miniboot.c    ****     data[RESET_VECTOR + 1] = static_cast<uint8_t>(jmp_instruction >> 8);
+  28:miniboot.c    ****     data[RESET_VECTOR + 1] = static_cast<uint8_t>(jmp_instruction >> 8);
  164               	.LM6:
  165 0034 24E9      		ldi r18,lo8(-108)
  166 0036 1196      		adiw r26,1
  167 0038 2C93      		st X,r18
  168 003a 1197      		sbiw r26,1
-  30:miniboot.c    **** 
-  31:miniboot.c    ****     data[RESET_VECTOR_ARGUMENT_ADDRESS] = static_cast<uint8_t>(
-  32:miniboot.c    ****         static_cast<uint16_t>(BOOTLOADER_START_ADDRESS) / 2);
+  29:miniboot.c    **** 
+  30:miniboot.c    ****     data[RESET_VECTOR_ARGUMENT_ADDRESS] = static_cast<uint8_t>(
+  31:miniboot.c    ****         static_cast<uint16_t>(BOOTLOADER_START_ADDRESS) / 2);
  170               	.LM7:
  171 003c 1296      		adiw r26,2
  172 003e 1C92      		st X,__zero_reg__
  173 0040 1297      		sbiw r26,2
-  33:miniboot.c    ****     data[RESET_VECTOR_ARGUMENT_ADDRESS + 1] = static_cast<uint8_t>(
-  34:miniboot.c    ****         (static_cast<uint16_t>(BOOTLOADER_START_ADDRESS) / 2) >> 8);
+  32:miniboot.c    ****     data[RESET_VECTOR_ARGUMENT_ADDRESS + 1] = static_cast<uint8_t>(
+  33:miniboot.c    ****         (static_cast<uint16_t>(BOOTLOADER_START_ADDRESS) / 2) >> 8);
  175               	.LM8:
  176 0042 2CE3      		ldi r18,lo8(60)
  177 0044 1396      		adiw r26,3
  178 0046 2C93      		st X,r18
  179 0048 1397      		sbiw r26,3
  180               	.L2:
- 181               	.LBB25:
- 182               	.LBB26:
- 183               	.LBB27:
+ 181               	.LBB29:
+ 182               	.LBB30:
+ 183               	.LBB31:
  185               	.Ltext1:
    1:flash.h       **** #pragma once
    2:flash.h       **** 
@@ -134,10 +133,10 @@
  201 0056 00FC      		sbrc __tmp_reg__,0
  202 0058 00C0      		rjmp .L3
  203 005a 40E0      		ldi r20,0
- 204               	.LBE27:
- 205               	.LBE26:
- 206               	.LBB28:
- 207               	.LBB29:
+ 204               	.LBE31:
+ 205               	.LBE30:
+ 206               	.LBB32:
+ 207               	.LBB33:
   21:flash.h       **** }
   22:flash.h       **** 
   23:flash.h       **** static inline void writeToPageBuffer(const uint16_t address, uint8_t *data) {
@@ -176,17 +175,17 @@
  237               		
  238               	 ;  0 "" 2
  239               	/* #NOAPP */
- 240               	.LBE29:
+ 240               	.LBE33:
   25:flash.h       ****     uint16_t w = *data++;
  242               	.LM14:
  243 0086 4E5F      		subi r20,lo8(-(2))
  244 0088 1296      		adiw r26,2
  245 008a 4038      		cpi r20,lo8(-128)
  246 008c 01F4      		brne .L4
- 247               	.LBE28:
- 248               	.LBE25:
- 249               	.LBB30:
- 250               	.LBB31:
+ 247               	.LBE32:
+ 248               	.LBE29:
+ 249               	.LBB34:
+ 250               	.LBB35:
   29:flash.h       ****   }
   30:flash.h       **** }
   31:flash.h       **** 
@@ -219,21 +218,21 @@
  276               	 ;  0 "" 2
  277               	/* epilogue start */
  278               	/* #NOAPP */
- 279               	.LBE31:
- 280               	.LBE30:
+ 279               	.LBE35:
+ 280               	.LBE34:
  282               	.Ltext2:
-  35:miniboot.c    ****   }
-  36:miniboot.c    **** 
-  37:miniboot.c    ****   writeToPageBuffer(address, data);
-  38:miniboot.c    ****   writePageBufferToFlash(address);
-  39:miniboot.c    **** }
+  34:miniboot.c    ****   }
+  35:miniboot.c    **** 
+  36:miniboot.c    ****   writeToPageBuffer(address, data);
+  37:miniboot.c    ****   writePageBufferToFlash(address);
+  38:miniboot.c    **** }
  284               	.LM18:
  285 00a6 DF91      		pop r29
  286 00a8 CF91      		pop r28
  287 00aa 0895      		ret
  292               	.Lscope1:
  294               		.stabd	78,0,0
- 297               	_ZL8readBytehj.constprop.6:
+ 297               	_ZL8readBytehj.constprop.7:
  298               		.stabd	46,0,0
  300               	.Ltext3:
    1:i2c_communication.h **** #pragma once
@@ -287,7 +286,7 @@
  337 00d2 0C94 0000 		jmp _Z12i2c_read_ackv
  339               	.Lscope2:
  341               		.stabd	78,0,0
- 345               	_ZL17getWordFromSourcehj.constprop.5:
+ 345               	_ZL17getWordFromSourcehj.constprop.6:
  346               		.stabd	46,0,0
   20:i2c_communication.h **** 
   21:i2c_communication.h **** static inline uint16_t getWordFromSource(const uint8_t i2c_address,
@@ -305,7 +304,7 @@
   22:i2c_communication.h ****                                          const uint16_t data_address) {
   23:i2c_communication.h ****   uint16_t result = static_cast<uint16_t>(readByte(i2c_address, data_address))
  360               	.LM28:
- 361 00e0 0E94 0000 		call _ZL8readBytehj.constprop.6
+ 361 00e0 0E94 0000 		call _ZL8readBytehj.constprop.7
   24:i2c_communication.h ****                     << 8;
  363               	.LM29:
  364 00e4 C82F      		mov r28,r24
@@ -316,7 +315,7 @@
  369               	.LM30:
  370 00ec C801      		movw r24,r16
  371 00ee 0196      		adiw r24,1
- 372 00f0 0E94 0000 		call _ZL8readBytehj.constprop.6
+ 372 00f0 0E94 0000 		call _ZL8readBytehj.constprop.7
   26:i2c_communication.h ****   return result;
   27:i2c_communication.h **** }
  374               	.LM31:
@@ -331,11 +330,11 @@
  383 0102 0895      		ret
  385               	.Lscope3:
  387               		.stabd	78,0,0
- 390               	_ZL7isCrcOkh.constprop.3:
+ 390               	_ZL7isCrcOkh.constprop.4:
  391               		.stabd	46,0,0
  393               	.Ltext4:
-  40:miniboot.c    **** 
-  41:miniboot.c    **** static inline bool isCrcOk(const uint8_t i2c_address) {
+  39:miniboot.c    **** 
+  40:miniboot.c    **** static inline bool isCrcOk(const uint8_t i2c_address) {
  395               	.LM32:
  396               	.LFBB4:
  397 0104 3F92      		push r3
@@ -367,13 +366,13 @@
  423               	/* frame size = 1024 */
  424               	/* stack size = 1041 */
  425               	.L__stack_usage = 1041
- 426               	.LBB45:
- 427               	.LBB46:
-  17:miniboot.c    **** }
+ 426               	.LBB49:
+ 427               	.LBB50:
+  16:miniboot.c    **** }
  429               	.LM33:
  430 0136 80E2      		ldi r24,lo8(32)
  431 0138 90E0      		ldi r25,0
- 432 013a 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
+ 432 013a 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
  433 013e 7C01      		movw r14,r24
  434 0140 FE01      		movw r30,r28
  435 0142 3196      		adiw r30,1
@@ -386,24 +385,24 @@
  442 014e CA01      		movw r24,r20
  443 0150 28E0      		ldi r18,lo8(8)
  444               	.L14:
- 445               	.LBE46:
- 446               	.LBE45:
- 447               	.LBB47:
- 448               	.LBB48:
- 449               	.LBB49:
- 450               	.LBB50:
- 451               	.LBB51:
+ 445               	.LBE50:
+ 446               	.LBE49:
+ 447               	.LBB51:
+ 448               	.LBB52:
+ 449               	.LBB53:
+ 450               	.LBB54:
+ 451               	.LBB55:
  453               	.Ltext5:
-   1:Drivers/CRC/crc32.h **** #pragma once
-   2:Drivers/CRC/crc32.h **** 
-   3:Drivers/CRC/crc32.h **** #include <stdint.h>
-   4:Drivers/CRC/crc32.h **** 
-   5:Drivers/CRC/crc32.h **** static constexpr uint32_t polynomial_representation = 0xEDB88320UL;
-   6:Drivers/CRC/crc32.h **** static constexpr uint16_t crc_table_size = 0x100;
-   7:Drivers/CRC/crc32.h **** 
-   8:Drivers/CRC/crc32.h **** static inline uint32_t crc32_for_byte(uint32_t r) {
-   9:Drivers/CRC/crc32.h ****   for (uint8_t i = 0; i < 8; ++i) {
-  10:Drivers/CRC/crc32.h ****     r = (r & 1 ? 0 : polynomial_representation) ^ r >> 1;
+   1:crc32.h       **** #pragma once
+   2:crc32.h       **** 
+   3:crc32.h       **** #include <stdint.h>
+   4:crc32.h       **** 
+   5:crc32.h       **** static constexpr uint32_t polynomial_representation = 0xEDB88320UL;
+   6:crc32.h       **** static constexpr uint16_t crc_table_size = 0x100;
+   7:crc32.h       **** 
+   8:crc32.h       **** static inline uint32_t crc32_for_byte(uint32_t r) {
+   9:crc32.h       ****   for (uint8_t i = 0; i < 8; ++i) {
+  10:crc32.h       ****     r = (r & 1 ? 0 : polynomial_representation) ^ r >> 1;
  455               	.LM34:
  456 0152 80FD      		sbrc r24,0
  457 0154 00C0      		rjmp .L22
@@ -430,19 +429,19 @@
  478 017a AA25      		eor r26,r10
  479 017c BB25      		eor r27,r11
  480 017e 2150      		subi r18,lo8(-(-1))
-   9:Drivers/CRC/crc32.h ****     r = (r & 1 ? 0 : polynomial_representation) ^ r >> 1;
+   9:crc32.h       ****     r = (r & 1 ? 0 : polynomial_representation) ^ r >> 1;
  482               	.LM35:
  483 0180 01F4      		brne .L14
- 484               	.LBE51:
- 485               	.LBE50:
- 486               	.LBE49:
-  11:Drivers/CRC/crc32.h ****   }
-  12:Drivers/CRC/crc32.h ****   return r ^ (uint32_t)0xFF000000L;
-  13:Drivers/CRC/crc32.h **** }
-  14:Drivers/CRC/crc32.h **** 
-  15:Drivers/CRC/crc32.h **** static inline void init_table(uint32_t *crc_table) {
-  16:Drivers/CRC/crc32.h ****   for (uint16_t i = 0; i < crc_table_size; ++i) {
-  17:Drivers/CRC/crc32.h ****     crc_table[i] = crc32_for_byte(i);
+ 484               	.LBE55:
+ 485               	.LBE54:
+ 486               	.LBE53:
+  11:crc32.h       ****   }
+  12:crc32.h       ****   return r ^ (uint32_t)0xFF000000L;
+  13:crc32.h       **** }
+  14:crc32.h       **** 
+  15:crc32.h       **** static inline void init_table(uint32_t *crc_table) {
+  16:crc32.h       ****   for (uint16_t i = 0; i < crc_table_size; ++i) {
+  17:crc32.h       ****     crc_table[i] = crc32_for_byte(i);
  488               	.LM36:
  489 0182 B095      		com r27
  490 0184 8193      		st Z+,r24
@@ -453,7 +452,7 @@
  495 018e 5F4F      		sbci r21,-1
  496 0190 6F4F      		sbci r22,-1
  497 0192 7F4F      		sbci r23,-1
-  16:Drivers/CRC/crc32.h ****     crc_table[i] = crc32_for_byte(i);
+  16:crc32.h       ****     crc_table[i] = crc32_for_byte(i);
  499               	.LM37:
  500 0194 4115      		cp r20,__zero_reg__
  501 0196 21E0      		ldi r18,1
@@ -466,97 +465,97 @@
  508 01a4 3201      		movw r6,r4
  509 01a6 00E0      		ldi r16,0
  510 01a8 10E0      		ldi r17,0
- 511               	.LBE48:
- 512               	.LBE47:
- 513               	.LBB52:
+ 511               	.LBE52:
+ 512               	.LBE51:
+ 513               	.LBB56:
  515               	.Ltext6:
-  42:miniboot.c    ****   bool status = false;
-  43:miniboot.c    ****   uint32_t crc = 0;
-  44:miniboot.c    ****   uint16_t start_address = getDataStartAddressInSource(i2c_address);
-  45:miniboot.c    ****   uint16_t length = getDataLength(i2c_address);
-  46:miniboot.c    **** 
-  47:miniboot.c    ****   uint32_t table[crc_table_size];
-  48:miniboot.c    ****   init_table(&table[0]);
-  49:miniboot.c    **** 
-  50:miniboot.c    ****   for (uint16_t pos = 0; pos < length + 1;
+  41:miniboot.c    ****   bool status = false;
+  42:miniboot.c    ****   uint32_t crc = 0;
+  43:miniboot.c    ****   uint16_t start_address = getDataStartAddressInSource(i2c_address);
+  44:miniboot.c    ****   uint16_t length = getDataLength(i2c_address);
+  45:miniboot.c    **** 
+  46:miniboot.c    ****   uint32_t table[crc_table_size];
+  47:miniboot.c    ****   init_table(&table[0]);
+  48:miniboot.c    **** 
+  49:miniboot.c    ****   for (uint16_t pos = 0; pos < length + 1;
  517               	.LM38:
  518 01aa 4701      		movw r8,r14
  519 01ac 8FEF      		ldi r24,-1
  520 01ae 881A      		sub r8,r24
  521 01b0 980A      		sbc r9,r24
- 522               	.LBB53:
-  51:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
-  52:miniboot.c    ****     if (pos >= length)
-  53:miniboot.c    ****       break;
-  54:miniboot.c    **** 
-  55:miniboot.c    ****     uint16_t data = getWordFromSource(i2c_address, pos + start_address);
-  56:miniboot.c    ****     if (pos == length - 1)
+ 522               	.LBB57:
+  50:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
+  51:miniboot.c    ****     if (pos >= length)
+  52:miniboot.c    ****       break;
+  53:miniboot.c    **** 
+  54:miniboot.c    ****     uint16_t data = getWordFromSource(i2c_address, pos + start_address);
+  55:miniboot.c    ****     if (pos == length - 1)
  524               	.LM39:
  525 01b2 5701      		movw r10,r14
  526 01b4 91E0      		ldi r25,1
  527 01b6 A91A      		sub r10,r25
  528 01b8 B108      		sbc r11,__zero_reg__
-  57:miniboot.c    ****       data &= 0xFF00;
-  58:miniboot.c    **** 
-  59:miniboot.c    ****     uint8_t to_little_endian[2];
-  60:miniboot.c    ****     to_little_endian[0] = static_cast<uint8_t>(data >> 8);
-  61:miniboot.c    ****     to_little_endian[1] = static_cast<uint8_t>(data);
-  62:miniboot.c    **** 
-  63:miniboot.c    ****     crc32(reinterpret_cast<const void *>(&to_little_endian[0]), 2, &table[0],
-  64:miniboot.c    ****           &crc);
-  65:miniboot.c    **** 
-  66:miniboot.c    ****     uint8_t toggle_led_every_x_bytes = 128;
-  67:miniboot.c    ****     if (0 == pos % toggle_led_every_x_bytes)
-  68:miniboot.c    ****       LED_TOGGLE();
+  56:miniboot.c    ****       data &= 0xFF00;
+  57:miniboot.c    **** 
+  58:miniboot.c    ****     uint8_t to_little_endian[2];
+  59:miniboot.c    ****     to_little_endian[0] = static_cast<uint8_t>(data >> 8);
+  60:miniboot.c    ****     to_little_endian[1] = static_cast<uint8_t>(data);
+  61:miniboot.c    **** 
+  62:miniboot.c    ****     crc32(reinterpret_cast<const void *>(&to_little_endian[0]), 2, &table[0],
+  63:miniboot.c    ****           &crc);
+  64:miniboot.c    **** 
+  65:miniboot.c    ****     uint8_t toggle_led_every_x_bytes = 128;
+  66:miniboot.c    ****     if (0 == pos % toggle_led_every_x_bytes)
+  67:miniboot.c    ****       LED_TOGGLE();
  530               	.LM40:
  531 01ba 3324      		clr r3
  532 01bc 3394      		inc r3
  533               	.L20:
- 534               	.LBE53:
-  50:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
+ 534               	.LBE57:
+  49:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
  536               	.LM41:
  537 01be 0815      		cp r16,r8
  538 01c0 1905      		cpc r17,r9
  539 01c2 00F4      		brsh .L16
- 540               	.LBB56:
-  52:miniboot.c    ****       break;
+ 540               	.LBB60:
+  51:miniboot.c    ****       break;
  542               	.LM42:
  543 01c4 0E15      		cp r16,r14
  544 01c6 1F05      		cpc r17,r15
  545 01c8 00F4      		brsh .L16
-  55:miniboot.c    ****     if (pos == length - 1)
+  54:miniboot.c    ****     if (pos == length - 1)
  547               	.LM43:
  548 01ca C801      		movw r24,r16
  549 01cc 8296      		adiw r24,34
- 550 01ce 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
-  56:miniboot.c    ****       data &= 0xFF00;
+ 550 01ce 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+  55:miniboot.c    ****       data &= 0xFF00;
  552               	.LM44:
  553 01d2 0A15      		cp r16,r10
  554 01d4 1B05      		cpc r17,r11
  555 01d6 01F4      		brne .L18
-  57:miniboot.c    **** 
+  56:miniboot.c    **** 
  557               	.LM45:
  558 01d8 8827      		clr r24
  559               	.L18:
- 560               	.LBB54:
- 561               	.LBB55:
+ 560               	.LBB58:
+ 561               	.LBB59:
  563               	.Ltext7:
-  18:Drivers/CRC/crc32.h ****   }
-  19:Drivers/CRC/crc32.h **** }
-  20:Drivers/CRC/crc32.h **** 
-  21:Drivers/CRC/crc32.h **** static inline void crc32(const void *data, const uint16_t length,
-  22:Drivers/CRC/crc32.h ****                          const uint32_t *crc_table, uint32_t *crc) {
-  23:Drivers/CRC/crc32.h ****   for (uint16_t i = 0; i < length; ++i) {
-  24:Drivers/CRC/crc32.h ****     *crc = crc_table[static_cast<uint8_t>(*crc) ^ ((uint8_t *)data)[i]] ^
+  18:crc32.h       ****   }
+  19:crc32.h       **** }
+  20:crc32.h       **** 
+  21:crc32.h       **** static inline void crc32(const void *data, const uint16_t length,
+  22:crc32.h       ****                          const uint32_t *crc_table, uint32_t *crc) {
+  23:crc32.h       ****   for (uint16_t i = 0; i < length; ++i) {
+  24:crc32.h       ****     *crc = crc_table[static_cast<uint8_t>(*crc) ^ ((uint8_t *)data)[i]] ^
  565               	.LM46:
  566 01da 9425      		eor r25,r4
-  25:Drivers/CRC/crc32.h ****            *crc >> 8;
+  25:crc32.h       ****            *crc >> 8;
  568               	.LM47:
  569 01dc 452C      		mov r4,r5
  570 01de 562C      		mov r5,r6
  571 01e0 672C      		mov r6,r7
  572 01e2 7724      		clr r7
-  24:Drivers/CRC/crc32.h ****            *crc >> 8;
+  24:crc32.h       ****            *crc >> 8;
  574               	.LM48:
  575 01e4 F601      		movw r30,r12
  576 01e6 24E0      		ldi r18,lo8(4)
@@ -578,7 +577,7 @@
  593 0204 562C      		mov r5,r6
  594 0206 672C      		mov r6,r7
  595 0208 7724      		clr r7
-  24:Drivers/CRC/crc32.h ****            *crc >> 8;
+  24:crc32.h       ****            *crc >> 8;
  597               	.LM50:
  598 020a F601      		movw r30,r12
  599 020c 94E0      		ldi r25,lo8(4)
@@ -594,10 +593,10 @@
  609 0220 5926      		eor r5,r25
  610 0222 6A26      		eor r6,r26
  611 0224 7B26      		eor r7,r27
- 612               	.LBE55:
- 613               	.LBE54:
+ 612               	.LBE59:
+ 613               	.LBE58:
  615               	.Ltext8:
-  67:miniboot.c    ****       LED_TOGGLE();
+  66:miniboot.c    ****       LED_TOGGLE();
  617               	.LM51:
  618 0226 C801      		movw r24,r16
  619 0228 8F77      		andi r24,127
@@ -609,23 +608,23 @@
  626 0232 8325      		eor r24,r3
  627 0234 85B9      		out 0x5,r24
  628               	.L19:
- 629               	.LBE56:
-  50:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
+ 629               	.LBE60:
+  49:miniboot.c    ****        pos += 2) { // length +1 in case of odd number lengths
  631               	.LM53:
  632 0236 0E5F      		subi r16,-2
  633 0238 1F4F      		sbci r17,-1
  634 023a 00C0      		rjmp .L20
  635               	.L16:
- 636               	.LBE52:
-  69:miniboot.c    ****   }
-  70:miniboot.c    **** 
-  71:miniboot.c    ****   uint32_t expected_crc = static_cast<uint32_t>(getWordFromSource(
+ 636               	.LBE56:
+  68:miniboot.c    ****   }
+  69:miniboot.c    **** 
+  70:miniboot.c    ****   uint32_t expected_crc = static_cast<uint32_t>(getWordFromSource(
  638               	.LM54:
  639 023c 8CE1      		ldi r24,lo8(28)
  640 023e 90E0      		ldi r25,0
- 641 0240 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
-  72:miniboot.c    ****                               i2c_address, application_crc_expected_index))
-  73:miniboot.c    ****                           << 16;
+ 641 0240 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+  71:miniboot.c    ****                               i2c_address, application_crc_expected_index))
+  72:miniboot.c    ****                           << 16;
  643               	.LM55:
  644 0244 6C01      		movw r12,r24
  645 0246 E12C      		mov r14,__zero_reg__
@@ -633,17 +632,17 @@
  647 024a 7601      		movw r14,r12
  648 024c DD24      		clr r13
  649 024e CC24      		clr r12
-  74:miniboot.c    ****   expected_crc |= static_cast<uint32_t>(
-  75:miniboot.c    ****       getWordFromSource(i2c_address, application_crc_expected_index + 2));
+  73:miniboot.c    ****   expected_crc |= static_cast<uint32_t>(
+  74:miniboot.c    ****       getWordFromSource(i2c_address, application_crc_expected_index + 2));
  651               	.LM56:
  652 0250 8EE1      		ldi r24,lo8(30)
  653 0252 90E0      		ldi r25,0
- 654 0254 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
-  76:miniboot.c    **** 
-  77:miniboot.c    ****   if (crc == expected_crc) {
-  78:miniboot.c    ****     status = true;
-  79:miniboot.c    ****   }
-  80:miniboot.c    ****   return status;
+ 654 0254 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+  75:miniboot.c    **** 
+  76:miniboot.c    ****   if (crc == expected_crc) {
+  77:miniboot.c    ****     status = true;
+  78:miniboot.c    ****   }
+  79:miniboot.c    ****   return status;
  656               	.LM57:
  657 0258 A0E0      		ldi r26,0
  658 025a B0E0      		ldi r27,0
@@ -660,7 +659,7 @@
  669 0270 80E0      		ldi r24,0
  670               	.L21:
  671               	/* epilogue start */
-  81:miniboot.c    **** }
+  80:miniboot.c    **** }
  673               	.LM58:
  674 0272 DC5F      		subi r29,-4
  675 0274 0FB6      		in __tmp_reg__,__SREG__
@@ -692,100 +691,73 @@
  716               	.global	main
  718               	main:
  719               		.stabd	46,0,0
-  82:miniboot.c    **** 
-  83:miniboot.c    **** static inline void writeFlashFromI2C(const uint8_t i2c_address,
-  84:miniboot.c    ****                                      uint16_t &application_start) {
-  85:miniboot.c    ****   uint16_t start_address = getDataStartAddressInSource(i2c_address);
-  86:miniboot.c    ****   uint16_t length = getDataLength(i2c_address);
-  87:miniboot.c    ****   uint8_t buf[SPM_PAGESIZE];
-  88:miniboot.c    ****   uint16_t writes = 0;
-  89:miniboot.c    **** 
-  90:miniboot.c    ****   for (uint16_t pos = 0; pos < length; pos += 2) {
-  91:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
-  92:miniboot.c    ****       writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
-  93:miniboot.c    ****       LED_TOGGLE();
-  94:miniboot.c    ****       ++writes;
-  95:miniboot.c    ****     }
-  96:miniboot.c    ****     uint16_t data = getWordFromSource(i2c_address, pos + start_address);
-  97:miniboot.c    ****     buf[pos % SPM_PAGESIZE] = static_cast<uint8_t>(data >> 8);
-  98:miniboot.c    ****     buf[(pos + 1) % SPM_PAGESIZE] = static_cast<uint8_t>(data);
-  99:miniboot.c    ****   }
- 100:miniboot.c    **** 
- 101:miniboot.c    ****   for (uint16_t pos = SPM_PAGESIZE -
- 102:miniboot.c    ****                       (static_cast<uint16_t>(writes + 1) *
- 103:miniboot.c    ****                        static_cast<uint16_t>(SPM_PAGESIZE)) %
- 104:miniboot.c    ****                           length;
- 105:miniboot.c    ****        pos < SPM_PAGESIZE; ++pos) {
- 106:miniboot.c    ****     buf[pos] = 0xFF; // reset contents, since these bytes were not filled in
- 107:miniboot.c    ****                      // this page and have value from previous page
- 108:miniboot.c    ****   }
- 109:miniboot.c    **** 
- 110:miniboot.c    ****   writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
- 111:miniboot.c    ****   LED_OFF();
- 112:miniboot.c    **** }
- 113:miniboot.c    **** 
- 114:miniboot.c    **** // [[ noreturn ]]
- 115:miniboot.c    **** static inline void leaveBootloader(uint16_t &application_start) {
- 116:miniboot.c    ****   // hold my beer and watch this!
- 117:miniboot.c    ****   reinterpret_cast<void (*)(void)>(application_start)();
+  81:miniboot.c    **** 
+  82:miniboot.c    **** static inline void writeFlashFromI2C(const uint8_t i2c_address,
+  83:miniboot.c    ****                                      uint16_t &application_start) {
+  84:miniboot.c    ****   uint16_t start_address = getDataStartAddressInSource(i2c_address);
+  85:miniboot.c    ****   uint16_t length = getDataLength(i2c_address);
+  86:miniboot.c    ****   uint8_t buf[SPM_PAGESIZE];
+  87:miniboot.c    ****   uint16_t writes = 0;
+  88:miniboot.c    **** 
+  89:miniboot.c    ****   for (uint16_t pos = 0; pos < length; pos += 2) {
+  90:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
+  91:miniboot.c    ****       writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
+  92:miniboot.c    ****       LED_TOGGLE();
+  93:miniboot.c    ****       ++writes;
+  94:miniboot.c    ****     }
+  95:miniboot.c    ****     uint16_t data = getWordFromSource(i2c_address, pos + start_address);
+  96:miniboot.c    ****     buf[pos % SPM_PAGESIZE] = static_cast<uint8_t>(data >> 8);
+  97:miniboot.c    ****     buf[(pos + 1) % SPM_PAGESIZE] = static_cast<uint8_t>(data);
+  98:miniboot.c    ****   }
+  99:miniboot.c    **** 
+ 100:miniboot.c    ****   for (uint16_t pos = SPM_PAGESIZE -
+ 101:miniboot.c    ****                       (static_cast<uint16_t>(writes + 1) *
+ 102:miniboot.c    ****                        static_cast<uint16_t>(SPM_PAGESIZE)) %
+ 103:miniboot.c    ****                           length;
+ 104:miniboot.c    ****        pos < SPM_PAGESIZE; ++pos) {
+ 105:miniboot.c    ****     buf[pos] = 0xFF; // reset contents, since these bytes were not filled in
+ 106:miniboot.c    ****                      // this page and have value from previous page
+ 107:miniboot.c    ****   }
+ 108:miniboot.c    **** 
+ 109:miniboot.c    ****   writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
+ 110:miniboot.c    ****   LED_OFF();
+ 111:miniboot.c    **** }
+ 112:miniboot.c    **** 
+ 113:miniboot.c    **** [[ noreturn ]]
+ 114:miniboot.c    **** static inline void leaveBootloader(uint16_t &application_start) {
+ 115:miniboot.c    ****   // hold my beer and watch this!
+ 116:miniboot.c    ****   reinterpret_cast<void (*)(void)>(application_start)();
+ 117:miniboot.c    ****   while (1);
  118:miniboot.c    **** }
  119:miniboot.c    **** 
  120:miniboot.c    **** static inline bool isReflashNecessary(uint32_t &i2c_application_timestamp) {
- 121:miniboot.c    ****   uint32_t current_application_timestamp =
- 122:miniboot.c    ****       readLatestApplicationTimestampFromInternalEeprom();
+ 121:miniboot.c    **** 
+ 122:miniboot.c    **** // TODO: Don't reflash everytime
  123:miniboot.c    **** 
- 124:miniboot.c    ****   i2c_application_timestamp =
- 125:miniboot.c    ****       static_cast<uint32_t>(getWordFromSource(
- 126:miniboot.c    ****           source_i2c_address_for_program, timestamp_application_byte_offset))
- 127:miniboot.c    ****       << 16;
- 128:miniboot.c    ****   i2c_application_timestamp |= static_cast<uint32_t>(getWordFromSource(
- 129:miniboot.c    ****       source_i2c_address_for_program, timestamp_application_byte_offset + 2));
- 130:miniboot.c    **** 
- 131:miniboot.c    ****   if (eeprom_not_programmed == current_application_timestamp)
- 132:miniboot.c    ****     return true;
- 133:miniboot.c    ****   if (i2c_application_timestamp != current_application_timestamp)
- 134:miniboot.c    ****     return true;
- 135:miniboot.c    ****   return false;
- 136:miniboot.c    **** }
- 137:miniboot.c    **** 
- 138:miniboot.c    **** int main() {
+ 124:miniboot.c    ****   return true;
+ 125:miniboot.c    **** }
+ 126:miniboot.c    **** 
+ 127:miniboot.c    **** int main() {
  721               	.LM59:
  722               	.LFBB5:
- 723 0000 3F92      		push r3
- 724 0002 4F92      		push r4
- 725 0004 5F92      		push r5
- 726 0006 6F92      		push r6
- 727 0008 7F92      		push r7
- 728 000a 8F92      		push r8
- 729 000c 9F92      		push r9
- 730 000e AF92      		push r10
- 731 0010 BF92      		push r11
- 732 0012 CF92      		push r12
- 733 0014 DF92      		push r13
- 734 0016 EF92      		push r14
- 735 0018 FF92      		push r15
- 736 001a 0F93      		push r16
- 737 001c 1F93      		push r17
- 738 001e CF93      		push r28
- 739 0020 DF93      		push r29
- 740 0022 CDB7      		in r28,__SP_L__
- 741 0024 DEB7      		in r29,__SP_H__
- 742 0026 C258      		subi r28,-126
- 743 0028 D109      		sbc r29,__zero_reg__
- 744 002a 0FB6      		in __tmp_reg__,__SREG__
- 745 002c F894      		cli
- 746 002e DEBF      		out __SP_H__,r29
- 747 0030 0FBE      		out __SREG__,__tmp_reg__
- 748 0032 CDBF      		out __SP_L__,r28
- 749               	/* prologue: function */
- 750               	/* frame size = 130 */
- 751               	/* stack size = 147 */
- 752               	.L__stack_usage = 147
- 753               	.LBB82:
- 754               	.LBB83:
- 755               	.LBB84:
- 756               	.LBB85:
- 758               	.Ltext9:
+ 723 0000 CF93      		push r28
+ 724 0002 DF93      		push r29
+ 725 0004 CDB7      		in r28,__SP_L__
+ 726 0006 DEB7      		in r29,__SP_H__
+ 727 0008 C258      		subi r28,-126
+ 728 000a D109      		sbc r29,__zero_reg__
+ 729 000c 0FB6      		in __tmp_reg__,__SREG__
+ 730 000e F894      		cli
+ 731 0010 DEBF      		out __SP_H__,r29
+ 732 0012 0FBE      		out __SREG__,__tmp_reg__
+ 733 0014 CDBF      		out __SP_L__,r28
+ 734               	/* prologue: function */
+ 735               	/* frame size = 130 */
+ 736               	/* stack size = 132 */
+ 737               	.L__stack_usage = 132
+ 738               	.LBB78:
+ 739               	.LBB79:
+ 741               	.Ltext9:
    1:init.h        **** #pragma once
    2:init.h        **** 
    3:init.h        **** #include "I2C-master-lib/i2c_master.h"
@@ -796,558 +768,310 @@
    8:init.h        **** 
    9:init.h        **** static inline void disableWatchdog() {
   10:init.h        ****   wdt_reset();
- 760               	.LM60:
- 761               	/* #APP */
- 762               	 ;  10 "init.h" 1
- 763 0034 A895      		wdr
- 764               	 ;  0 "" 2
   11:init.h        ****   MCUSR = 0;
- 766               	.LM61:
- 767               	/* #NOAPP */
- 768 0036 14BE      		out 0x34,__zero_reg__
   12:init.h        ****   WDTCSR |= (1 << WDCE) | (1 << WDE);
- 770               	.LM62:
- 771 0038 8091 6000 		lds r24,96
- 772 003c 8861      		ori r24,lo8(24)
- 773 003e 8093 6000 		sts 96,r24
   13:init.h        ****   WDTCSR = 0;
- 775               	.LM63:
- 776 0042 1092 6000 		sts 96,__zero_reg__
   14:init.h        ****   asm("cli");
- 778               	.LM64:
- 779               	/* #APP */
- 780               	 ;  14 "init.h" 1
- 781 0046 F894      		cli
- 782               	 ;  0 "" 2
- 783               	/* #NOAPP */
- 784               	.LBE85:
- 785               	.LBE84:
   15:init.h        **** }
   16:init.h        **** 
   17:init.h        **** static inline void init() {
-  18:init.h        ****   disableWatchdog();
+  18:init.h        ****   //disableWatchdog();
   19:init.h        ****   i2c_init();
- 787               	.LM65:
- 788 0048 0E94 0000 		call _Z8i2c_initv
- 789               	.LBB86:
- 790               	.LBB87:
+ 743               	.LM60:
+ 744 0016 0E94 0000 		call _Z8i2c_initv
+ 745               	.LBB80:
+ 746               	.LBB81:
    7:init.h        **** 
- 792               	.LM66:
- 793 004c 289A      		sbi 0x5,0
- 794 004e 81E0      		ldi r24,lo8(1)
- 795 0050 84B9      		out 0x4,r24
- 796               	.LBE87:
- 797               	.LBE86:
- 798               	.LBE83:
- 799               	.LBE82:
- 801               	.Ltext10:
- 139:miniboot.c    **** 
- 140:miniboot.c    ****   init();
- 141:miniboot.c    **** 
- 142:miniboot.c    ****   uint32_t i2c_application_timestamp;
- 143:miniboot.c    ****   uint16_t application_start = 0;
- 803               	.LM67:
- 804 0052 CF57      		subi r28,lo8(-129)
- 805 0054 DF4F      		sbci r29,hi8(-129)
- 806 0056 1982      		std Y+1,__zero_reg__
- 807 0058 1882      		st Y,__zero_reg__
- 808 005a C158      		subi r28,lo8(129)
- 809 005c D040      		sbci r29,hi8(129)
- 810               	.LBB88:
- 811               	.LBB89:
- 812               	.LBB90:
- 813               	.LBB91:
- 814               	.LBB92:
- 816               	.Ltext11:
-   1:eeprom.h      **** #pragma once
-   2:eeprom.h      **** 
-   3:eeprom.h      **** #include "bootloader.h"
-   4:eeprom.h      **** #include <avr/boot.h>
-   5:eeprom.h      **** #include <avr/eeprom.h>
-   6:eeprom.h      **** 
-   7:eeprom.h      **** #if 0
-   8:eeprom.h      **** void writeToInternalEeprom(const uint16_t data){
-   9:eeprom.h      ****   eeprom_write_byte (reinterpret_cast<uint8_t
-  10:eeprom.h      **** *>(EEPROM_CONFIGURATION_START_BYTE+4),data>>8);
-  11:eeprom.h      ****   eeprom_write_byte (reinterpret_cast<uint8_t
-  12:eeprom.h      **** *>(EEPROM_CONFIGURATION_START_BYTE+5),data);
-  13:eeprom.h      ****   boot_spm_busy_wait();
-  14:eeprom.h      **** }
-  15:eeprom.h      **** 
-  16:eeprom.h      **** void writeToInternalEeprom(const uint32_t data) {
-  17:eeprom.h      ****   eeprom_write_byte(
-  18:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 4),
-  19:eeprom.h      ****       data >> 24);
-  20:eeprom.h      ****   eeprom_write_byte(
-  21:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 5),
-  22:eeprom.h      ****       data >> 16);
-  23:eeprom.h      ****   eeprom_write_byte(
-  24:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 6),
-  25:eeprom.h      ****       data >> 8);
-  26:eeprom.h      ****   eeprom_write_byte(
-  27:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 7), data);
-  28:eeprom.h      ****   boot_spm_busy_wait();
-  29:eeprom.h      **** }
-  30:eeprom.h      **** #endif // #if 0
-  31:eeprom.h      **** 
-  32:eeprom.h      **** static inline void writeLatestApplicationTimestampToInternalEeprom(
-  33:eeprom.h      ****     const uint32_t latest_timestamp) {
-  34:eeprom.h      ****   eeprom_write_byte(
-  35:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE),
-  36:eeprom.h      ****       latest_timestamp >> 24);
-  37:eeprom.h      ****   eeprom_write_byte(
-  38:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 1),
-  39:eeprom.h      ****       latest_timestamp >> 16);
-  40:eeprom.h      ****   eeprom_write_byte(
-  41:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 2),
-  42:eeprom.h      ****       latest_timestamp >> 8);
-  43:eeprom.h      ****   eeprom_write_byte(
-  44:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 3),
-  45:eeprom.h      ****       latest_timestamp);
-  46:eeprom.h      ****   boot_spm_busy_wait();
-  47:eeprom.h      **** }
-  48:eeprom.h      **** 
-  49:eeprom.h      **** static inline uint32_t readLatestApplicationTimestampFromInternalEeprom() {
-  50:eeprom.h      ****   uint32_t result =
-  51:eeprom.h      ****       static_cast<uint32_t>(eeprom_read_byte(
- 818               	.LM68:
- 819 005e 86EF      		ldi r24,lo8(-10)
- 820 0060 93E0      		ldi r25,lo8(3)
- 821 0062 0E94 0000 		call eeprom_read_byte
-  52:eeprom.h      ****           reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE)))
-  53:eeprom.h      ****       << 24;
- 823               	.LM69:
- 824 0066 C82E      		mov r12,r24
- 825 0068 D12C      		mov r13,__zero_reg__
- 826 006a E12C      		mov r14,__zero_reg__
- 827 006c F12C      		mov r15,__zero_reg__
- 828 006e FC2C      		mov r15,r12
- 829 0070 EE24      		clr r14
- 830 0072 DD24      		clr r13
- 831 0074 CC24      		clr r12
-  54:eeprom.h      ****   result |= static_cast<uint32_t>(eeprom_read_byte(reinterpret_cast<uint8_t *>(
- 833               	.LM70:
- 834 0076 87EF      		ldi r24,lo8(-9)
- 835 0078 93E0      		ldi r25,lo8(3)
- 836 007a 0E94 0000 		call eeprom_read_byte
-  55:eeprom.h      ****                 EEPROM_CONFIGURATION_START_BYTE + 1)))
-  56:eeprom.h      ****             << 16;
- 838               	.LM71:
- 839 007e E82A      		or r14,r24
-  57:eeprom.h      ****   result |= static_cast<uint32_t>(eeprom_read_byte(reinterpret_cast<uint8_t *>(
- 841               	.LM72:
- 842 0080 88EF      		ldi r24,lo8(-8)
- 843 0082 93E0      		ldi r25,lo8(3)
- 844 0084 0E94 0000 		call eeprom_read_byte
- 845 0088 182F      		mov r17,r24
-  58:eeprom.h      ****                 EEPROM_CONFIGURATION_START_BYTE + 2)))
-  59:eeprom.h      ****             << 8;
-  60:eeprom.h      ****   result |= static_cast<uint32_t>(eeprom_read_byte(
- 847               	.LM73:
- 848 008a 89EF      		ldi r24,lo8(-7)
- 849 008c 93E0      		ldi r25,lo8(3)
- 850 008e 0E94 0000 		call eeprom_read_byte
-  61:eeprom.h      ****       reinterpret_cast<uint8_t *>(EEPROM_CONFIGURATION_START_BYTE + 3)));
- 852               	.LM74:
- 853 0092 C82A      		or r12,r24
- 854 0094 D12A      		or r13,r17
- 855               	.L26:
-  62:eeprom.h      ****   boot_spm_busy_wait();
- 857               	.LM75:
- 858 0096 07B6      		in __tmp_reg__,0x37
- 859 0098 00FC      		sbrc __tmp_reg__,0
- 860 009a 00C0      		rjmp .L26
- 861               	.LBE92:
- 862               	.LBE91:
- 864               	.Ltext12:
- 125:miniboot.c    ****           source_i2c_address_for_program, timestamp_application_byte_offset))
- 866               	.LM76:
- 867 009c 84E1      		ldi r24,lo8(20)
- 868 009e 90E0      		ldi r25,0
- 869 00a0 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
- 127:miniboot.c    ****   i2c_application_timestamp |= static_cast<uint32_t>(getWordFromSource(
- 871               	.LM77:
- 872 00a4 2C01      		movw r4,r24
- 873 00a6 612C      		mov r6,__zero_reg__
- 874 00a8 712C      		mov r7,__zero_reg__
- 875 00aa 5201      		movw r10,r4
- 876 00ac 9924      		clr r9
- 877 00ae 8824      		clr r8
- 128:miniboot.c    ****       source_i2c_address_for_program, timestamp_application_byte_offset + 2));
- 879               	.LM78:
- 880 00b0 86E1      		ldi r24,lo8(22)
- 881 00b2 90E0      		ldi r25,0
- 882 00b4 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
- 129:miniboot.c    **** 
- 884               	.LM79:
- 885 00b8 2C01      		movw r4,r24
- 886 00ba 612C      		mov r6,__zero_reg__
- 887 00bc 712C      		mov r7,__zero_reg__
- 888 00be 4828      		or r4,r8
- 889 00c0 5928      		or r5,r9
- 890 00c2 6A28      		or r6,r10
- 891 00c4 7B28      		or r7,r11
- 131:miniboot.c    ****     return true;
- 893               	.LM80:
- 894 00c6 8FEF      		ldi r24,-1
- 895 00c8 C816      		cp r12,r24
- 896 00ca D806      		cpc r13,r24
- 897 00cc E806      		cpc r14,r24
- 898 00ce F806      		cpc r15,r24
- 899 00d0 01F0      		breq .L27
- 133:miniboot.c    ****     return true;
- 901               	.LM81:
- 902 00d2 4C14      		cp r4,r12
- 903 00d4 5D04      		cpc r5,r13
- 904 00d6 6E04      		cpc r6,r14
- 905 00d8 7F04      		cpc r7,r15
- 906 00da 01F4      		brne .L27
- 907               	.L28:
- 908               	.LBE90:
- 909               	.LBE89:
- 910               	.LBB93:
- 144:miniboot.c    **** 
- 145:miniboot.c    ****   if (isReflashNecessary(i2c_application_timestamp) &&
- 146:miniboot.c    ****       isCrcOk(source_i2c_address_for_program)) {
- 147:miniboot.c    ****     eraseApplication();
- 148:miniboot.c    ****     writeFlashFromI2C(source_i2c_address_for_program, application_start);
- 149:miniboot.c    ****     writeLatestApplicationTimestampToInternalEeprom(i2c_application_timestamp);
- 150:miniboot.c    ****   } else {
- 151:miniboot.c    ****     uint16_t address_in_external_eeprom = getWordFromSource(
- 152:miniboot.c    ****         source_i2c_address_for_program, application_start_address_byte_offset);
- 912               	.LM82:
- 913 00dc 84E2      		ldi r24,lo8(36)
- 914 00de 90E0      		ldi r25,0
- 915 00e0 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
- 153:miniboot.c    **** 
- 154:miniboot.c    ****     application_start = address_in_external_eeprom >> 8;
- 155:miniboot.c    ****     application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8
- 917               	.LM83:
- 918 00e4 9827      		eor r25,r24
- 919 00e6 8927      		eor r24,r25
- 920 00e8 9827      		eor r25,r24
- 921 00ea CF57      		subi r28,lo8(-129)
- 922 00ec DF4F      		sbci r29,hi8(-129)
- 923 00ee 9983      		std Y+1,r25
- 924 00f0 8883      		st Y,r24
- 925 00f2 C158      		subi r28,lo8(129)
- 926 00f4 D040      		sbci r29,hi8(129)
- 927 00f6 00C0      		rjmp .L37
- 928               	.L27:
- 929               	.LBE93:
- 146:miniboot.c    ****     eraseApplication();
- 931               	.LM84:
- 932 00f8 0E94 0000 		call _ZL7isCrcOkh.constprop.3
- 145:miniboot.c    ****       isCrcOk(source_i2c_address_for_program)) {
- 934               	.LM85:
- 935 00fc 8823      		tst r24
- 936 00fe 01F0      		breq .L28
- 937 0100 E0E0      		ldi r30,0
- 938 0102 F8E7      		ldi r31,lo8(120)
- 939               	.LBB94:
- 940               	.LBB95:
- 942               	.Ltext13:
+ 748               	.LM61:
+ 749 001a 289A      		sbi 0x5,0
+ 750 001c 81E0      		ldi r24,lo8(1)
+ 751 001e 84B9      		out 0x4,r24
+ 752               	.LBE81:
+ 753               	.LBE80:
+ 754               	.LBE79:
+ 755               	.LBE78:
+ 757               	.Ltext10:
+ 128:miniboot.c    **** 
+ 129:miniboot.c    ****   init();
+ 130:miniboot.c    **** 
+ 131:miniboot.c    ****   uint32_t i2c_application_timestamp;
+ 132:miniboot.c    ****   uint16_t application_start = 0;
+ 759               	.LM62:
+ 760 0020 CF57      		subi r28,lo8(-129)
+ 761 0022 DF4F      		sbci r29,hi8(-129)
+ 762 0024 1982      		std Y+1,__zero_reg__
+ 763 0026 1882      		st Y,__zero_reg__
+ 764 0028 C158      		subi r28,lo8(129)
+ 765 002a D040      		sbci r29,hi8(129)
+ 766               	.LBB82:
+ 133:miniboot.c    **** 
+ 134:miniboot.c    ****   if (isReflashNecessary(i2c_application_timestamp) &&
+ 135:miniboot.c    ****       isCrcOk(source_i2c_address_for_program)) {
+ 768               	.LM63:
+ 769 002c 0E94 0000 		call _ZL7isCrcOkh.constprop.4
+ 134:miniboot.c    ****       isCrcOk(source_i2c_address_for_program)) {
+ 771               	.LM64:
+ 772 0030 8823      		tst r24
+ 773 0032 01F4      		brne .+2
+ 774 0034 00C0      		rjmp .L26
+ 775 0036 E0E0      		ldi r30,0
+ 776 0038 F8E7      		ldi r31,lo8(120)
+ 777               	.LBB83:
+ 778               	.LBB84:
+ 780               	.Ltext11:
   12:flash.h       ****     boot_spm_busy_wait();
- 944               	.LM86:
- 945 0104 83E0      		ldi r24,lo8(3)
- 946               	.L30:
+ 782               	.LM65:
+ 783 003a 83E0      		ldi r24,lo8(3)
+ 784               	.L28:
   11:flash.h       ****     boot_page_erase(ptr);
- 948               	.LM87:
- 949 0106 E058      		subi r30,-128
- 950 0108 F109      		sbc r31,__zero_reg__
+ 786               	.LM66:
+ 787 003c E058      		subi r30,-128
+ 788 003e F109      		sbc r31,__zero_reg__
   12:flash.h       ****     boot_spm_busy_wait();
- 952               	.LM88:
- 953               	/* #APP */
- 954               	 ;  12 "flash.h" 1
- 955 010a 8093 5700 		sts 87, r24
- 956 010e E895      		spm
- 957               		
- 958               	 ;  0 "" 2
- 959               	/* #NOAPP */
- 960               	.L29:
+ 790               	.LM67:
+ 791               	/* #APP */
+ 792               	 ;  12 "flash.h" 1
+ 793 0040 8093 5700 		sts 87, r24
+ 794 0044 E895      		spm
+ 795               		
+ 796               	 ;  0 "" 2
+ 797               	/* #NOAPP */
+ 798               	.L27:
   13:flash.h       ****   } while (ptr);
- 962               	.LM89:
- 963 0110 07B6      		in __tmp_reg__,0x37
- 964 0112 00FC      		sbrc __tmp_reg__,0
- 965 0114 00C0      		rjmp .L29
+ 800               	.LM68:
+ 801 0046 07B6      		in __tmp_reg__,0x37
+ 802 0048 00FC      		sbrc __tmp_reg__,0
+ 803 004a 00C0      		rjmp .L27
   10:flash.h       ****     ptr -= SPM_PAGESIZE;
- 967               	.LM90:
- 968 0116 3097      		sbiw r30,0
- 969 0118 01F4      		brne .L30
+ 805               	.LM69:
+ 806 004c 3097      		sbiw r30,0
+ 807 004e 01F4      		brne .L28
   15:flash.h       **** }
- 971               	.LM91:
- 972               	/* #APP */
- 973               	 ;  15 "flash.h" 1
- 974 011a A895      		wdr
- 975               	 ;  0 "" 2
- 976               	/* #NOAPP */
- 977               	.LBE95:
- 978               	.LBE94:
- 979               	.LBB96:
- 980               	.LBB97:
- 981               	.LBB98:
- 982               	.LBB99:
- 984               	.Ltext14:
-  17:miniboot.c    **** }
- 986               	.LM92:
- 987 011c 80E2      		ldi r24,lo8(32)
- 988 011e 90E0      		ldi r25,0
- 989 0120 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
- 990 0124 4C01      		movw r8,r24
- 991               	.LBE99:
- 992               	.LBE98:
- 993               	.LBB100:
-  90:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
- 995               	.LM93:
- 996 0126 E12C      		mov r14,__zero_reg__
- 997 0128 F12C      		mov r15,__zero_reg__
- 998               	.LBE100:
-  88:miniboot.c    **** 
- 1000               	.LM94:
- 1001 012a 00E0      		ldi r16,0
- 1002 012c 10E0      		ldi r17,0
- 1003 012e CE01      		movw r24,r28
- 1004 0130 0196      		adiw r24,1
- 1005 0132 6C01      		movw r12,r24
- 1006               	.LBB103:
- 1007               	.LBB101:
-  93:miniboot.c    ****       ++writes;
- 1009               	.LM95:
- 1010 0134 3324      		clr r3
- 1011 0136 3394      		inc r3
- 1012               	.L33:
- 1013               	.LBE101:
-  90:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
- 1015               	.LM96:
- 1016 0138 E814      		cp r14,r8
- 1017 013a F904      		cpc r15,r9
- 1018 013c 00F4      		brsh .L31
- 1019 013e 5701      		movw r10,r14
- 1020 0140 E894      		clt
- 1021 0142 A7F8      		bld r10,7
- 1022 0144 BB24      		clr r11
- 1023               	.LBB102:
-  91:miniboot.c    ****       writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
- 1025               	.LM97:
- 1026 0146 E114      		cp r14,__zero_reg__
- 1027 0148 F104      		cpc r15,__zero_reg__
- 1028 014a 01F0      		breq .L32
- 1029 014c A114      		cp r10,__zero_reg__
- 1030 014e B104      		cpc r11,__zero_reg__
- 1031 0150 01F4      		brne .L32
-  92:miniboot.c    ****       LED_TOGGLE();
- 1033               	.LM98:
- 1034 0152 AE01      		movw r20,r28
- 1035 0154 4F57      		subi r20,127
- 1036 0156 5F4F      		sbci r21,-1
- 1037 0158 B601      		movw r22,r12
- 1038 015a C801      		movw r24,r16
- 1039 015c 9695      		lsr r25
- 1040 015e 982F      		mov r25,r24
- 1041 0160 8827      		clr r24
- 1042 0162 9795      		ror r25
- 1043 0164 8795      		ror r24
- 1044 0166 0E94 0000 		call _ZL12writeToFlashjPhRj
-  93:miniboot.c    ****       ++writes;
- 1046               	.LM99:
- 1047 016a 85B1      		in r24,0x5
- 1048 016c 8325      		eor r24,r3
- 1049 016e 85B9      		out 0x5,r24
-  94:miniboot.c    ****     }
- 1051               	.LM100:
- 1052 0170 0F5F      		subi r16,-1
- 1053 0172 1F4F      		sbci r17,-1
- 1054               	.L32:
-  96:miniboot.c    ****     buf[pos % SPM_PAGESIZE] = static_cast<uint8_t>(data >> 8);
- 1056               	.LM101:
- 1057 0174 C701      		movw r24,r14
- 1058 0176 8296      		adiw r24,34
- 1059 0178 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.5
-  97:miniboot.c    ****     buf[(pos + 1) % SPM_PAGESIZE] = static_cast<uint8_t>(data);
- 1061               	.LM102:
- 1062 017c F601      		movw r30,r12
- 1063 017e EA0D      		add r30,r10
- 1064 0180 FB1D      		adc r31,r11
- 1065 0182 9083      		st Z,r25
-  98:miniboot.c    ****   }
- 1067               	.LM103:
- 1068 0184 F701      		movw r30,r14
- 1069 0186 3196      		adiw r30,1
- 1070 0188 EF77      		andi r30,127
- 1071 018a FF27      		clr r31
- 1072 018c EC0D      		add r30,r12
- 1073 018e FD1D      		adc r31,r13
- 1074 0190 8083      		st Z,r24
- 1075               	.LBE102:
-  90:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
- 1077               	.LM104:
- 1078 0192 92E0      		ldi r25,2
- 1079 0194 E90E      		add r14,r25
- 1080 0196 F11C      		adc r15,__zero_reg__
- 1081 0198 00C0      		rjmp .L33
- 1082               	.L31:
- 1083               	.LBE103:
- 1084               	.LBB104:
- 102:miniboot.c    ****                        static_cast<uint16_t>(SPM_PAGESIZE)) %
- 1086               	.LM105:
- 1087 019a 0F5F      		subi r16,-1
- 1088 019c 1F4F      		sbci r17,-1
- 1089 019e 1695      		lsr r17
- 1090 01a0 102F      		mov r17,r16
- 1091 01a2 0027      		clr r16
- 1092 01a4 1795      		ror r17
- 1093 01a6 0795      		ror r16
- 1094 01a8 C801      		movw r24,r16
- 1095 01aa B401      		movw r22,r8
- 1096 01ac 0E94 0000 		call __udivmodhi4
- 1097 01b0 F601      		movw r30,r12
- 1098 01b2 E81B      		sub r30,r24
- 1099 01b4 F90B      		sbc r31,r25
- 1100 01b6 E058      		subi r30,-128
- 1101 01b8 FF4F      		sbci r31,-1
- 106:miniboot.c    ****                      // this page and have value from previous page
- 1103               	.LM106:
- 1104 01ba 8FEF      		ldi r24,lo8(-1)
- 1105               	.L35:
- 105:miniboot.c    ****     buf[pos] = 0xFF; // reset contents, since these bytes were not filled in
- 1107               	.LM107:
- 1108 01bc 9F01      		movw r18,r30
- 1109 01be 2C19      		sub r18,r12
- 1110 01c0 3D09      		sbc r19,r13
- 1111 01c2 2038      		cpi r18,-128
- 1112 01c4 3105      		cpc r19,__zero_reg__
- 1113 01c6 00F4      		brsh .L34
- 106:miniboot.c    ****                      // this page and have value from previous page
- 1115               	.LM108:
- 1116 01c8 8193      		st Z+,r24
- 1117 01ca 00C0      		rjmp .L35
- 1118               	.L34:
- 1119               	.LBE104:
- 110:miniboot.c    ****   LED_OFF();
- 1121               	.LM109:
- 1122 01cc AE01      		movw r20,r28
- 1123 01ce 4F57      		subi r20,127
- 1124 01d0 5F4F      		sbci r21,-1
- 1125 01d2 B601      		movw r22,r12
- 1126 01d4 C801      		movw r24,r16
- 1127 01d6 8058      		subi r24,-128
- 1128 01d8 9109      		sbc r25,__zero_reg__
- 1129 01da 0E94 0000 		call _ZL12writeToFlashjPhRj
- 111:miniboot.c    **** }
- 1131               	.LM110:
- 1132 01de 289A      		sbi 0x5,0
- 1133               	.LBE97:
- 1134               	.LBE96:
- 1135               	.LBB105:
- 1136               	.LBB106:
- 1138               	.Ltext15:
-  36:eeprom.h      ****   eeprom_write_byte(
- 1140               	.LM111:
- 1141 01e0 672D      		mov r22,r7
- 1142 01e2 7727      		clr r23
- 1143 01e4 8827      		clr r24
- 1144 01e6 9927      		clr r25
- 1145 01e8 86EF      		ldi r24,lo8(-10)
- 1146 01ea 93E0      		ldi r25,lo8(3)
- 1147 01ec 0E94 0000 		call eeprom_write_byte
-  39:eeprom.h      ****   eeprom_write_byte(
- 1149               	.LM112:
- 1150 01f0 B301      		movw r22,r6
- 1151 01f2 8827      		clr r24
- 1152 01f4 9927      		clr r25
- 1153 01f6 87EF      		ldi r24,lo8(-9)
- 1154 01f8 93E0      		ldi r25,lo8(3)
- 1155 01fa 0E94 0000 		call eeprom_write_byte
-  42:eeprom.h      ****   eeprom_write_byte(
- 1157               	.LM113:
- 1158 01fe 9927      		clr r25
- 1159 0200 872D      		mov r24,r7
- 1160 0202 762D      		mov r23,r6
- 1161 0204 652D      		mov r22,r5
- 1162 0206 88EF      		ldi r24,lo8(-8)
- 1163 0208 93E0      		ldi r25,lo8(3)
- 1164 020a 0E94 0000 		call eeprom_write_byte
-  45:eeprom.h      ****   boot_spm_busy_wait();
- 1166               	.LM114:
- 1167 020e 642D      		mov r22,r4
- 1168 0210 89EF      		ldi r24,lo8(-7)
- 1169 0212 93E0      		ldi r25,lo8(3)
- 1170 0214 0E94 0000 		call eeprom_write_byte
- 1171               	.L36:
-  46:eeprom.h      **** }
- 1173               	.LM115:
- 1174 0218 07B6      		in __tmp_reg__,0x37
- 1175 021a 00FC      		sbrc __tmp_reg__,0
- 1176 021c 00C0      		rjmp .L36
- 1177               	.L37:
- 1178               	.LBE106:
- 1179               	.LBE105:
- 1180               	.LBE88:
- 1181               	.LBB107:
- 1182               	.LBB108:
- 1184               	.Ltext16:
- 117:miniboot.c    **** }
- 1186               	.LM116:
- 1187 021e CF57      		subi r28,lo8(-129)
- 1188 0220 DF4F      		sbci r29,hi8(-129)
- 1189 0222 E881      		ld r30,Y
- 1190 0224 F981      		ldd r31,Y+1
- 1191 0226 C158      		subi r28,lo8(129)
- 1192 0228 D040      		sbci r29,hi8(129)
- 1193 022a 0995      		icall
- 1194               	.LBE108:
- 1195               	.LBE107:
- 156:miniboot.c    ****   }
- 157:miniboot.c    ****   leaveBootloader(application_start);
- 158:miniboot.c    **** 
- 159:miniboot.c    ****   return 0;
- 160:miniboot.c    **** }
- 1197               	.LM117:
- 1198 022c 80E0      		ldi r24,0
- 1199 022e 90E0      		ldi r25,0
- 1200               	/* epilogue start */
- 1201 0230 CE57      		subi r28,126
- 1202 0232 DF4F      		sbci r29,-1
- 1203 0234 0FB6      		in __tmp_reg__,__SREG__
- 1204 0236 F894      		cli
- 1205 0238 DEBF      		out __SP_H__,r29
- 1206 023a 0FBE      		out __SREG__,__tmp_reg__
- 1207 023c CDBF      		out __SP_L__,r28
- 1208 023e DF91      		pop r29
- 1209 0240 CF91      		pop r28
- 1210 0242 1F91      		pop r17
- 1211 0244 0F91      		pop r16
- 1212 0246 FF90      		pop r15
- 1213 0248 EF90      		pop r14
- 1214 024a DF90      		pop r13
- 1215 024c CF90      		pop r12
- 1216 024e BF90      		pop r11
- 1217 0250 AF90      		pop r10
- 1218 0252 9F90      		pop r9
- 1219 0254 8F90      		pop r8
- 1220 0256 7F90      		pop r7
- 1221 0258 6F90      		pop r6
- 1222 025a 5F90      		pop r5
- 1223 025c 4F90      		pop r4
- 1224 025e 3F90      		pop r3
- 1225 0260 0895      		ret
- 1246               	.Lscope5:
- 1248               		.stabd	78,0,0
- 1260               		.text
- 1262               	.Letext0:
- 1263               		.ident	"GCC: (GNU) 5.4.0"
+ 809               	.LM70:
+ 810               	/* #APP */
+ 811               	 ;  15 "flash.h" 1
+ 812 0050 A895      		wdr
+ 813               	 ;  0 "" 2
+ 814               	/* #NOAPP */
+ 815               	.LBE84:
+ 816               	.LBE83:
+ 817               	.LBB85:
+ 818               	.LBB86:
+ 819               	.LBB87:
+ 820               	.LBB88:
+ 822               	.Ltext12:
+  16:miniboot.c    **** }
+ 824               	.LM71:
+ 825 0052 80E2      		ldi r24,lo8(32)
+ 826 0054 90E0      		ldi r25,0
+ 827 0056 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+ 828 005a 6C01      		movw r12,r24
+ 829               	.LBE88:
+ 830               	.LBE87:
+ 831               	.LBB89:
+  89:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
+ 833               	.LM72:
+ 834 005c A12C      		mov r10,__zero_reg__
+ 835 005e B12C      		mov r11,__zero_reg__
+ 836               	.LBE89:
+  87:miniboot.c    **** 
+ 838               	.LM73:
+ 839 0060 00E0      		ldi r16,0
+ 840 0062 10E0      		ldi r17,0
+ 841 0064 CE01      		movw r24,r28
+ 842 0066 0196      		adiw r24,1
+ 843 0068 7C01      		movw r14,r24
+ 844               	.LBB92:
+ 845               	.LBB90:
+  92:miniboot.c    ****       ++writes;
+ 847               	.LM74:
+ 848 006a 7724      		clr r7
+ 849 006c 7394      		inc r7
+ 850               	.L31:
+ 851               	.LBE90:
+  89:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
+ 853               	.LM75:
+ 854 006e AC14      		cp r10,r12
+ 855 0070 BD04      		cpc r11,r13
+ 856 0072 00F4      		brsh .L29
+ 857 0074 4501      		movw r8,r10
+ 858 0076 E894      		clt
+ 859 0078 87F8      		bld r8,7
+ 860 007a 9924      		clr r9
+ 861               	.LBB91:
+  90:miniboot.c    ****       writeToFlash(writes * SPM_PAGESIZE, &buf[0], application_start);
+ 863               	.LM76:
+ 864 007c A114      		cp r10,__zero_reg__
+ 865 007e B104      		cpc r11,__zero_reg__
+ 866 0080 01F0      		breq .L30
+ 867 0082 8114      		cp r8,__zero_reg__
+ 868 0084 9104      		cpc r9,__zero_reg__
+ 869 0086 01F4      		brne .L30
+  91:miniboot.c    ****       LED_TOGGLE();
+ 871               	.LM77:
+ 872 0088 AE01      		movw r20,r28
+ 873 008a 4F57      		subi r20,127
+ 874 008c 5F4F      		sbci r21,-1
+ 875 008e B701      		movw r22,r14
+ 876 0090 C801      		movw r24,r16
+ 877 0092 9695      		lsr r25
+ 878 0094 982F      		mov r25,r24
+ 879 0096 8827      		clr r24
+ 880 0098 9795      		ror r25
+ 881 009a 8795      		ror r24
+ 882 009c 0E94 0000 		call _ZL12writeToFlashjPhRj
+  92:miniboot.c    ****       ++writes;
+ 884               	.LM78:
+ 885 00a0 85B1      		in r24,0x5
+ 886 00a2 8725      		eor r24,r7
+ 887 00a4 85B9      		out 0x5,r24
+  93:miniboot.c    ****     }
+ 889               	.LM79:
+ 890 00a6 0F5F      		subi r16,-1
+ 891 00a8 1F4F      		sbci r17,-1
+ 892               	.L30:
+  95:miniboot.c    ****     buf[pos % SPM_PAGESIZE] = static_cast<uint8_t>(data >> 8);
+ 894               	.LM80:
+ 895 00aa C501      		movw r24,r10
+ 896 00ac 8296      		adiw r24,34
+ 897 00ae 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+  96:miniboot.c    ****     buf[(pos + 1) % SPM_PAGESIZE] = static_cast<uint8_t>(data);
+ 899               	.LM81:
+ 900 00b2 F701      		movw r30,r14
+ 901 00b4 E80D      		add r30,r8
+ 902 00b6 F91D      		adc r31,r9
+ 903 00b8 9083      		st Z,r25
+  97:miniboot.c    ****   }
+ 905               	.LM82:
+ 906 00ba F501      		movw r30,r10
+ 907 00bc 3196      		adiw r30,1
+ 908 00be EF77      		andi r30,127
+ 909 00c0 FF27      		clr r31
+ 910 00c2 EE0D      		add r30,r14
+ 911 00c4 FF1D      		adc r31,r15
+ 912 00c6 8083      		st Z,r24
+ 913               	.LBE91:
+  89:miniboot.c    ****     if (pos > 0 && (0 == (pos % SPM_PAGESIZE))) {
+ 915               	.LM83:
+ 916 00c8 92E0      		ldi r25,2
+ 917 00ca A90E      		add r10,r25
+ 918 00cc B11C      		adc r11,__zero_reg__
+ 919 00ce 00C0      		rjmp .L31
+ 920               	.L29:
+ 921               	.LBE92:
+ 922               	.LBB93:
+ 101:miniboot.c    ****                        static_cast<uint16_t>(SPM_PAGESIZE)) %
+ 924               	.LM84:
+ 925 00d0 0F5F      		subi r16,-1
+ 926 00d2 1F4F      		sbci r17,-1
+ 927 00d4 1695      		lsr r17
+ 928 00d6 102F      		mov r17,r16
+ 929 00d8 0027      		clr r16
+ 930 00da 1795      		ror r17
+ 931 00dc 0795      		ror r16
+ 932 00de C801      		movw r24,r16
+ 933 00e0 B601      		movw r22,r12
+ 934 00e2 0E94 0000 		call __udivmodhi4
+ 935 00e6 F701      		movw r30,r14
+ 936 00e8 E81B      		sub r30,r24
+ 937 00ea F90B      		sbc r31,r25
+ 938 00ec E058      		subi r30,-128
+ 939 00ee FF4F      		sbci r31,-1
+ 105:miniboot.c    ****                      // this page and have value from previous page
+ 941               	.LM85:
+ 942 00f0 8FEF      		ldi r24,lo8(-1)
+ 943               	.L33:
+ 104:miniboot.c    ****     buf[pos] = 0xFF; // reset contents, since these bytes were not filled in
+ 945               	.LM86:
+ 946 00f2 9F01      		movw r18,r30
+ 947 00f4 2E19      		sub r18,r14
+ 948 00f6 3F09      		sbc r19,r15
+ 949 00f8 2038      		cpi r18,-128
+ 950 00fa 3105      		cpc r19,__zero_reg__
+ 951 00fc 00F4      		brsh .L32
+ 105:miniboot.c    ****                      // this page and have value from previous page
+ 953               	.LM87:
+ 954 00fe 8193      		st Z+,r24
+ 955 0100 00C0      		rjmp .L33
+ 956               	.L32:
+ 957               	.LBE93:
+ 109:miniboot.c    ****   LED_OFF();
+ 959               	.LM88:
+ 960 0102 AE01      		movw r20,r28
+ 961 0104 4F57      		subi r20,127
+ 962 0106 5F4F      		sbci r21,-1
+ 963 0108 B701      		movw r22,r14
+ 964 010a C801      		movw r24,r16
+ 965 010c 8058      		subi r24,-128
+ 966 010e 9109      		sbc r25,__zero_reg__
+ 967 0110 0E94 0000 		call _ZL12writeToFlashjPhRj
+ 110:miniboot.c    **** }
+ 969               	.LM89:
+ 970 0114 289A      		sbi 0x5,0
+ 971               	.L35:
+ 972               	.LBE86:
+ 973               	.LBE85:
+ 974               	.LBE82:
+ 975               	.LBB95:
+ 976               	.LBB96:
+ 116:miniboot.c    ****   while (1);
+ 978               	.LM90:
+ 979 0116 CF57      		subi r28,lo8(-129)
+ 980 0118 DF4F      		sbci r29,hi8(-129)
+ 981 011a E881      		ld r30,Y
+ 982 011c F981      		ldd r31,Y+1
+ 983 011e C158      		subi r28,lo8(129)
+ 984 0120 D040      		sbci r29,hi8(129)
+ 985 0122 0995      		icall
+ 986               	.L34:
+ 987 0124 00C0      		rjmp .L34
+ 988               	.L26:
+ 989               	.LBE96:
+ 990               	.LBE95:
+ 991               	.LBB97:
+ 992               	.LBB94:
+ 136:miniboot.c    ****     eraseApplication();
+ 137:miniboot.c    ****     writeFlashFromI2C(source_i2c_address_for_program, application_start);
+ 138:miniboot.c    ****   } else {
+ 139:miniboot.c    ****     uint16_t address_in_external_eeprom = getWordFromSource(
+ 140:miniboot.c    ****         source_i2c_address_for_program, application_start_address_byte_offset);
+ 994               	.LM91:
+ 995 0126 84E2      		ldi r24,lo8(36)
+ 996 0128 90E0      		ldi r25,0
+ 997 012a 0E94 0000 		call _ZL17getWordFromSourcehj.constprop.6
+ 141:miniboot.c    **** 
+ 142:miniboot.c    ****     application_start = address_in_external_eeprom >> 8;
+ 143:miniboot.c    ****     application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8
+ 999               	.LM92:
+ 1000 012e 9827      		eor r25,r24
+ 1001 0130 8927      		eor r24,r25
+ 1002 0132 9827      		eor r25,r24
+ 1003 0134 CF57      		subi r28,lo8(-129)
+ 1004 0136 DF4F      		sbci r29,hi8(-129)
+ 1005 0138 9983      		std Y+1,r25
+ 1006 013a 8883      		st Y,r24
+ 1007 013c C158      		subi r28,lo8(129)
+ 1008 013e D040      		sbci r29,hi8(129)
+ 1009 0140 00C0      		rjmp .L35
+ 1010               	.LBE94:
+ 1011               	.LBE97:
+ 1029               	.Lscope5:
+ 1031               		.stabd	78,0,0
+ 1043               		.text
+ 1045               	.Letext0:
+ 1046               		.ident	"GCC: (GNU) 5.4.0"
 DEFINED SYMBOLS
                             *ABS*:0000000000000000 miniboot.c
-     /tmp/ccnSHSvS.s:2      *ABS*:000000000000003e __SP_H__
-     /tmp/ccnSHSvS.s:3      *ABS*:000000000000003d __SP_L__
-     /tmp/ccnSHSvS.s:4      *ABS*:000000000000003f __SREG__
-     /tmp/ccnSHSvS.s:5      *ABS*:0000000000000000 __tmp_reg__
-     /tmp/ccnSHSvS.s:6      *ABS*:0000000000000001 __zero_reg__
-     /tmp/ccnSHSvS.s:118    .text:0000000000000000 _ZL12writeToFlashjPhRj
-     /tmp/ccnSHSvS.s:297    .text:00000000000000ac _ZL8readBytehj.constprop.6
-     /tmp/ccnSHSvS.s:345    .text:00000000000000d6 _ZL17getWordFromSourcehj.constprop.5
-     /tmp/ccnSHSvS.s:390    .text:0000000000000104 _ZL7isCrcOkh.constprop.3
-     /tmp/ccnSHSvS.s:718    .text.startup:0000000000000000 main
+     /tmp/ccarZnVc.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccarZnVc.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccarZnVc.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccarZnVc.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccarZnVc.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccarZnVc.s:118    .text:0000000000000000 _ZL12writeToFlashjPhRj
+     /tmp/ccarZnVc.s:297    .text:00000000000000ac _ZL8readBytehj.constprop.7
+     /tmp/ccarZnVc.s:345    .text:00000000000000d6 _ZL17getWordFromSourcehj.constprop.6
+     /tmp/ccarZnVc.s:390    .text:0000000000000104 _ZL7isCrcOkh.constprop.4
+     /tmp/ccarZnVc.s:718    .text.startup:0000000000000000 main
 
 UNDEFINED SYMBOLS
 _Z9i2c_starth
@@ -1355,6 +1079,4 @@ _Z9i2c_writeh
 _Z8i2c_stopv
 _Z12i2c_read_ackv
 _Z8i2c_initv
-eeprom_read_byte
 __udivmodhi4
-eeprom_write_byte

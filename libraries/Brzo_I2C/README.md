@@ -22,9 +22,12 @@ HW and Tool Chain Support
 	 - ESP8266 Arduino Core 2.2.0
 	 - ESP8266 Arduino Core 2.1.0
  - Tested Native SDK versions:
- 	 - SDK Version 2.0.0	
+ 	 - SDK Version 3.0.1
+	 - SDK Version 2.0.0	
 
 Brzo i2c was tested with several i2c devices. If you find one which is not working, please open an issue.
+
+**NOTE for AM2320 Sensor: The wake-up sequence is not compatible with `brzo_i2c`, see analysis [here](https://github.com/pasko-zh/brzo_i2c/issues/33#issuecomment-460065731)**
 
 How to install the Brzo I2C Library
 -------
