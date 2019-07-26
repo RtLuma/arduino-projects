@@ -8,7 +8,8 @@
 
 #define PIXELS 24
 #define PIXELPIN  4
-uint8_t led_data[PIXELS] = {0};
+#define RADIO_CHANNEL 96
+volatile uint8_t led_data[PIXELS] = {0};
 const auto payload_size = (sizeof(led_data) / sizeof(*led_data));
 
 
@@ -30,12 +31,13 @@ void setup(void) {
   attachInterrupt(digitalPinToInterrupt(2), nRF24L01ISR, FALLING);
 
   radio.begin(); // Start the NRF24L01
-  radio.setChannel(10); // Up to 128?
+  radio.setChannel(RADIO_CHANNEL); // Up to 128?
 
-  radio.setAutoAck(1);        // Ensure autoACK is enabled so rec sends ack packet to let you know it got the transmit packet payload
+  radio.setAutoAck(0);        // Ensure autoACK is enabled so rec sends ack packet to let you know it got the transmit packet payload
 //  radio.enableAckPayload();   //allows you to include payload on ack packet
   radio.maskIRQ(1, 1, 0);       //mask all IRQ triggers except for receive (1 is mask, 0 is no mask)
-  radio.setPALevel(RF24_PA_MIN); //Set power level to low, won't work well at higher levels (interfer with receiver)
+  radio.setPALevel(RF24_PA_MAX); //Set power level to low, won't work well at higher levels (interfer with receiver)
+  radio.setDataRate( RF24_2MBPS );
 
   radio.openReadingPipe(1, pipe); // Get NRF24L01 ready to receive
   radio.startListening(); // Listen to see if information received

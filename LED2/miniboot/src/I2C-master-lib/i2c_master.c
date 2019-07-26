@@ -7,13 +7,15 @@
 
 #include "i2c_master.h"
 
-#define F_SCL 100000UL // SCL frequency
+#define F_SCL 400000UL // SCL frequency
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 
 void i2c_init(void)
 {
 	TWBR = (uint8_t)TWBR_val;
+	PORTC = 0x30;
+
 }
 
 uint8_t i2c_start(uint8_t address)

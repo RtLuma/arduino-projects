@@ -6,7 +6,6 @@ EEPROM_CONFIGURATION_START_BYTE = 0x03F6
 # Main Oscillator Frequency
 # This is only used to define F_CPU in all assembler and c-sources.
 F_CPU = 8000000UL
-# F_CPU = 16000000UL
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex

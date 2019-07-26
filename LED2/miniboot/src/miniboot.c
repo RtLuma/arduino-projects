@@ -2,7 +2,7 @@
 //  Fuses :     Ext: 0xFF, Hi: 0xD8, Lo: 0xE2
 //
 
-#include "crc32.h"
+#include "Drivers/CRC/crc32.h"
 #include "bootloader.h"
 #include "eeprom.h"
 #include "flash.h"
@@ -115,7 +115,8 @@ static inline void writeFlashFromI2C(const uint8_t i2c_address,
 static inline void leaveBootloader(uint16_t &application_start) {
   // hold my beer and watch this!
   reinterpret_cast<void (*)(void)>(application_start)();
-  while (1);
+  while (1)
+    ;
 }
 
 static inline bool isReflashNecessary(uint32_t &i2c_application_timestamp) {
@@ -140,23 +141,21 @@ int main() {
 
   init();
 
-  // uint32_t i2c_application_timestamp;
+  uint32_t i2c_application_timestamp;
   uint16_t application_start = 0;
 
-  // if (isReflashNecessary(i2c_application_timestamp) &&
-      // isCrcOk(source_i2c_address_for_program)) {
-  LED_ON();
+  if (isReflashNecessary(i2c_application_timestamp) &&
+      isCrcOk(source_i2c_address_for_program)) {
     eraseApplication();
-  LED_OFF();
     writeFlashFromI2C(source_i2c_address_for_program, application_start);
-    
-  // } else {
-  //   uint16_t address_in_external_eeprom = getWordFromSource(
-  //       source_i2c_address_for_program, application_start_address_byte_offset);
+    writeLatestApplicationTimestampToInternalEeprom(i2c_application_timestamp);
+  } else {
+    uint16_t address_in_external_eeprom = getWordFromSource(
+        source_i2c_address_for_program, application_start_address_byte_offset);
 
-  //   application_start = address_in_external_eeprom >> 8;
-  //   application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8;
-  // }
+    application_start = address_in_external_eeprom >> 8;
+    application_start |= static_cast<uint16_t>(static_cast<uint8_t>(address_in_external_eeprom))<<8;
+  }
   leaveBootloader(application_start);
 
   return 0;

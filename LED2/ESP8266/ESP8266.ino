@@ -18,11 +18,12 @@ double vImag[samples];
 #define NUMPIXELS 64
 #define PIXEL_PIN  4
 #define PIXELS 24
+#define RADIO_CHANNEL 96
 
 arduinoFFT FFT = arduinoFFT();
 MCP3002 adc;
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUMPIXELS, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
-//CE, CSN
+//        CE, CSN
 RF24 radio(2, 0); // NRF24L01 used SPI pins + Pin 9 and 10 on the NANO
 const uint64_t pipe = 0xE6E6E6E6E6E6; // Needs to be the same for communicating between 2 NRF24L01
 
@@ -34,7 +35,7 @@ double vals[2][samples >> 1] = {1.0};
 
 
 void setup() {
-    Serial.begin(115200);
+  Serial.begin(115200);
   adc.begin();
 
   leds.begin();
@@ -42,13 +43,13 @@ void setup() {
   leds.show();
 
   radio.begin(); // Start the NRF24L01
-  radio.setChannel(10);
+  radio.setChannel(RADIO_CHANNEL);
 
-  radio.setAutoAck(1);        // Ensure autoACK is enabled so rec sends ack packet to let you know it got the transmit packet payload
+  radio.setAutoAck(0);        // Ensure autoACK is enabled so rec sends ack packet to let you know it got the transmit packet payload
   //  radio.enableAckPayload();   //allows you to include payload on ack packet
   radio.setPALevel(RF24_PA_HIGH); //Set power level to low, won't work well at higher levels (interfer with receiver)
-  radio.setRetries(1, 1);
-  //  radio.setDataRate( RF24_250KBPS ); // also 1MB/s or 2MB/s
+  radio.setRetries(0, 0);
+  radio.setDataRate( RF24_2MBPS );
   radio.openWritingPipe(pipe); // Get NRF24L01 ready to transmit
 }
 
