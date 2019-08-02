@@ -45,17 +45,17 @@
     //#define DISABLE_USER_PAYLOADS 
 
     /** Enable tracking of success and failures for all transmissions, routed and user initiated */
-    //#define ENABLE_NETWORK_STATS
+    #define ENABLE_NETWORK_STATS
     
     /** Enable dynamic payloads - If using different types of NRF24L01 modules, some may be incompatible when using this feature **/
     #define ENABLE_DYNAMIC_PAYLOADS
 
     /** Debug Options */
-    //#define SERIAL_DEBUG
-    //#define SERIAL_DEBUG_MINIMAL
-    //#define SERIAL_DEBUG_ROUTING
-    //#define SERIAL_DEBUG_FRAGMENTATION
-    //#define SERIAL_DEBUG_FRAGMENTATION_L2
+    // #define SERIAL_DEBUG
+    // #define SERIAL_DEBUG_MINIMAL
+    #define SERIAL_DEBUG_ROUTING
+    #define SERIAL_DEBUG_FRAGMENTATION
+    #define SERIAL_DEBUG_FRAGMENTATION_L2
     /*************************************/
  
   #else // Different set of defaults for ATTiny - fragmentation is disabled and user payloads are set to 3 max

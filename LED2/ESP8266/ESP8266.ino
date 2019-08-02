@@ -16,7 +16,7 @@ double vImag[samples];
 
 #define CHANNEL   A0
 #define NUMPIXELS 64
-#define PIXEL_PIN  4
+#define PIXEL_PIN  2
 #define PIXELS 24
 #define RADIO_CHANNEL 96
 
@@ -24,7 +24,7 @@ arduinoFFT FFT = arduinoFFT();
 MCP3002 adc;
 Adafruit_NeoPixel leds = Adafruit_NeoPixel(NUMPIXELS, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 //        CE, CSN
-RF24 radio(2, 0); // NRF24L01 used SPI pins + Pin 9 and 10 on the NANO
+RF24 radio(4, 0); // NRF24L01 used SPI pins + Pin 9 and 10 on the NANO
 const uint64_t pipe = 0xE6E6E6E6E6E6; // Needs to be the same for communicating between 2 NRF24L01
 
 uint8_t fft_payload[samples] = {0};
@@ -50,7 +50,9 @@ void setup() {
   radio.setPALevel(RF24_PA_HIGH); //Set power level to low, won't work well at higher levels (interfer with receiver)
   radio.setRetries(0, 0);
   radio.setDataRate( RF24_2MBPS );
+//  radio.setDataRate( RF24_250KBPS );
   radio.openWritingPipe(pipe); // Get NRF24L01 ready to transmit
+  radio.printDetails();
 }
 
 void loop() {
@@ -72,10 +74,11 @@ void loop() {
       double magn = vReal[i];
 
       if (magn > maxs[C][i]) maxs[C][i] = magn;
-      maxs[C][i] *= 0.9995;
+      maxs[C][i] *= 0.999;
 
       magn /= (maxs[C][i]);
-      magn = pow(magn, 3);
+//      magn = pow(magn, 2);
+      magn *= magn;
 
       if (magn > hardmax) hardmax = magn;
       ratios[i] = magn;

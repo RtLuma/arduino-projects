@@ -6,10 +6,12 @@
 #include <avr/power.h>
 #endif
 
-#define PIXELS 24
+#define PIXELS 60
 #define PIXELPIN  4
 #define RADIO_CHANNEL 96
 volatile uint8_t led_data[PIXELS] = {0};
+volatile unsigned long counter = 0;
+unsigned long t = 0;
 const auto payload_size = (sizeof(led_data) / sizeof(*led_data));
 
 
@@ -20,13 +22,12 @@ Adafruit_NeoPixel leds = Adafruit_NeoPixel(PIXELS, PIXELPIN, NEO_GRB + NEO_KHZ80
 const uint64_t pipe = 0xE6E6E6E6E6E6; // Needs to be the same for communicating between 2 NRF24L01
 
 void nRF24L01ISR(void) {
-  while (radio.available())  {
-    radio.read(&led_data, payload_size); // Read information from the NRF24L01
-  }
+  counter++;
+  while (radio.available())  radio.read(&led_data, payload_size); // Read information from the NRF24L01
 }
 
 void setup(void) {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   attachInterrupt(digitalPinToInterrupt(2), nRF24L01ISR, FALLING);
 
@@ -34,29 +35,41 @@ void setup(void) {
   radio.setChannel(RADIO_CHANNEL); // Up to 128?
 
   radio.setAutoAck(0);        // Ensure autoACK is enabled so rec sends ack packet to let you know it got the transmit packet payload
-//  radio.enableAckPayload();   //allows you to include payload on ack packet
+  //  radio.enableAckPayload();   //allows you to include payload on ack packet
   radio.maskIRQ(1, 1, 0);       //mask all IRQ triggers except for receive (1 is mask, 0 is no mask)
   radio.setPALevel(RF24_PA_MAX); //Set power level to low, won't work well at higher levels (interfer with receiver)
   radio.setDataRate( RF24_2MBPS );
+  //radio.setDataRate( RF24_250KBPS );
 
   radio.openReadingPipe(1, pipe); // Get NRF24L01 ready to receive
   radio.startListening(); // Listen to see if information received
 
   leds.begin();
   leds.clear();
+  for (uint8_t i = 0; i < PIXELS; i++) leds.setPixelColor(i, leds.Color(255, 255, 255));
   leds.show();
+  //  cli();
+  //  auto heck = counter;
 
+  //  sei();
 }
 
 void loop(void) {
   for (uint8_t i = 0; i < PIXELS; i++) {
-    uint8_t hue = ((uint16_t(i) << 8) / PIXELS);
-    uint8_t r = (uint16_t(rainbow(hue + 170)) * uint16_t(led_data[i])) >> 8;
-    uint8_t g = (uint16_t(rainbow(hue + 85))  * uint16_t(led_data[i])) >> 8;
-    uint8_t b = (uint16_t(rainbow(hue))       * uint16_t(led_data[i])) >> 8;
-    leds.setPixelColor(i, leds.Color(r, g, b));
+    //    uint8_t hue = ((uint16_t(i) << 8) / PIXELS);
+    //    uint8_t r = (uint16_t(rainbow(hue + 170)) * uint16_t(led_data[i])) >> 8;
+    //    uint8_t g = (uint16_t(rainbow(hue + 85))  * uint16_t(led_data[i])) >> 8;
+    //    uint8_t b = (uint16_t(rainbow(hue))       * uint16_t(led_data[i])) >> 8;
+    //    leds.setPixelColor(i, leds.Color(r, g, b));
+    leds.setPixelColor(i, leds.Color(led_data[i], led_data[i] >> 2, 0));
   }
   leds.show();
+  auto _t = millis();
+  if (_t - t > 1000) {
+    Serial.println(counter);
+    counter = 0;
+    t = _t;
+  }
 }
 
 uint8_t rainbow(uint8_t hue) {

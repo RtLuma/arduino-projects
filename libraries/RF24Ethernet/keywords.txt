@@ -6,6 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
+RF24EthernetClass	KEYWORD1
 SerialIP	KEYWORD1
 IP_ADDR	KEYWORD1
 
