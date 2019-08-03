@@ -32,7 +32,6 @@ void setup() {
   //  radio.printDetails();
   mesh.begin();
   //  radio.printDetails();
-
 }
 
 uint32_t displayTimer = 0;
@@ -70,21 +69,46 @@ void loop() {
 
   // Send each node a message every five seconds
   // Send a different message to node 1, containing another counter instead of millis()
-  if (millis() - displayTimer > 2000) {
+  //  if (millis() - displayTimer > 50) {
 
-    const uint8_t arr_size = 128;  // "random" number
-    uint8_t payload[arr_size];
-    for (int i = 0; i < arr_size; i++) payload[i] = micros() + i;
 
+  const uint8_t arr_size = 32;  // "random" number
+  uint8_t payload[arr_size];
+
+
+  //      RF24NetworkHeader header(mesh.addrList[i].address, OCT);
   for (int i = 0; i < mesh.addrListTop; i++) {
 
-    //      RF24NetworkHeader header(mesh.addrList[i].address, OCT);
-    Serial.println(mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].address) ? "size OK" : "size Fail");
-      Serial.println(mesh.write(payload, 'P', arr_size, mesh.addrList[i].address) ? "payload OK" : "payload Fail");
 
-      // Serial.println( network.write(header, payload, DATA_SIZE) ? "Send OK" : "Send Fail"); //network-write instead
-
+    if (!mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].address)) {
+      Serial.println("Couldn't push size");
+      continue;
     }
-    displayTimer = millis();
+
+    auto period = millis();
+    uint32_t throughput = 0;
+
+    do {
+      for (int i = 0; i < arr_size; i++) payload[i] = micros() + i;
+      while (!mesh.write(payload, 'P', arr_size, mesh.addrList[i].address)) yield(); //prevent WDTR
+      throughput += arr_size;
+    } while (millis() - period < 1000);
+
+    Serial.print(millis());
+    Serial.print(" ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.println(throughput);
+
+    //      for (int i = 0; i < arr_size; i++) {
+    //        Serial.print(payload[i]);
+    //        Serial.print(" ");
+    //      }
+    //      Serial.println();
+    //Serial.println(mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].address) ? "size OK" : "size Fail");
+    // Serial.println( network.write(header, payload, DATA_SIZE) ? "Send OK" : "Send Fail"); //network-write instead
+
   }
+  //    displayTimer = millis();
+  //}
 }

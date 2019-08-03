@@ -14,4 +14,4 @@
 /home/m/.arduino15/packages/arduino/tools/avr-gcc/5.4.0-atmel3.6.1-arduino2/bin/avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 /tmp/arduino_build_11666/Mesh.ino.elf /tmp/arduino_build_11666/Mesh.ino.eep
 /home/m/.arduino15/packages/arduino/tools/avr-gcc/5.4.0-atmel3.6.1-arduino2/bin/avr-objcopy -O ihex -R .eeprom /tmp/arduino_build_11666/Mesh.ino.elf /tmp/arduino_build_11666/Mesh.ino.hex
 /home/m/.arduino15/packages/arduino/tools/avr-gcc/5.4.0-atmel3.6.1-arduino2/bin/avr-size -A /tmp/arduino_build_11666/Mesh.ino.elf
-/home/m/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino14/bin/avrdude -C/home/m/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino14/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyUSB0 -b57600 -D -Uflash:w:/tmp/arduino_build_11666/Mesh.ino.hex:i 
+/home/m/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino14/bin/avrdude -C/home/m/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino14/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyUSB1 -b57600 -D -Uflash:w:/tmp/arduino_build_11666/Mesh.ino.hex:i 
