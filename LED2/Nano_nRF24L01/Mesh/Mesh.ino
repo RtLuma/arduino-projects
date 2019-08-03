@@ -21,16 +21,7 @@ RF24 radio(9, 10);
 RF24Network network(radio);
 RF24Mesh mesh(radio, network);
 
-/**
-   User Configuration: nodeID - A unique identifier for each radio. Allows addressing
-   to change dynamically with physical changes to the mesh.
-
-   In this example, configuration takes place below, prior to uploading the sketch to the device
-   A unique value from 1-255 must be configured for each node.
-   This will be stored in EEPROM on AVR devices, so remains persistent between further uploads, loss of power, etc.
-
- **/
-#define nodeID 3
+#define nodeID 5
 #define MESH_NOMASTER 0
 
 
@@ -48,52 +39,63 @@ void setup() {
   // Set the nodeID manually
   mesh.setNodeID(nodeID);
   // Connect to the mesh
-  pinMode(LED_BUILTIN, OUTPUT);
-
-
-  Serial.println(F("Connecting to the mesh..."));
-  radio.begin();
+  Serial.println(("Connecting to the mesh..."));
   mesh.begin();
-  Serial.println(F("Rad io"));
-  radio.printDetails();
-
+  
 }
 
-#define DATA_SIZE 10
-
-bool new_data = false;
-uint8_t data[DATA_SIZE];
+uint8_t arr_size = 1;
 
 void loop() {
 
   mesh.update();
+//  Serial.println("asses n cocks");
+//  delay(100);
 
   // Send to the master node every second
-  if (millis() - displayTimer >= 1500) {
-    //    displayTimer = millis() + 500;
+  if (millis() - displayTimer >= 1000) {
+    displayTimer = millis();
 
-    mesh.renewAddress();
-    //    Serial.println('.');
+    // Send an 'M' type message containing the current millis()
+    if (!mesh.write(&displayTimer, 'M', sizeof(displayTimer))) {
 
-    //    if (new_data) {
-
-    //      new_data = false;
-    //    }
-
+      // If a write fails, check connectivity to the mesh network
+      if ( ! mesh.checkConnection() ) {
+        //refresh the network address
+        Serial.println("Renewing Address");
+        mesh.renewAddress();
+      } else {
+        Serial.println("Send fail, Test OK");
+      }
+    } else {
+      Serial.print("Send OK: "); Serial.println(displayTimer);
+    }
   }
 
   while (network.available()) {
     RF24NetworkHeader header;
+    network.peek(header);
+    switch (header.type) {
 
-    network.read(header, &data, DATA_SIZE);
-    for (int i = 0; i < DATA_SIZE; i++) {
-      Serial.print(data[i]);
-      Serial.print(" ");
+      case 'Z':
+        network.read(header, &arr_size, 1);
+        Serial.print("Got arr_length of ");
+        Serial.println(arr_size);
+        break;
+      case 'P':
+        uint8_t payload[arr_size];
+        network.read(header, payload, arr_size); //no & on payload cuz already a pointer
+        Serial.println("Got payload:");
+        for (int i = 0; i < arr_size; i++) {
+          Serial.print(payload[i]);
+          Serial.print(" ");
+        }
+        Serial.println();
+        break;
+      default:
+        network.read(header, 0, 0);
+        Serial.println(header.type);
+        break;
     }
-    Serial.println();
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-//    if (!mesh.write(&data, 66, data, 00)) Serial.println("no dicks");
-    //    new_data = true;
-    break;
   }
 }

@@ -53,9 +53,9 @@
     /** Debug Options */
     // #define SERIAL_DEBUG
     // #define SERIAL_DEBUG_MINIMAL
-    #define SERIAL_DEBUG_ROUTING
-    #define SERIAL_DEBUG_FRAGMENTATION
-    #define SERIAL_DEBUG_FRAGMENTATION_L2
+    // #define SERIAL_DEBUG_ROUTING
+    // #define SERIAL_DEBUG_FRAGMENTATION
+    // #define SERIAL_DEBUG_FRAGMENTATION_L2
     /*************************************/
  
   #else // Different set of defaults for ATTiny - fragmentation is disabled and user payloads are set to 3 max
