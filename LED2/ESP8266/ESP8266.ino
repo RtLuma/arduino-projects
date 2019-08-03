@@ -74,7 +74,7 @@ void loop() {
       double magn = vReal[i];
 
       if (magn > maxs[C][i]) maxs[C][i] = magn;
-      maxs[C][i] *= 0.999;
+      maxs[C][i] *= 0.9995;
 
       magn /= (maxs[C][i]);
 //      magn = pow(magn, 2);

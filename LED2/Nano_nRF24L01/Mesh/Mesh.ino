@@ -21,7 +21,7 @@ RF24 radio(9, 10);
 RF24Network network(radio);
 RF24Mesh mesh(radio, network);
 
-#define nodeID 10
+#define nodeID 1
 #define MESH_NOMASTER 0
 
 
@@ -39,10 +39,9 @@ void setup() {
   // Set the nodeID manually
   mesh.setNodeID(nodeID);
   // Connect to the mesh
-  Serial.println(("Connecting to the mesh..."));
+  Serial.println(("Connecting 2 the mesh..."));
   mesh.begin();
-  mesh.renewAddress();
-  
+//  mesh.renewAddress();
 }
 
 uint8_t arr_size = 32;
@@ -56,12 +55,12 @@ void loop() {
   // Send to the master node every second
   if (millis() - displayTimer >= 5000) {
 
-    //    if ( ! mesh.checkConnection() ) {
-    //      //refresh the network address
-    //      Serial.println("Renewing Address");
-    //      mesh.renewAddress();
-    //      displayTimer = millis();
-    //    }
+//    if ( ! mesh.checkConnection() ) {
+//      //refresh the network address
+//      Serial.println("Renewing Address");
+//      mesh.renewAddress();
+//      displayTimer = millis();
+//    }
 
     //    displayTimer = millis();
     //
@@ -94,12 +93,12 @@ void loop() {
       case 'P':
         uint8_t payload[arr_size];
         network.read(header, payload, arr_size); //no & on payload cuz already a pointer
-        //        Serial.println("Got payload:");
-        //        for (int i = 0; i < arr_size; i++) {
-        //          Serial.print(payload[i]);
-        //          Serial.print(" ");
-        //        }
-        //        Serial.println();
+//        Serial.println("Got payload:");
+//        for (int i = 0; i < arr_size; i++) {
+//          Serial.print(payload[i]);
+//          Serial.print(" ");
+//        }
+//        Serial.println();
         break;
       default:
         network.read(header, 0, 0);

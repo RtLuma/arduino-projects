@@ -47,30 +47,24 @@ void loop() {
 
 
   // Check for incoming data from the sensors
-  if (network.available()) {
-    RF24NetworkHeader header;
-    network.peek(header);
-    Serial.print("Got ");
-    uint32_t dat = 0;
-    switch (header.type) {
-      case 'M':
-        network.read(header, &dat, sizeof(dat));
-        Serial.print(dat);
-        Serial.print(" from RF24Network address 0");
-        Serial.println(header.from_node, OCT);
-        break;
-      default:
-        network.read(header, 0, 0);
-        Serial.println(header.type);
-        break;
-    }
-  }
-
-
-  // Send each node a message every five seconds
-  // Send a different message to node 1, containing another counter instead of millis()
-  //  if (millis() - displayTimer > 50) {
-
+  //  if (network.available()) {
+  //    RF24NetworkHeader header;
+  //    network.peek(header);
+  //    Serial.print("Got ");
+  //    uint32_t dat = 0;
+  //    switch (header.type) {
+  //      case 'M':
+  //        network.read(header, &dat, sizeof(dat));
+  //        Serial.print(dat);
+  //        Serial.print(" from RF24Network address 0");
+  //        Serial.println(header.from_node, OCT);
+  //        break;
+  //      default:
+  //        network.read(header, 0, 0);
+  //        Serial.println(header.type);
+  //        break;
+  //    }
+  //  }
 
   const uint8_t arr_size = 32;  // "random" number
   uint8_t payload[arr_size];
@@ -78,10 +72,17 @@ void loop() {
 
   //      RF24NetworkHeader header(mesh.addrList[i].address, OCT);
   for (int i = 0; i < mesh.addrListTop; i++) {
+    mesh.update();
+    mesh.checkConnection();
+    mesh.DHCP();
 
 
-    if (!mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].address)) {
+    if (!mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].nodeID)) {
       Serial.println("Couldn't push size");
+      delay(1000);
+      mesh.update();
+      mesh.checkConnection();
+      mesh.DHCP();
       continue;
     }
 
@@ -90,7 +91,13 @@ void loop() {
 
     do {
       for (int i = 0; i < arr_size; i++) payload[i] = micros() + i;
-      while (!mesh.write(payload, 'P', arr_size, mesh.addrList[i].address)) yield(); //prevent WDTR
+      while (!mesh.write(payload, 'P', arr_size, mesh.addrList[i].nodeID)) {
+        yield(); //prevent WDTR
+        mesh.update();
+        mesh.checkConnection();
+        mesh.DHCP();
+        if (millis() - period > 1000) break;
+      }
       throughput += arr_size;
     } while (millis() - period < 1000);
 
@@ -98,7 +105,10 @@ void loop() {
     Serial.print(" ");
     Serial.print(i);
     Serial.print(": ");
-    Serial.println(throughput);
+    Serial.print(throughput);
+    Serial.print(" : ");
+    Serial.print(millis() - period);
+    Serial.println();
 
     //      for (int i = 0; i < arr_size; i++) {
     //        Serial.print(payload[i]);
@@ -109,6 +119,4 @@ void loop() {
     // Serial.println( network.write(header, payload, DATA_SIZE) ? "Send OK" : "Send Fail"); //network-write instead
 
   }
-  //    displayTimer = millis();
-  //}
 }
