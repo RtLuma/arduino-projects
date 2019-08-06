@@ -27,15 +27,19 @@
 ### ESP8266
 * [ ] Look into [asynchronous webserver](https://github.com/me-no-dev/ESPAsyncWebServer)
 ### nRF24L01
-> #### nRF24L01 pinout to ESP8266 Thing Dev Board pins
-> |ESP8266||nRF24L01|nRF24L01||ESP8266|
-> |:-:|:-:|:-:|:-:|:-:|:-|
-> | GND  | &larr; | GND  | VCC   | &rarr; | 3.3V  |
-> | GPIO - 4 (was 2, but 2 is SDA)  | &larr; | CE   | !CS aka CSN  | &rarr; | GPIO - 0  |
-> | 14 | &larr; | SCK  | MOSI | &rarr; |  13 |
-> | 12  | &larr; | MISO | IRQ  | &rarr; | _(not necessary when used in mesh)_ |
->
-> GPIO not used for SPI can be 0, 2(SDA for I2C), 4, 5(LED), 16(XPD), so any GPIO listed above can be from this pool&mdash;just make sure to initialize the RF24 in code appropriately, e.g. `RF24 radio(4, 0);`
+<details>
+  <summary>Pinout</summary>
+  
+#### nRF24L01 pinout to ESP8266 Thing Dev Board pins
+|ESP8266||nRF24L01|nRF24L01||ESP8266|
+|:-:|:-:|:-:|:-:|:-:|:-|
+| GND  | &larr; | GND  | VCC   | &rarr; | 3.3V  |
+| GPIO - 4 (was 2, but 2 is SDA)  | &larr; | CE   | !CS aka CSN  | &rarr; | GPIO - 0  |
+| 14 | &larr; | SCK  | MOSI | &rarr; |  13 |
+| 12  | &larr; | MISO | IRQ  | &rarr; | _(not necessary when used in mesh)_ |
+
+GPIO not used for SPI can be 0, 2(SDA for I2C), 4, 5(LED), 16(XPD), so any GPIO listed above can be from this pool&mdash;just make sure to initialize the RF24 in code appropriately, e.g. `RF24 radio(4, 0);`
+</details>
 
 
 #### Mesh

@@ -79,7 +79,6 @@ void loop() {
 
     if (!mesh.write(&arr_size, 'Z', 1, mesh.addrList[i].nodeID)) {
       Serial.println("Couldn't push size");
-      delay(1000);
       mesh.update();
       mesh.checkConnection();
       mesh.DHCP();
@@ -90,7 +89,13 @@ void loop() {
     uint32_t throughput = 0;
 
     do {
-      for (int i = 0; i < arr_size; i++) payload[i] = micros() + i;
+      uint32_t chksum = 0;
+      for (int i = 0; i < arr_size-1; i++) {
+        payload[i] = micros() + i;
+        chksum += payload[i];
+      }
+      payload[arr_size - 1] = chksum;
+
       while (!mesh.write(payload, 'P', arr_size, mesh.addrList[i].nodeID)) {
         yield(); //prevent WDTR
         mesh.update();
@@ -100,14 +105,16 @@ void loop() {
       }
       throughput += arr_size;
     } while (millis() - period < 1000);
-
+    
     Serial.print(millis());
-    Serial.print(" ");
-    Serial.print(i);
+    Serial.print("> ");
+    Serial.print(mesh.addrList[i].nodeID);
+    Serial.print("/");
+    Serial.print(mesh.addrList[i].address, OCT);
     Serial.print(": ");
     Serial.print(throughput);
-    Serial.print(" : ");
-    Serial.print(millis() - period);
+    //    Serial.print(" : ");
+    //    Serial.print(millis() - period);
     Serial.println();
 
     //      for (int i = 0; i < arr_size; i++) {

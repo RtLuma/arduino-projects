@@ -35,51 +35,29 @@ struct payload_t {
 void setup() {
 
   Serial.begin(115200);
-  //printf_begin();
-  // Set the nodeID manually
   mesh.setNodeID(nodeID);
-  // Connect to the mesh
+
+
   Serial.println(("Connecting 2 the mesh..."));
   mesh.begin();
-//  mesh.renewAddress();
+  Serial.println(("Meshed"));
+  //  mesh.renewAddress();
+  //  auto _t = millis();
+  //  while (millis() - _t < 10000) {
+  //    Serial.println("Renewing...");
+  //    mesh.renewAddress();
+  //    if (mesh.checkConnection()) break;
+  //  }
+  radio.setPALevel(RF24_PA_HIGH);
+  attachInterrupt(digitalPinToInterrupt(2), nRF24L01ISR, FALLING);
+  //  radio.setDataRate( RF24_250KBPS );
+
 }
 
-uint8_t arr_size = 32;
+volatile uint8_t arr_size = 32;
+//volatile uint8_t payload[32] = {0};
 
-void loop() {
-
-  mesh.update();
-  //  Serial.println("asses n cocks");
-  //  delay(100);
-
-  // Send to the master node every second
-  if (millis() - displayTimer >= 5000) {
-
-//    if ( ! mesh.checkConnection() ) {
-//      //refresh the network address
-//      Serial.println("Renewing Address");
-//      mesh.renewAddress();
-//      displayTimer = millis();
-//    }
-
-    //    displayTimer = millis();
-    //
-    //    // Send an 'M' type message containing the current millis()
-    //    if (!mesh.write(&displayTimer, 'M', sizeof(displayTimer))) {
-    //
-    //      // If a write fails, check connectivity to the mesh network
-    //      if ( ! mesh.checkConnection() ) {
-    //        //refresh the network address
-    //        Serial.println("Renewing Address");
-    //        mesh.renewAddress();
-    //      } else {
-    //        Serial.println("Send fail, Test OK");
-    //      }
-    //    } else {
-    //      Serial.print("Send OK: "); Serial.println(displayTimer);
-    //    }
-  }
-
+void nRF24L01ISR(void) {
   while (network.available()) {
     RF24NetworkHeader header;
     network.peek(header);
@@ -90,20 +68,31 @@ void loop() {
         Serial.print("Got arr_length of ");
         Serial.println(arr_size);
         break;
-      case 'P':
-        uint8_t payload[arr_size];
-        network.read(header, payload, arr_size); //no & on payload cuz already a pointer
-//        Serial.println("Got payload:");
-//        for (int i = 0; i < arr_size; i++) {
-//          Serial.print(payload[i]);
-//          Serial.print(" ");
-//        }
-//        Serial.println();
-        break;
+      case 'P': {
+          uint8_t payload[arr_size];
+          network.read(header, payload, arr_size); //no & on payload cuz already a pointer
+          uint8_t chksum = 0;
+          for (int i = 0; i < arr_size - 1; i++) chksum += payload[i];
+          if (chksum != payload[arr_size - 1]) {
+            Serial.print("Corrupted! ");
+            Serial.print(chksum);
+            Serial.print(" =/= ");
+            Serial.print(payload[arr_size - 1]);
+            Serial.println();
+          }
+          
+          break;
+        }
       default:
         network.read(header, 0, 0);
         Serial.println(header.type);
         break;
     }
   }
+}
+
+
+
+void loop() {
+  mesh.update();
 }
