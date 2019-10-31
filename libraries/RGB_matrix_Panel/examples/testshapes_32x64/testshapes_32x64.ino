@@ -94,15 +94,15 @@ void setup() {
   matrix.print('4');
   matrix.setCursor(34, 24);
   matrix.setTextColor(matrix.Color333(0,7,7));
-  matrix.print("*");
+  matrix.print('*');
   matrix.setTextColor(matrix.Color333(0,4,7));
   matrix.print('R');
   matrix.setTextColor(matrix.Color333(0,0,7));
   matrix.print('G');
   matrix.setTextColor(matrix.Color333(4,0,7));
-  matrix.print("B");
+  matrix.print('B');
   matrix.setTextColor(matrix.Color333(7,0,4));
-  matrix.println("*");
+  matrix.print('*');
 
   // whew!
 }
@@ -122,6 +122,6 @@ uint16_t Wheel(byte WheelPos) {
    return matrix.Color333(0, 7-WheelPos, WheelPos);
   } else {
    WheelPos -= 16;
-   return matrix.Color333(0, WheelPos, 7 - WheelPos);
+   return matrix.Color333(WheelPos, 0, 7 - WheelPos);
   }
 }
