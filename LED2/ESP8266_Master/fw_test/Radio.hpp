@@ -21,10 +21,16 @@ uint8_t unique_pipe_template[]   = { 0, 0x4e, 0x4f, 0x44, 0x45 }; // <maskable t
 
 ICACHE_RAM_ATTR void nRF24L01ISR(void) { // This should only get triggered on ACKS?
     // acks++;
+    // while (radio.isAckPayloadAvailable()) {
+    //   uint8_t _data;
+    //   radio.read(&_data, 1);
+    //   // Serial.println(_data);
+    // }
+    
     while (radio.isAckPayloadAvailable()) {
-      uint8_t _data;
-      radio.read(&_data, 1);
-      // Serial.println(_data);
+        size_t dyn_size = radio.getDynamicPayloadSize();
+        uint8_t buff[dyn_size];
+        radio.read(buff, dyn_size);
     }
     
     // while (radio.isAckPayloadAvailable()) {
@@ -57,7 +63,7 @@ namespace Radio {
         
         radio.setPALevel(RF24_PA_HIGH); 
         // radio.setRetries(15, 3); // arg1*250us delay, arg2 = tries
-        radio.setRetries(0, 15); // arg1*250us delay, arg2 = tries
+        radio.setRetries(1, 15); // arg1*250us delay, arg2 = tries
         //  radio.setDataRate( RF24_2MBPS ); // radio.setDataRate( RF24_250KBPS );
 
         radio.openWritingPipe(multicast_pipe);

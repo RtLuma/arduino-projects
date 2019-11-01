@@ -93,7 +93,7 @@ void nRF24L01ISR(void) {
         switch(ack_data[0]) {
           
           case uint8_t(RadioHeader::Mode) :
-            radio.writeAckPayload(RF24_UNIQUE_PIPE_NUM, ack_data, 2);
+            radio.writeAckPayload(RF24_UNIQUE_PIPE_NUM, ack_data+1, 1);
             break;
 
           ////////
